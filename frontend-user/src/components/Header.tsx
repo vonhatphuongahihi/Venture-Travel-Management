@@ -34,18 +34,18 @@ const Header = () => {
           >
             TOUR
           </Link>
-          <a href="#destinations" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/destination" className="text-sm font-medium hover:text-primary transition-colors">
             ĐIỂM ĐẾN
-          </a>
-          <a href="#map" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link to="/map" className="text-sm font-medium hover:text-primary transition-colors">
             BẢN ĐỒ
-          </a>
-          <a href="#explore-60" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link to="/explore-360" className="text-sm font-medium hover:text-primary transition-colors">
             KHÁM PHÁ 360°
-          </a>
-          <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">
             LIÊN HỆ
-          </a>
+          </Link>
         </nav>
 
         {/* Login */}

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Search, User } from "lucide-react";
+import { Menu, Plane, Search, User } from "lucide-react";
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -12,12 +12,17 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <Link to="/tour">
-            <img src={logo} alt="Venture" className="h-7 w-30" />
-          </Link>
-        </div>
 
+        <div className="flex items-center space-x-2">
+          <div className="relative">
+            <Link to="/tour">
+              <img src={logo} alt="Venture" className="h-7 w-30" />
+            </Link>
+          </div>
+          <div className="relative ml-1">
+            <Plane className="h-4 w-4 text-primary" />
+          </div>
+        </div>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-16">
           <Link

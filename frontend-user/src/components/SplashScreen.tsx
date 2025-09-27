@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { Plane } from "lucide-react";
 
 const SplashScreen = () => {
     const navigate = useNavigate();
@@ -34,36 +35,14 @@ const SplashScreen = () => {
                 >
                     {/* Logo Container */}
                     <div className="relative flex items-center justify-center mb-8">
-                        {/* Plane Icon */}
-                        <div
-                            className="absolute animate-pulse"
-                            style={{ top: "-36px", right: "-28px" }}
-                        >
-                            <svg
-                                width="32"
-                                height="32"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                className="text-[#26B8ED] animate-bounce"
-                                style={{ animationDelay: '0.5s' }}
-                            >
-                                <path
-                                    d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z"
-                                    fill="currentColor"
-                                />
-                                {/* Trail effect */}
-                                <path
-                                    d="M21 16L18 14.5"
-                                    stroke="currentColor"
-                                    strokeWidth="1"
-                                    opacity="0.3"
-                                    className="animate-pulse"
-                                />
-                            </svg>
+                        <div className="flex items-center space-x-2">
+                            <div className="relative">
+                                <img src={logo} alt="Venture" className="h-14 w-30" />
+                            </div>
+                            <div className="relative ml-2 -mt-2">
+                                <Plane className="h-8 w-8 text-primary" />
+                            </div>
                         </div>
-
-                        {/* Logo Image */}
-                        <img src={logo} alt="Venture" className="h-16 w-50" />
                     </div>
                 </div>
 

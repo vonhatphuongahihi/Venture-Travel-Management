@@ -1,30 +1,89 @@
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Users, Search, Instagram, Facebook, Phone } from "lucide-react";
+import { useState, useEffect } from "react";
 import heroImage from "@/assets/hero-vietnam.jpg";
+import heroImage1 from "@/assets/hero-vietnam-1.jpg";
+import heroImage2 from "@/assets/hero-vietnam-2.jpg";
+import './herosection.css'
 
 const HeroSection = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      id: 0,
+      image: heroImage,
+      title: "Việt Nam quê hương ta",
+      description: "Trải nghiệm những chuyến du lịch tuyệt vời với bản đồ tương tác, khám phá các địa điểm hấp dẫn khắp Việt Nam."
+    },
+    {
+      id: 1,
+      image: heroImage1,
+      title: "Khám phá thiên nhiên Việt Nam",
+      description: "Từ núi rừng Tây Bắc đến biển đảo Phú Quốc, khám phá vẻ đẹp thiên nhiên đa dạng của đất nước hình chữ S."
+    },
+    {
+      id: 2,
+      image: heroImage2,
+      title: "Khám phá Sapa mờ sương",
+      description: "Chiêm ngưỡng ruộng bậc thang hùng vĩ, tận hưởng khí hậu se lạnh và tìm hiểu bản sắc văn hóa độc đáo của đồng bào vùng cao Sapa."
+    }
+  ];
+
+  const handleThumbnailClick = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
+
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={heroImage}
-          alt="Vietnam travel destinations"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/30 to-transparent" />
+    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+      {/* Background Image Slider */}
+      <div className="absolute inset-0 z-0 carousel">
+        <div className="list">
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={`item ${index === currentSlide ? 'active' : ''}`}
+            >
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/50 via-primary/30 to-transparent" />
+            </div>
+          ))}
+        </div>
+
+        {/* Thumbnails */}
+        <div className="thumbnail">
+          {slides.map((slide, index) => (
+            <div
+              key={slide.id}
+              className={`item ${index === currentSlide ? 'active' : ''}`}
+              onClick={() => handleThumbnailClick(index)}
+            >
+              <img src={slide.image} alt={slide.title} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 container text-center text-white">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-[26px] md:text-[42px] font-medium font-marmelad mb-6 leading-tight">
-            Việt Nam quê hương ta
+            {slides[currentSlide].title}
           </h1>
 
           <p className="text-base md:text-lg mb-8 text-white/90 max-w-2xl mx-auto">
-            Trải nghiệm những chuyến du lịch tuyệt vời với bản đồ tương tác, khám phá các
-            địa điểm hấp dẫn khắp Việt Nam.
+            {slides[currentSlide].description}
           </p>
 
           {/* Search Bar */}

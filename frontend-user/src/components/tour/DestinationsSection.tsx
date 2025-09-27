@@ -128,18 +128,18 @@ const DestinationsSection = () => {
                 {/* Navigation Arrows */}
                 <div className="flex justify-center gap-4">
                     <Button
-                        variant="outline"
+                        variant="default"
                         size="icon"
                         onClick={handlePrev}
-                        className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 border-gray-300"
+                        className="w-12 h-12 rounded-full bg-primary/60 hover:bg-primary/90"
                     >
-                        <ChevronLeft className="h-6 w-6 text-gray-700" />
+                        <ChevronLeft className="h-6 w-6 text-white" />
                     </Button>
                     <Button
                         variant="default"
                         size="icon"
                         onClick={handleNext}
-                        className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90"
+                        className="w-12 h-12 rounded-full bg-primary/60 hover:bg-primary/90"
                     >
                         <ChevronRight className="h-6 w-6 text-white" />
                     </Button>

@@ -146,15 +146,33 @@ const HeroSection = () => {
 
       {/* Social Media Icons */}
       <div className="absolute bottom-10 left-10 flex gap-4 hidden lg:flex">
-        <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110">
-          <Instagram className="h-6 w-6 text-white" />
+        <div className="flex space-x-4">
+          <a
+            href="https://www.instagram.com/tuhy.sapoche.99"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110 flex items-center justify-center"
+          >
+            <Instagram className="h-6 w-6 text-white" />
+          </a>
+
+          <a
+            href="https://www.facebook.com/phuong.vonhat.tuhy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110 flex items-center justify-center"
+          >
+            <Facebook className="h-6 w-6 text-white" />
+          </a>
+
+          <a
+            href="tel:+84365486141"
+            className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110 flex items-center justify-center"
+          >
+            <Phone className="h-6 w-6 text-white" />
+          </a>
         </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110">
-          <Facebook className="h-6 w-6 text-white" />
-        </div>
-        <div className="bg-white/10 backdrop-blur-sm rounded-full p-3 cursor-pointer hover:bg-white/20 transition-all duration-300 hover:scale-110">
-          <Phone className="h-6 w-6 text-white" />
-        </div>
+
       </div>
     </section>
   );

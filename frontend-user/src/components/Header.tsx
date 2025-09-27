@@ -1,24 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Search, User } from "lucide-react";
 import { useState } from "react";
+import { useLocation, Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <img src={logo} alt="Venture" className="h-7 w-30" />
+          <Link to="/tour">
+            <img src={logo} alt="Venture" className="h-7 w-30" />
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-16">
-          <a href="#tours" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link
+            to="/tour"
+            className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
+              }`}
+          >
             TOUR
-          </a>
+          </Link>
           <a href="#destinations" className="text-sm font-medium hover:text-primary transition-colors">
             ĐIỂM ĐẾN
           </a>
@@ -37,7 +47,7 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           <Button variant="tour" size="sm" className="hidden sm:flex">
             <User className="h-4 w-4" />
-            Đăng nhập
+            ĐĂNG NHẬP
           </Button>
 
           {/* Mobile menu button */}
@@ -55,26 +65,33 @@ const Header = () => {
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur">
-          <nav className="container py-4 space-y-3">
-            <a href="#tours" className="block text-sm font-medium hover:text-primary transition-colors">
-              Tours
-            </a>
+          <nav className="container py-4 space-y-5">
+            <Link
+              to="/tour"
+              className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
+                ? "text-primary font-semibold"
+                : "hover:text-primary"
+                }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              TOUR
+            </Link>
             <a href="#destinations" className="block text-sm font-medium hover:text-primary transition-colors">
-              Điểm đến
+              ĐIỂM ĐẾN
             </a>
             <a href="#map" className="block text-sm font-medium hover:text-primary transition-colors">
-              Bản đồ
+              BẢN ĐỒ
             </a>
             <a href="#events" className="block text-sm font-medium hover:text-primary transition-colors">
-              Sự kiện
+              KHÁM PHÁ 360°
             </a>
             <a href="#blog" className="block text-sm font-medium hover:text-primary transition-colors">
-              Blog
+              LIÊN HỆ
             </a>
             <div className="pt-3 border-t border-border">
               <Button variant="tour" size="sm" className="w-full">
                 <User className="h-4 w-4" />
-                Đăng nhập
+                ĐĂNG NHẬP
               </Button>
             </div>
           </nav>

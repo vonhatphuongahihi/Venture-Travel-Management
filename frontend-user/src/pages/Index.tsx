@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
-import ToursSection from "@/components/ToursSection";
-import MapSection from "@/components/MapSection";
+import HeroSection from "@/components/tour/HeroSection";
+import ToursSection from "@/components/tour/ToursSection";
+import MapSection from "@/components/tour/MapSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {

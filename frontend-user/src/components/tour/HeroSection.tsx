@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Users, Search, Instagram, Facebook, Phone } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import heroImage from "@/assets/hero-vietnam.jpg";
 import heroImage1 from "@/assets/hero-vietnam-1.jpg";
 import heroImage2 from "@/assets/hero-vietnam-2.jpg";
@@ -8,6 +8,25 @@ import './herosection.css'
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   const slides = [
     {
@@ -25,7 +44,7 @@ const HeroSection = () => {
     {
       id: 2,
       image: heroImage2,
-      title: "Khám phá Sapa mờ sương",
+      title: "Du ngoạn Sapa mờ sương",
       description: "Chiêm ngưỡng ruộng bậc thang hùng vĩ, tận hưởng khí hậu se lạnh và tìm hiểu bản sắc văn hóa độc đáo của đồng bào vùng cao Sapa."
     }
   ];
@@ -42,7 +61,7 @@ const HeroSection = () => {
   }, [slides.length]);
 
   return (
-    <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
       {/* Background Image Slider */}
       <div className="absolute inset-0 z-0 carousel">
         <div className="list">
@@ -78,16 +97,16 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 container text-center text-white">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-[26px] md:text-[42px] font-medium font-marmelad mb-6 leading-tight">
+          <h1 className={`text-[26px] md:text-[42px] font-medium font-marmelad mb-6 leading-tight transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {slides[currentSlide].title}
           </h1>
 
-          <p className="text-base md:text-lg mb-8 text-white/90 max-w-2xl mx-auto">
+          <p className={`text-base md:text-lg mb-8 text-white/90 max-w-2xl mx-auto transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {slides[currentSlide].description}
           </p>
 
           {/* Search Bar */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto">
+          <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
@@ -104,7 +123,7 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+          <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="text-center font-black italic">
               <div className="text-2xl mb-2">120+</div>
               <div className="text-white/80">Tours du lịch</div>

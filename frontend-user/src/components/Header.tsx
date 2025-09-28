@@ -28,8 +28,11 @@ const Header = () => {
           <a href="#explore-60" className="text-sm font-medium hover:text-primary transition-colors">
             KHÁM PHÁ 360°
           </a>
-          <a href="#contact" className="text-sm font-medium hover:text-primary transition-colors">
-            LIÊN HỆ
+          <a href="/contact" className="text-sm font-medium hover:text-primary transition-colors">
+            Contact
+          </a>
+          <a href="/book-tour" className="text-sm font-medium hover:text-primary transition-colors">
+            Book Tour
           </a>
         </nav>
 
@@ -58,6 +61,12 @@ const Header = () => {
           <nav className="container py-4 space-y-3">
             <a href="#tours" className="block text-sm font-medium hover:text-primary transition-colors">
               Tours
+            </a>
+            <a href="/contact" className="block text-sm font-medium hover:text-primary transition-colors">
+              Contact
+            </a>
+            <a href="/book-tour" className="block text-sm font-medium hover:text-primary transition-colors">
+              Book Tour
             </a>
             <a href="#destinations" className="block text-sm font-medium hover:text-primary transition-colors">
               Điểm đến

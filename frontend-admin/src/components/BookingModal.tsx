@@ -1,39 +1,39 @@
-import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 // --- Types ---
-export type BookingStatus = 'completed' | 'pending' | 'canceled'
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded'
+export type BookingStatus = "completed" | "pending" | "canceled";
+export type PaymentStatus = "unpaid" | "paid" | "refunded";
 
 export type Booking = {
-  id: string
-  customerName: string
-  customerAvatarUrl: string
-  tourTitle: string
-  bookedAt: string
-  startAt: string
-  status: BookingStatus
-  email: string
-  phone: string
-  address: string
-  quantity: number
-  paymentStatus: PaymentStatus
-  tourSlug: string
-  note?: string
-}
+  id: string;
+  customerName: string;
+  customerAvatarUrl: string;
+  tourTitle: string;
+  bookedAt: string;
+  startAt: string;
+  status: BookingStatus;
+  email: string;
+  phone: string;
+  address: string;
+  quantity: number;
+  paymentStatus: PaymentStatus;
+  tourSlug: string;
+  note?: string;
+};
 
 type Props = {
-  booking: Booking
-  onClose: () => void
-  onSave: (b: Booking) => void
-}
+  booking: Booking;
+  onClose: () => void;
+  onSave: (b: Booking) => void;
+};
 
 // --- Component ---
 export function BookingModal({ booking, onClose, onSave }: Props) {
-  const [form, setForm] = useState<Booking>({ ...booking })
+  const [form, setForm] = useState<Booking>({ ...booking });
 
   function update<K extends keyof Booking>(key: K, value: Booking[K]) {
-    setForm(prev => ({ ...prev, [key]: value }))
+    setForm((prev) => ({ ...prev, [key]: value }));
   }
 
   return (
@@ -58,29 +58,33 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
             <input
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
               value={form.customerName}
-              onChange={e => update('customerName', e.target.value)}
+              onChange={(e) => update("customerName", e.target.value)}
             />
           </div>
 
-     <div className="flex flex-col gap-1">
-  <label className="text-sm text-gray-600">Trạng thái thanh toán</label>
-  <div className="relative">
-    <select
-      className="h-9 w-full appearance-none rounded-md border border-gray-300 bg-white px-3 pr-8 text-sm focus:outline-none"
-      value={form.paymentStatus}
-      onChange={e => update("paymentStatus", e.target.value as PaymentStatus)}
-    >
-      <option value="unpaid">Chưa thanh toán</option>
-      <option value="paid">Đã thanh toán</option>
-      <option value="refunded">Hoàn tiền</option>
-    </select>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-gray-600">
+              Trạng thái thanh toán
+            </label>
+            <div className="relative">
+              <select
+                className="h-9 w-full appearance-none rounded-md border border-gray-300 bg-white px-3 pr-8 text-sm focus:outline-none"
+                value={form.paymentStatus}
+                onChange={(e) =>
+                  update("paymentStatus", e.target.value as PaymentStatus)
+                }
+              >
+                <option value="unpaid">Chưa thanh toán</option>
+                <option value="paid">Đã thanh toán</option>
+                <option value="refunded">Hoàn tiền</option>
+              </select>
 
-    {/* Mũi tên */}
-    <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500">
-       <ChevronDown size={16} />
-    </span>
-  </div>
-</div>
+              {/* Mũi tên */}
+              <span className="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-500">
+                <ChevronDown size={16} />
+              </span>
+            </div>
+          </div>
 
           <div className="flex flex-col gap-1">
             <label className="text-sm text-gray-600">Email</label>
@@ -88,7 +92,7 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
               type="email"
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
               value={form.email}
-              onChange={e => update('email', e.target.value)}
+              onChange={(e) => update("email", e.target.value)}
             />
           </div>
 
@@ -98,7 +102,7 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
               type="tel"
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
               value={form.phone}
-              onChange={e => update('phone', e.target.value)}
+              onChange={(e) => update("phone", e.target.value)}
             />
           </div>
 
@@ -107,7 +111,7 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
             <input
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
               value={form.address}
-              onChange={e => update('address', e.target.value)}
+              onChange={(e) => update("address", e.target.value)}
             />
           </div>
 
@@ -117,7 +121,7 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
               type="number"
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none"
               value={form.quantity}
-              onChange={e => update('quantity', Number(e.target.value))}
+              onChange={(e) => update("quantity", Number(e.target.value))}
             />
           </div>
 
@@ -126,16 +130,18 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
             <input
               className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
               value={form.tourTitle}
-              onChange={e => update('tourTitle', e.target.value)}
+              onChange={(e) => update("tourTitle", e.target.value)}
             />
           </div>
 
           <div className="sm:col-span-2 flex flex-col gap-1">
-            <label className="text-sm text-gray-600">Thông tin tour chi tiết</label>
+            <label className="text-sm text-gray-600">
+              Thông tin tour chi tiết
+            </label>
             <textarea
               className="min-h-[80px] rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/20"
-              value={form.note ?? ''}
-              onChange={e => update('note', e.target.value)}
+              value={form.note ?? ""}
+              onChange={(e) => update("note", e.target.value)}
             />
           </div>
         </div>
@@ -157,5 +163,5 @@ export function BookingModal({ booking, onClose, onSave }: Props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

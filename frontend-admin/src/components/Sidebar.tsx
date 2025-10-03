@@ -25,6 +25,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="w-60 h-screen bg-[#F8FAFC] border-r flex flex-col justify-between fixed left-0">
+
       {/* Logo */}
       <div>
         <div className="p-6 flex border-b">

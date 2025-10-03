@@ -3,9 +3,11 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
+
 import ToursManage from "./pages/ToursManage";
 import TourCreate from "./pages/TourCreate";
 import Settings from "./pages/Settings";
+
 
 export default function App() {
   return (

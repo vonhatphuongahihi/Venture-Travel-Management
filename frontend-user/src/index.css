@@ -10,7 +10,8 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Brand Colors */
-    --background: 200 100% 99%; /* #F9FDFF equivalent */
+    --background: 200 100% 99%;
+    /* #F9FDFF */
     --foreground: 213 25% 15%;
 
     --card: 0 0% 100%;
@@ -19,7 +20,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 213 25% 15%;
 
-    /* Primary blue from #23CAF1 */
+    /* Primary blue from #26B8ED */
     --primary: 196 85% 54%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 196 85% 64%;
@@ -45,12 +46,12 @@ All colors MUST be HSL.
     --gradient-ocean: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
     --gradient-sky: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
     --gradient-hero: linear-gradient(135deg, hsl(var(--primary) / 0.9) 0%, hsl(var(--primary-glow) / 0.8) 100%);
-    
+
     /* Shadows */
     --shadow-tour-card: 0 4px 20px hsl(var(--primary) / 0.1);
     --shadow-floating: 0 8px 32px hsl(var(--primary) / 0.15);
     --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.3);
-    
+
     /* Animation */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -124,47 +125,48 @@ All colors MUST be HSL.
 }
 
 @layer components {
+
   /* Travel-specific component styles */
   .tour-card {
     @apply bg-card border-border rounded-lg overflow-hidden;
     box-shadow: var(--shadow-tour-card);
     transition: var(--transition-smooth);
   }
-  
+
   .tour-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-floating);
   }
-  
+
   .hero-gradient {
     background: var(--gradient-hero);
   }
-  
+
   .ocean-gradient {
     background: var(--gradient-ocean);
   }
-  
+
   .sky-gradient {
     background: var(--gradient-sky);
   }
-  
+
   .tour-badge {
     @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
     @apply bg-accent text-accent-foreground;
   }
-  
+
   .map-overlay {
     @apply absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/50;
   }
-  
+
   .floating-element {
     animation: float 6s ease-in-out infinite;
   }
-  
+
   .tour-path {
     stroke: hsl(var(--primary));
     stroke-width: 3;
-    stroke-dasharray: 5,5;
+    stroke-dasharray: 5, 5;
     animation: dash 20s linear infinite;
   }
 }
@@ -179,9 +181,12 @@ All colors MUST be HSL.
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -194,10 +199,13 @@ All colors MUST be HSL.
 }
 
 @keyframes tour-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
+
   50% {
     transform: scale(1.05);
     opacity: 0.8;

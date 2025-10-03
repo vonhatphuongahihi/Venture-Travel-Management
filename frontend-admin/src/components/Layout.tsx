@@ -11,9 +11,10 @@ export default function Layout({ children, title }: LayoutProps) {
   return (
     <div className="flex h-screen">
       <Sidebar />
+
       <div className="flex-1 flex flex-col ml-60">
         <Navbar title={title} />
-        <main className="p-4 flex-1 bg-gray-50">{children}</main>
+        <main className="p-4 flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

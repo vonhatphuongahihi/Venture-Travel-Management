@@ -40,7 +40,12 @@ const Header = () => {
           <Link to="/map" className="text-sm font-medium hover:text-primary transition-colors">
             BẢN ĐỒ
           </Link>
-          <Link to="/explore-360" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link to="/explore-360"
+            className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
+              }`}
+          >
             KHÁM PHÁ 360°
           </Link>
           <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">

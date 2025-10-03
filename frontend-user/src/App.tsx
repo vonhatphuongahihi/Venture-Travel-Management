@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
+import ProvincePage from "./pages/ProvincePage";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<SplashScreen />} />
           <Route path="/tour" element={<Index />} />
           <Route path="/explore-360" element={<Explore360 />} />
+          <Route path="/province/:slug" element={<ProvincePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

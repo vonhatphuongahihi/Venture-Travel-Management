@@ -3,13 +3,15 @@ import { Menu, Plane, Search, User } from "lucide-react";
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import ProvinceDropdown from "./province/ProvinceDropdown";
+import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
 
@@ -27,23 +29,31 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-16">
           <Link
             to="/tour"
-            className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
-              ? "text-primary font-semibold"
-              : "hover:text-primary"
-              }`}
+            className={`text-sm font-medium transition-colors ${
+              location.pathname === "/tour"
+                ? "text-primary font-semibold"
+                : "hover:text-primary"
+            }`}
           >
             TOUR
           </Link>
-          <Link to="/destination" className="text-sm font-medium hover:text-primary transition-colors">
-            ĐIỂM ĐẾN
-          </Link>
-          <Link to="/map" className="text-sm font-medium hover:text-primary transition-colors">
+          <ProvinceDropdown />
+          <Link
+            to="/map"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
             BẢN ĐỒ
           </Link>
-          <Link to="/explore-360" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link
+            to="/explore-360"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
             KHÁM PHÁ 360°
           </Link>
-          <Link to="/contact" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link
+            to="/contact"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
             LIÊN HỆ
           </Link>
         </nav>
@@ -73,26 +83,39 @@ const Header = () => {
           <nav className="container py-4 space-y-5">
             <Link
               to="/tour"
-              className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
-                ? "text-primary font-semibold"
-                : "hover:text-primary"
-                }`}
+              className={`block text-sm font-medium transition-colors ${
+                location.pathname === "/tour"
+                  ? "text-primary font-semibold"
+                  : "hover:text-primary"
+              }`}
               onClick={() => setIsMenuOpen(false)}
             >
               TOUR
             </Link>
-            <a href="#destinations" className="block text-sm font-medium hover:text-primary transition-colors">
-              ĐIỂM ĐẾN
-            </a>
-            <a href="#map" className="block text-sm font-medium hover:text-primary transition-colors">
+
+            <MobileProvinceDropdown onItemClick={() => setIsMenuOpen(false)} />
+
+            <Link
+              to="/map"
+              className="block text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               BẢN ĐỒ
-            </a>
-            <a href="#events" className="block text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link
+              to="/explore-360"
+              className="block text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               KHÁM PHÁ 360°
-            </a>
-            <a href="#blog" className="block text-sm font-medium hover:text-primary transition-colors">
+            </Link>
+            <Link
+              to="/contact"
+              className="block text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
               LIÊN HỆ
-            </a>
+            </Link>
             <div className="pt-3 border-t border-border">
               <Button variant="tour" size="sm" className="w-full">
                 <User className="h-4 w-4" />

@@ -4,9 +4,10 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Users from "./pages/Users";
 
-import ToursManage from "./pages/ToursManage";
-import TourCreate from "./pages/TourCreate";
 import Settings from "./pages/Settings";
+import TourCreate from "./pages/TourCreate";
+import ToursManage from "./pages/ToursManage";
+
 
 
 export default function App() {

@@ -8,6 +8,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import SplashScreen from "./components/SplashScreen";
+import Explore360 from "./pages/Explore360";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/tour" element={<Index />} />
+          <Route path="/explore-360" element={<Explore360 />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />

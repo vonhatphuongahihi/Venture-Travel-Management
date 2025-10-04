@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
+import ProvincePage from "./pages/ProvincePage";
+import { AttractionPage } from "./pages/AttractionPage";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/tour" element={<Index />} />
           <Route path="/explore-360" element={<Explore360 />} />
+          <Route path="/province/:slug" element={<ProvincePage />} />
+          <Route path="/attraction/:slug" element={<AttractionPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />

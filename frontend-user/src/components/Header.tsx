@@ -38,11 +38,13 @@ const Header = () => {
             TOUR
           </Link>
           <ProvinceDropdown />
-          <Link
-            to="/map"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            BẢN ĐỒ
+          <Link 
+            to="/map" 
+            className={`text-sm font-medium transition-colors ${location.pathname === "/map"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
+              }`}>
+           BẢN ĐỒ
           </Link>
           <Link to="/explore-360"
             className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"

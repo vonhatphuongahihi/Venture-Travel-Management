@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
+import Map from "./pages/Map";
+import TourDetail from "./pages/TourDetail";
 import ProvincePage from "./pages/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
 
@@ -24,7 +26,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/tour" element={<Index />} />
+          <Route path="/tour/:id" element={<TourDetail />} />
           <Route path="/explore-360" element={<Explore360 />} />
+          <Route path="/map" element={<Map/>}/>
           <Route path="/province/:slug" element={<ProvincePage />} />
           <Route path="/attraction/:slug" element={<AttractionPage />} />
           <Route path="/login" element={<Login />} />

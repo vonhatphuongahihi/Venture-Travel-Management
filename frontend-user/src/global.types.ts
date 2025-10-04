@@ -18,12 +18,24 @@ export interface Attraction {
   id: number;
   name: string;
   description: string;
-  type: string;
+  category: string;
   image: string;
+  images?: string[]; // Additional images for gallery
+  location: {
+    province: string;
+    slug: string;
+    address?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
   reviewInfo: {
     rating: number;
     count: number;
   };
+  slug?: string;
+  tours?: Tour[]; // Related tours for this attraction
 }
 
 export interface Province {
@@ -55,4 +67,5 @@ export interface Review {
     title: string;
     image: string;
   };
+  images: string[] | null;
 }

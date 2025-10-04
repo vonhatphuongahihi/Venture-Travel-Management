@@ -2,7 +2,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { provinces } from "@/data/provinces";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // Import assets
@@ -14,6 +14,12 @@ import WeatherSection from "@/components/province/WeatherSection";
 import { mockAttractions } from "@/data/attractions";
 import { mockTours } from "@/data/tours";
 import { Attraction, Tour } from "@/global.types";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const ProvincePage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -23,6 +29,17 @@ const ProvincePage = () => {
   const [province, setProvince] = useState(() =>
     provinces.find((p) => p.slug === slug)
   );
+  const textRef = useRef(null);
+  const [isClamped, setIsClamped] = useState(false);
+
+  useEffect(() => {
+    if (textRef.current) {
+      // so sánh chiều cao thực tế với chiều cao hiển thị tối đa
+      const isOverflowing =
+        textRef.current.scrollHeight > textRef.current.clientHeight;
+      setIsClamped(isOverflowing);
+    }
+  }, []);
 
   // If province not found, show default or redirect
   if (!province) {
@@ -62,18 +79,27 @@ const ProvincePage = () => {
               {province.name}
             </h1>
             <div className="w-full text-sm">
-              <p className="leading-relaxed line-clamp-2">
-                Sapa là thị xã nằm ở phía Bắc Việt Nam, thuộc địa phận tỉnh Lào
-                Cai. Ở độ cao lên đến 1650m, Sapa sở hữu khung cảnh núi non hùng
-                vĩ và khí hậu mát mẻ quanh năm. Địa điểm này còn mệnh danh là
-                "thị trấn trong mây", với nhiều thắng cảnh thiên Sapa là thị xã
-                nằm ở phía Bắc Việt Nam, thuộc địa phận tỉnh Lào Cai. Ở độ cao
-                lên đến 1650m, Sapa sở hữu khung cảnh núi non hùng vĩ và khí hậu
-                mát mẻ quanh năm. Địa điểm này còn mệnh danh là "thị trấn trong
-                mây", với nhiều thắng cảnh thiên nhiên độc đáo.
+              <p ref={textRef} className="leading-relaxed line-clamp-2">
+                {province.description}
               </p>
             </div>
-            <button className="text-sm underline">Xem thêm</button>
+            {isClamped && (
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="text-sm underline">Xem thêm</button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <h2 className="text-lg font-semibold mb-4">
+                      {province.name}
+                    </h2>
+                  </SheetHeader>
+                  <p className="text-gray-700 leading-relaxed">
+                    {province.description}
+                  </p>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </div>

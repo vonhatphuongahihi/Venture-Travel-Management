@@ -10,12 +10,12 @@ const AttractionCard = ({ attraction }: { attraction: Attraction }) => {
         <img
           src={attraction.image}
           alt={attraction.name}
-          className="min-h-[300px]"
+          className="min-h-[250px]"
         />
 
         <div className="absolute top-3 left-3">
           <Badge className="bg-white/90 text-gray-700 text-xs px-2 py-1 rounded-full">
-            {attraction.type}
+            {attraction.category}
           </Badge>
         </div>
 

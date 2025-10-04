@@ -7,7 +7,7 @@ export const provinces: Province[] = [
     slug: "ha-noi",
     image: "/placeholder.svg",
     description:
-      "Thủ đô ngàn năm văn hiến với nhiều di tích lịch sử, văn hóa độc đáo và ẩm thực phong phú.",
+      "Thủ đô của Việt Nam với lịch sử hàng nghìn năm, nơi giao thoa giữa truyền thống và hiện đại. Hà Nội mang trong mình nét đẹp cổ kính với Hồ Hoàn Kiếm, Phố Cổ 36 phường, Văn Miếu Quốc Tử Giám và nhiều di tích lịch sử quan trọng khác. Thủ đô của Việt Nam với lịch sử hàng nghìn năm, nơi giao thoa giữa truyền thống và hiện đại. Hà Nội mang trong mình nét đẹp cổ kính với Hồ Hoàn Kiếm, Phố Cổ 36 phường, Văn Miếu Quốc Tử Giám và nhiều di tích lịch sử quan trọng khác.",
     point: {
       long: 105.8542,
       lat: 21.0285,

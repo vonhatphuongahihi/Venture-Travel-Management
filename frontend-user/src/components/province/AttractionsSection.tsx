@@ -9,6 +9,7 @@ import {
 import { Attraction, Province } from "@/global.types";
 import React from "react";
 import AttractionCard from "./AttractionCard";
+import { Link, useNavigate } from "react-router-dom";
 
 interface AttractionsSectionProps {
   province: Province;
@@ -60,7 +61,9 @@ const AttractionsSection = ({
         <CarouselContent className="pt-2">
           {attractions.map((attraction, index) => (
             <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
-              <AttractionCard key={attraction.id} attraction={attraction} />
+              <Link to={`/attraction/${attraction.slug}`}>
+                <AttractionCard key={attraction.id} attraction={attraction} />
+              </Link>
             </CarouselItem>
           ))}
         </CarouselContent>

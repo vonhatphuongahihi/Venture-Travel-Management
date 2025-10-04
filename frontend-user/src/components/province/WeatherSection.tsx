@@ -51,10 +51,7 @@ const WeatherSection = ({ province }: WeatherCardProps) => {
 
             <div className="grid grid-cols-2 lg:grid-cols-4">
               {weatherSeasons.map((season, index) => (
-                <div
-                  key={index}
-                  className="flex-1 p-6 border-b lg:border-b-0 lg:border-r border-gray-200 last:border-r-0"
-                >
+                <div key={index} className="flex-1 p-6 border-gray-200">
                   <div className="space-y-2">
                     <p className="text-sm text-gray-900 font-medium">
                       {season.season}

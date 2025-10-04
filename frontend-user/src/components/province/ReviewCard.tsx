@@ -9,7 +9,7 @@ const ReviewCard = ({
   isFromProvincePage = false,
 }: {
   review: Review;
-  isFromProvincePage: boolean;
+  isFromProvincePage?: boolean;
 }) => {
   return (
     <Card className="group overflow-hidden min-w-[200px] rounded-2xl transition-all hover:-translate-y-1 cursor-pointer h-full">
@@ -42,14 +42,29 @@ const ReviewCard = ({
           <p className="line-clamp-4 text-sm">{review.content}</p>
         </div>
 
-        {review.targetType == "tour" && isFromProvincePage && (
+        {review.targetType == "tour" && isFromProvincePage ? (
           <div className="p-2 bg-gray-100 flex rounded-t-md items-center gap-2">
-            <img
-              src={review.tour.image}
-              className="h-12 w-20 object-cover rounded-md"
-            />
+            <img src={review.tour.image} className="h-12 w-20 rounded-md" />
 
             <p className="text-xs font-medium">{review.tour.title}</p>
+          </div>
+        ) : (
+          <div className="p-2 flex flex-wrap gap-2">
+            {review?.images.map((img, indx) => {
+              if (indx > 3) return null;
+
+              return (
+                <div className="relative" key={indx}>
+                  <img key={indx} src={img} className="size-20 rounded-md" />
+
+                  {indx === 3 && (
+                    <span className="bg-black/50 p-1 absolute bottom-1 right-1 text-white text-xs rounded-sm">
+                      {review.images.length - 4}+
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

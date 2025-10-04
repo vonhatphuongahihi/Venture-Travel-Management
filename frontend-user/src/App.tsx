@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
@@ -19,11 +22,14 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<SplashScreen />} />
+          <Route path="/" element={<Index />} />
           <Route path="/tour" element={<Index />} />
           <Route path="/explore-360" element={<Explore360 />} />
           <Route path="/province/:slug" element={<ProvincePage />} />
           <Route path="/attraction/:slug" element={<AttractionPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -44,9 +44,11 @@ const Header = () => {
           >
             BẢN ĐỒ
           </Link>
-          <Link
-            to="/explore-360"
-            className="text-sm font-medium hover:text-primary transition-colors"
+          <Link to="/explore-360"
+            className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
+              }`}
           >
             KHÁM PHÁ 360°
           </Link>
@@ -60,11 +62,21 @@ const Header = () => {
 
         {/* Login */}
         <div className="flex items-center space-x-4">
-          <Button variant="tour" size="sm" className="hidden sm:flex">
-            <User className="h-4 w-4" />
-            ĐĂNG NHẬP
-          </Button>
-
+          <Link to="/login">
+            <Button variant="tour" size="sm" className="hidden sm:flex">
+              <User className="h-4 w-4" />
+              Đăng nhập
+            </Button>
+          </Link>
+          {/* Temporary small profile button to the right of Đăng nhập */}
+          <Link to="/profile" className="hidden sm:inline-flex">
+            <button
+              className="ml-2 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
+              aria-label="Hồ sơ"
+            >
+              <User className="h-4 w-4 text-primary" />
+            </button>
+          </Link>
           {/* Mobile menu button */}
           <Button
             variant="ghost"
@@ -117,10 +129,12 @@ const Header = () => {
               LIÊN HỆ
             </Link>
             <div className="pt-3 border-t border-border">
-              <Button variant="tour" size="sm" className="w-full">
-                <User className="h-4 w-4" />
-                ĐĂNG NHẬP
-              </Button>
+              <Link to="/login">
+                <Button variant="tour" size="sm" className="w-full">
+                  <User className="h-4 w-4" />
+                  Đăng nhập
+                </Button>
+              </Link>
             </div>
           </nav>
         </div>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu, Search, User } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
@@ -35,10 +36,21 @@ const Header = () => {
 
         {/* Login */}
         <div className="flex items-center space-x-4">
-          <Button variant="tour" size="sm" className="hidden sm:flex">
-            <User className="h-4 w-4" />
-            Đăng nhập
-          </Button>
+          <Link to="/login">
+            <Button variant="tour" size="sm" className="hidden sm:flex">
+              <User className="h-4 w-4" />
+              Đăng nhập
+            </Button>
+          </Link>
+          {/* Temporary small profile button to the right of Đăng nhập */}
+          <Link to="/profile" className="hidden sm:inline-flex">
+            <button
+              className="ml-2 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
+              aria-label="Hồ sơ"
+            >
+              <User className="h-4 w-4 text-primary" />
+            </button>
+          </Link>
 
           {/* Mobile menu button */}
           <Button
@@ -72,10 +84,12 @@ const Header = () => {
               Blog
             </a>
             <div className="pt-3 border-t border-border">
-              <Button variant="tour" size="sm" className="w-full">
-                <User className="h-4 w-4" />
-                Đăng nhập
-              </Button>
+              <Link to="/login">
+                <Button variant="tour" size="sm" className="w-full">
+                  <User className="h-4 w-4" />
+                  Đăng nhập
+                </Button>
+              </Link>
             </div>
           </nav>
         </div>

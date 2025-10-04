@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { TourType, DestinationType, EventType, HotelType } from "@/types";
+import { TourType, DestinationType, EventType, HotelType } from "@/types/mapType";
 
 interface InteractiveMapProps {
   area: string; // "north" | "centre" | "south" | "all"

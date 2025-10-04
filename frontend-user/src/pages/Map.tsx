@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
   CalendarClock,
+  CalendarDays,
   Flag,
   Hotel,
   LandPlot,
@@ -13,7 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { DateChooser } from "@/components/map/DateChooser";
 import InteractiveMap from "@/components/map/InteractiveMap";
-import { TourType, DestinationType, EventType, HotelType } from "@/types"; // các kiểu dữ liệu được khai báo trong types/index.d.ts
+import {
+  TourType,
+  DestinationType,
+  EventType,
+  HotelType,
+} from "@/types/mapType";
 
 type Layer = "tour" | "destination" | "event" | "hotel";
 type Area = "all" | "north" | "centre" | "south";
@@ -596,7 +602,8 @@ const Map = () => {
     const resEvent: EventType[] = [
       {
         name: "Hanoi Beverage Festival 2025",
-        description: "Lễ hội đồ uống Hà Nội tại Tây Hồ Creative Cultural Space, thưởng thức trà, bia thủ công, đồ uống sáng tạo",
+        description:
+          "Lễ hội đồ uống Hà Nội tại Tây Hồ Creative Cultural Space, thưởng thức trà, bia thủ công, đồ uống sáng tạo",
         region: "north",
         coords: [21.0735, 105.8343], // Tây Hồ, Hà Nội (Trịnh Công Sơn walking street)
       },
@@ -604,21 +611,22 @@ const Map = () => {
         name: "ITE HCMC 2025 (International Travel Expo HCM City)",
         description: "Hội chợ Du lịch Quốc tế tại SECC, TP. Hồ Chí Minh",
         region: "south",
-        coords: [10.7431, 106.7210], // SECC, District 7, HCM (approx)
+        coords: [10.7431, 106.721], // SECC, District 7, HCM (approx)
       },
       {
         name: "8Wonder Music Festival",
         description: "Đại nhạc hội âm nhạc quốc tế 8Wonder tại Phú Quốc,…",
         region: "south",
-        coords: [10.1970, 103.9700], // Phú Quốc – chọn 1 điểm làm đại diện (ví dụ Grand World Phú Quốc)
+        coords: [10.197, 103.97], // Phú Quốc – chọn 1 điểm làm đại diện (ví dụ Grand World Phú Quốc)
       },
       {
         name: "VietFood & Beverage Hanoi 2025",
-        description: "Triển lãm thực phẩm & đồ uống tại Cung Văn hóa I.C.E. Hà Nội",
+        description:
+          "Triển lãm thực phẩm & đồ uống tại Cung Văn hóa I.C.E. Hà Nội",
         region: "north",
-        coords: [21.0285, 105.8510], // I.C.E Hanoi (Cung Văn hóa), gần khu phố cổ
+        coords: [21.0285, 105.851], // I.C.E Hanoi (Cung Văn hóa), gần khu phố cổ
       },
-    ];    
+    ];
     const resHotel: HotelType[] = [
       {
         region: "north",
@@ -755,6 +763,15 @@ const Map = () => {
     // Gọi fetch data
     fetch(startDate, adjustedEndDate);
   }, [startDate, endDate]);
+
+  const formatDate = (date: Date): string => {
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  };
+  const [openStart, setOpenStart] = useState(false);
+  const [openEnd, setOpenEnd] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen space-y-10">
@@ -938,12 +955,45 @@ const Map = () => {
               <CalendarClock className="w-4 h-4 mt-[4px] text-primary" />
               <p className="font-bold font-['Inter']">Thời gian</p>
             </div>
-            <DateChooser selectedDate={startDate} onDateChange={setStart} />
-            <DateChooser
-              selectedDate={endDate}
-              onDateChange={setEnd}
-              startDate={startDate}
-            />
+            <div className="relative">
+              <Button
+                className={`flex bg-white justify-between w-full px-2 py-1 outline outline-1 outline-[#26B8ED] text-black rounded font-['Inter'] hover:bg-white`}
+                onClick={() => setOpenStart(!openStart)}
+              >
+                <p className="font-['Inter']">{formatDate(startDate)}</p>
+                <div className="p-1 bg-primary rounded hover:bg-[#0891B2]">
+                  <CalendarDays className="text-white w-6 h-6" />
+                </div>
+              </Button>
+              {openStart && (
+                <DateChooser
+                  className="absolute top-1/2 -translate-y-full translate-x-full -right-3 "
+                  selectedDate={startDate}
+                  onDateChange={setStart}
+                  onClose={() => setOpenStart(false)}
+                />
+              )}
+            </div>
+            <div className="relative">
+              <Button
+                className={`flex bg-white justify-between w-full px-2 py-1 outline outline-1 outline-[#26B8ED] text-black rounded font-['Inter'] hover:bg-white`}
+                onClick={() => setOpenEnd(!openEnd)}
+              >
+                <p className="font-['Inter']">{formatDate(endDate)}</p>
+                <div className="p-1 bg-primary rounded hover:bg-[#0891B2]">
+                  <CalendarDays className="text-white w-6 h-6" />
+                </div>
+              </Button>
+              {openEnd && (
+                <DateChooser
+                  className="absolute top-1/2 -translate-y-full translate-x-full -right-3 "
+                  selectedDate={endDate}
+                  onDateChange={setEnd}
+                  startDate={startDate}
+                  onClose={() => setOpenEnd(false)}
+                />
+              )}
+            </div>
           </div>
         </div>
         <div

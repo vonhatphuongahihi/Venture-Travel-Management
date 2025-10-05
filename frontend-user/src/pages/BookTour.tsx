@@ -83,7 +83,7 @@ const BookTour: React.FC = () => {
       <main className="flex-1 flex flex-col items-center justify-center py-10">
         <div className="w-full max-w-3xl px-4">
       {/* Page title */}
-      <h1 className="text-3xl font-bold mb-6 text-blue-700">Book Tour</h1>
+      <h1 className="text-3xl font-bold mb-6 text-blue-700">Đặt lịch</h1>
       {/* Tour information section */}
       <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
         <h2 className="text-xl font-semibold mb-4">Tour Information</h2>

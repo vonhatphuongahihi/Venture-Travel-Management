@@ -29,10 +29,10 @@ const Header = () => {
             KHÁM PHÁ 360°
           </a>
           <a href="/contact" className="text-sm font-medium hover:text-primary transition-colors">
-            Contact
+            LIÊN HỆ
           </a>
           <a href="/book-tour" className="text-sm font-medium hover:text-primary transition-colors">
-            Book Tour
+            ĐĂNG KÝ TOUR
           </a>
         </nav>
 
@@ -63,10 +63,10 @@ const Header = () => {
               Tours
             </a>
             <a href="/contact" className="block text-sm font-medium hover:text-primary transition-colors">
-              Contact
+              LIÊN HỆ
             </a>
             <a href="/book-tour" className="block text-sm font-medium hover:text-primary transition-colors">
-              Book Tour
+              ĐĂNG KÝ TOUR
             </a>
             <a href="#destinations" className="block text-sm font-medium hover:text-primary transition-colors">
               Điểm đến

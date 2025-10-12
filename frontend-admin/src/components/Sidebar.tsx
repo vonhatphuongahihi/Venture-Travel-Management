@@ -1,3 +1,4 @@
+
 import {
   BarChart3,
   Calendar,
@@ -70,3 +71,4 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+

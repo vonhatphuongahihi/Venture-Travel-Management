@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -7,6 +8,9 @@ import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import TourCreate from "./pages/TourCreate";
 import ToursManage from "./pages/ToursManage";
+import Bookings from "./pages/Bookings";
+import Places from "./pages/Places";
+import Reports from "./pages/Reports";
 
 
 export default function App() {
@@ -22,7 +26,11 @@ export default function App() {
         </Route>
         <Route path="/settings" element={<Settings />}></Route>
         <Route path="*" element={<NotFound />} />
+             <Route path="/bookings" element={<Bookings />} />
+              <Route path="/attractions" element={<Places />} />
+               <Route path="/reports" element={<Reports />} />
       </Routes>
     </BrowserRouter>
   );
 }
+

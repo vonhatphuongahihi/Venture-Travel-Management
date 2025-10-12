@@ -121,7 +121,7 @@ export function BookingList() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <h2 className="text-2xl font-bold text-[#26B8ED]">Đặt tour</h2>
+   
 
      <div className="rounded-[12.75px] border border-black/10 bg-white p-4">
       {/* Filters */}

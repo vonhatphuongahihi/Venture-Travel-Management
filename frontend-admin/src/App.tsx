@@ -1,39 +1,36 @@
 
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
+import Users from "./pages/Users";
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Bookings from './pages/Bookings'
-import Overview from './pages/Overview'
-import Tours from './pages/Tours'
-import Places from './pages/Places'
-import Reports from './pages/Reports'
-import Users from './pages/Users'
-import Settings from './pages/Settings'
-import NotFound from './pages/NotFound'
-import { Sidebar } from './components/Sidebar'
+import Settings from "./pages/Settings";
+import TourCreate from "./pages/TourCreate";
+import ToursManage from "./pages/ToursManage";
+import Bookings from "./pages/Bookings";
+import Places from "./pages/Places";
+import Reports from "./pages/Reports";
 
-function App() {
+
+export default function App() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <BrowserRouter>
-        <div className="flex">
-          <Sidebar />
-          <main className="flex-1 p-6 bg-[#F9FDFF]">
-            <Routes>
-              <Route path="/" element={<Navigate to="/bookings" replace />} />
-              <Route path="/overview" element={<Overview />} />
-              <Route path="/tours" element={<Tours />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/places" element={<Places />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="tours">
+          <Route index element={<ToursManage />} />
+          <Route path="create-tour" element={<TourCreate />} />
+        </Route>
+        <Route path="/settings" element={<Settings />}></Route>
+        <Route path="*" element={<NotFound />} />
+             <Route path="/bookings" element={<Bookings />} />
+              <Route path="/attractions" element={<Places />} />
+               <Route path="/reports" element={<Reports />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App

@@ -1,3 +1,4 @@
+import Layout from "@/components/Layout";
 import { ChevronDown, Funnel, MapPin, Search, Trash } from "lucide-react";
 import { useState } from "react";
 
@@ -113,11 +114,8 @@ export default function Places() {
   };
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-[#26B8ED]">Điểm đến</h2>
-       
-      </div>
+  <Layout title="Điểm đến">
+    
 
      <div className="rounded-[12.75px] border border-black/10 bg-white p-4">
        {/* Filter bar + Thêm điểm đến */}
@@ -277,6 +275,6 @@ export default function Places() {
         ))}
       </div>
       </div>
-    </div>
+    </Layout>
   );
 }

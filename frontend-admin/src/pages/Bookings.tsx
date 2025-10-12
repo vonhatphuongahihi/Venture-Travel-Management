@@ -1,8 +1,13 @@
+import Layout from "@/components/Layout";
 import { BookingList } from "../components/BookingList";
 
 
 export default function Bookings() {
-  return <BookingList />;
+  return (
+   <Layout title="Đặt tour">
+     <BookingList />
+   </Layout>
+  );
 }
 
 

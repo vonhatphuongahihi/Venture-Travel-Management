@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Star, Users, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TourCardProps {
   id: string;
@@ -19,6 +20,7 @@ interface TourCardProps {
 }
 
 const TourCard = ({
+  id,
   title,
   description,
   image,
@@ -32,6 +34,7 @@ const TourCard = ({
   maxParticipants,
   availableSpots
 }: TourCardProps) => {
+  const navigate = useNavigate();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "upcoming": return "bg-green-100 text-green-800";
@@ -51,7 +54,7 @@ const TourCard = ({
   };
 
   return (
-    <div className="tour-card group cursor-pointer">
+    <div className="tour-card group cursor-pointer" onClick={()=>{navigate(`/tour/${id}`)}}>
       {/* Image */}
       <div className="relative overflow-hidden">
         <img
@@ -119,7 +122,8 @@ const TourCard = ({
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-border flex gap-2">
-          <Button variant="tour" size="sm" className="flex-1 hover:bg-[#b2e8ff] hover:text-[#fafcff]">
+          <Button variant="tour" size="sm" className="flex-1 hover:bg-[#b2e8ff] hover:text-[#fafcff]"
+          onClick={()=>{navigate(`/tour/${id}`)}}>
             Xem chi tiết
           </Button>
           <Button variant="default" size="sm" className="flex-1">

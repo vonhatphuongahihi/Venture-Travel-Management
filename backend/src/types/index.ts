@@ -20,6 +20,10 @@ export interface RegisterRequest {
     gender?: string;
 }
 
+export interface VerifyEmailRequest {
+    token: string;
+}
+
 export interface AuthResponse {
     success: boolean;
     message: string;
@@ -27,6 +31,15 @@ export interface AuthResponse {
         user: Omit<User, 'password'>;
         token: string;
     };
+}
+
+export interface VerifyResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        user: Omit<User, 'password'>;
+    };
+    error?: string;
 }
 
 export interface ApiResponse<T = any> {

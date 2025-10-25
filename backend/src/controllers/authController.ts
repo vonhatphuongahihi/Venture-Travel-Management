@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthService } from '@/services/authService';
-import { LoginRequest, RegisterRequest, AuthenticatedRequest } from '@/types';
+import { LoginRequest, RegisterRequest, VerifyEmailRequest, AuthenticatedRequest } from '@/types';
 import { ResponseUtils } from '@/utils';
 
 export class AuthController {
@@ -66,6 +66,25 @@ export class AuthController {
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
                 'Logout failed',
+                error instanceof Error ? error.message : 'Unknown error'
+            ));
+        }
+    }
+
+    // Verify email
+    static async verifyEmail(req: Request, res: Response): Promise<void> {
+        try {
+            const verifyData: VerifyEmailRequest = req.body;
+            const result = await AuthService.verifyEmail(verifyData);
+
+            if (result.success) {
+                res.status(200).json(result);
+            } else {
+                res.status(400).json(result);
+            }
+        } catch (error) {
+            res.status(500).json(ResponseUtils.error(
+                'Email verification failed',
                 error instanceof Error ? error.message : 'Unknown error'
             ));
         }

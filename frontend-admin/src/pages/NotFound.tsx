@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -22,3 +23,4 @@ const NotFound = () => {
 };
 
 export default NotFound;
+

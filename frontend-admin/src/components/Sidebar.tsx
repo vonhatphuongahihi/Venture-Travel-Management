@@ -1,3 +1,4 @@
+
 import {
   BarChart3,
   Calendar,
@@ -9,10 +10,20 @@ import {
   Users,
 } from "lucide-react";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('remember');
+
+    navigate('/login');
+  };
+
   const menus = [
     { name: "Tổng quan", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Tour", icon: Package, path: "/tours" },
@@ -42,10 +53,9 @@ const Sidebar: React.FC = () => {
                   to={menu.path}
                   className={({ isActive }) =>
                     `flex items-center gap-3 pl-3 pr-5 py-[10px] transition rounded-md mx-3
-                    ${
-                      isActive
-                        ? "bg-[#E4F8FF] text-[#09BCFD] font-medium border border-[#BBEBFD] rounded-lg"
-                        : "text-[#45556C] hover:bg-[#F0F4F8] hover:text-black"
+                    ${isActive
+                      ? "bg-[#E4F8FF] text-[#09BCFD] font-medium border border-[#BBEBFD] rounded-lg"
+                      : "text-[#45556C] hover:bg-[#F0F4F8] hover:text-black"
                     }`
                   }
                 >
@@ -60,7 +70,10 @@ const Sidebar: React.FC = () => {
 
       {/* Logout */}
       <div className="border-t">
-        <button className="flex items-center gap-3 w-full px-6 py-4 text-[#45556C] hover:bg-red-50 hover:text-red-600 transition">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-6 py-4 text-[#45556C] hover:bg-red-50 hover:text-red-600 transition"
+        >
           <LogOut size={22} />
           <span className="ml-1">Đăng xuất</span>
         </button>
@@ -70,3 +83,4 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+

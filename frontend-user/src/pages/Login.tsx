@@ -1,16 +1,54 @@
+import React from "react";
 import logo from "@/assets/logo.png";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 
 const Login = () => {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      showToast('Vui lòng nhập đầy đủ thông tin', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await login(email, password, remember);
+
+      if (result.success) {
+        showToast('Đăng nhập thành công!', 'success');
+        navigate('/');
+      } else {
+        showToast(result.message, 'error');
+      }
+    } catch (error) {
+      showToast('Đăng nhập thất bại. Vui lòng thử lại.', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-  <div className="relative min-h-screen bg-[url('/src/assets/hero-vietnam.jpg')] bg-cover bg-center flex items-center justify-center md:items-start md:justify-end">
+    <div className="relative min-h-screen bg-[url('/src/assets/hero-vietnam.jpg')] bg-cover bg-center flex items-center justify-center md:items-start md:justify-end">
       {/* gradient overlay like HeroSection */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-primary/70 via-primary/50 to-transparent" />
 
@@ -26,9 +64,8 @@ const Login = () => {
             <div className="relative bg-slate-100 rounded-full flex p-1 mb-6">
               {/* Highlight xanh */}
               <div
-                className={`absolute top-1 bottom-1 w-1/2 bg-primary rounded-full transition-all duration-300 ${
-                  tab === "login" ? "left-1" : "left-1/2"
-                }`}
+                className={`absolute top-1 bottom-1 w-1/2 bg-primary rounded-full transition-all duration-300 ${tab === "login" ? "left-1" : "left-1/2"
+                  }`}
               ></div>
 
               <button
@@ -36,9 +73,8 @@ const Login = () => {
                   setTab("login");
                   navigate("/login");
                 }}
-                className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${
-                  tab === "login" ? "text-white" : "text-slate-600"
-                }`}
+                className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${tab === "login" ? "text-white" : "text-slate-600"
+                  }`}
               >
                 Đăng nhập
               </button>
@@ -47,55 +83,63 @@ const Login = () => {
                   setTab("register");
                   navigate("/register");
                 }}
-                className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${
-                  tab === "register" ? "text-white" : "text-slate-600"
-                }`}
+                className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${tab === "register" ? "text-white" : "text-slate-600"
+                  }`}
               >
                 Đăng ký
               </button>
             </div>
 
-            {/* Email */}
-            <label className="block text-sm font-medium text-muted-foreground mb-1">
-              Email
-            </label>
-            <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Nhập email"
-            />
-
-            {/* Mật khẩu */}
-            <label className="block text-sm font-medium text-muted-foreground mb-1">
-              Mật khẩu
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mb-2 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Nhập mật khẩu"
-            />
-
-            {/* Ghi nhớ + Quên mật khẩu */}
-            <div className="flex items-center justify-between text-sm mb-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span className="text-sm">Ghi nhớ đăng nhập</span>
+            <form onSubmit={handleLogin}>
+              {/* Email */}
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Email
               </label>
-              <a className="text-sm text-primary underline">Quên mật khẩu ?</a>
-            </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Nhập email"
+                required
+              />
 
-            {/* Nút đăng nhập */}
-            <button className="w-full rounded-full bg-primary text-white py-2 font-medium">
-              Đăng nhập
-            </button>
+              {/* Mật khẩu */}
+              <label className="block text-sm font-medium text-muted-foreground mb-1">
+                Mật khẩu
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full mb-2 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Nhập mật khẩu"
+                required
+              />
+
+              {/* Ghi nhớ + Quên mật khẩu */}
+              <div className="flex items-center justify-between text-sm mb-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm">Ghi nhớ đăng nhập</span>
+                </label>
+                <a className="text-sm text-primary underline">Quên mật khẩu ?</a>
+              </div>
+
+              {/* Nút đăng nhập */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full rounded-full bg-primary text-white py-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              </button>
+            </form>
 
             {/* Hoặc */}
             <div className="flex items-center gap-3 my-6">

@@ -29,22 +29,21 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-16">
           <Link
             to="/tour"
-            className={`text-sm font-medium transition-colors ${
-              location.pathname === "/tour"
+            className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
                 ? "text-primary font-semibold"
                 : "hover:text-primary"
-            }`}
+              }`}
           >
             TOUR
           </Link>
           <ProvinceDropdown />
-          <Link 
-            to="/map" 
+          <Link
+            to="/map"
             className={`text-sm font-medium transition-colors ${location.pathname === "/map"
               ? "text-primary font-semibold"
               : "hover:text-primary"
               }`}>
-           BẢN ĐỒ
+            BẢN ĐỒ
           </Link>
           <Link to="/explore-360"
             className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
@@ -97,11 +96,10 @@ const Header = () => {
           <nav className="container py-4 space-y-5">
             <Link
               to="/tour"
-              className={`block text-sm font-medium transition-colors ${
-                location.pathname === "/tour"
+              className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
                   ? "text-primary font-semibold"
                   : "hover:text-primary"
-              }`}
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               TOUR

@@ -1,8 +1,25 @@
+import { User as PrismaUser } from '@prisma/client';
 import { Request } from 'express';
-import { User } from '@prisma/client';
+
+// Custom user type for authenticated requests
+export interface AuthUser {
+    user_id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    address: string | null;
+    profile_photo: string | null;
+    date_of_birth: Date | null;
+    gender: string | null;
+    role: string;
+    is_active: boolean;
+    last_login: Date | null;
+    created_at: Date;
+    updated_at: Date;
+}
 
 export interface AuthenticatedRequest extends Request {
-    user?: User;
+    user?: Express.User;
 }
 
 export interface LoginRequest {
@@ -28,7 +45,7 @@ export interface AuthResponse {
     success: boolean;
     message: string;
     data?: {
-        user: Omit<User, 'password'>;
+        user: Omit<PrismaUser, 'password'>;
         token: string;
     };
 }
@@ -37,7 +54,7 @@ export interface VerifyResponse {
     success: boolean;
     message: string;
     data?: {
-        user: Omit<User, 'password'>;
+        user: Omit<PrismaUser, 'password'>;
     };
     error?: string;
 }

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JWTUtils } from '@/utils';
 import { PrismaClient } from '@prisma/client';
-import { AuthenticatedRequest } from '@/types';
+import { AuthenticatedRequest, AuthUser } from '@/types';
 
 const prisma = new PrismaClient();
 
@@ -60,7 +60,7 @@ export const authenticateToken = async (
             return;
         }
 
-        req.user = user as any;
+        req.user = user as Express.User;
         next();
     } catch (error) {
         res.status(401).json({

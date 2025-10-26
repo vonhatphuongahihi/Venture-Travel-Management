@@ -15,10 +15,53 @@ export class AuthService {
             });
 
             if (existingUser) {
-                return {
-                    success: false,
-                    message: 'User with this email already exists'
-                };
+                // If user exists but not verified, resend verification email
+                if (!existingUser.is_verified) {
+                    // Generate new verification token
+                    const verificationToken = generateUserId();
+                    const verificationExpires = new Date();
+                    verificationExpires.setTime(verificationExpires.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+
+                    // Update user with new token
+                    await prisma.user.update({
+                        where: { user_id: existingUser.user_id },
+                        data: {
+                            verification_token: verificationToken,
+                            verification_expires: verificationExpires
+                        }
+                    });
+
+                    // Send verification email
+                    const emailSent = await emailService.sendVerificationEmail(
+                        existingUser.email,
+                        existingUser.name,
+                        verificationToken
+                    );
+
+                    if (!emailSent) {
+                        console.error('Failed to resend verification email to:', existingUser.email);
+                    }
+
+                    return {
+                        success: true,
+                        message: 'Email đã tồn tại nhưng chưa xác thực. Chúng tôi đã gửi lại email xác thực.',
+                        data: {
+                            user: {
+                                user_id: existingUser.user_id,
+                                name: existingUser.name,
+                                email: existingUser.email,
+                                is_verified: false
+                            },
+                            token: ''
+                        }
+                    };
+                } else {
+                    // User exists and is already verified
+                    return {
+                        success: false,
+                        message: 'Email đã được sử dụng'
+                    };
+                }
             }
 
             const hashedPassword = await PasswordUtils.hashPassword(userData.password);
@@ -26,7 +69,7 @@ export class AuthService {
             // Generate verification token
             const verificationToken = generateUserId();
             const verificationExpires = new Date();
-            verificationExpires.setHours(verificationExpires.getHours() + 24); // 24 hours
+            verificationExpires.setTime(verificationExpires.getTime() + (24 * 60 * 60 * 1000));
 
             const user = await prisma.user.create({
                 data: {
@@ -73,7 +116,7 @@ export class AuthService {
 
             return {
                 success: true,
-                message: 'User registered successfully. Please check your email to verify your account.',
+                message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
                 data: {
                     user,
                     token: '' // No token until email is verified
@@ -82,7 +125,7 @@ export class AuthService {
         } catch (error) {
             return {
                 success: false,
-                message: 'Registration failed',
+                message: 'Đăng ký thất bại',
             };
         }
     }
@@ -97,14 +140,14 @@ export class AuthService {
             if (!user) {
                 return {
                     success: false,
-                    message: 'Invalid email or password'
+                    message: 'Email hoặc mật khẩu không đúng'
                 };
             }
 
             if (!user.is_active) {
                 return {
                     success: false,
-                    message: 'Account is deactivated'
+                    message: 'Tài khoản đã bị vô hiệu hóa'
                 };
             }
 
@@ -112,7 +155,7 @@ export class AuthService {
             if (!user.is_verified) {
                 return {
                     success: false,
-                    message: 'Please verify your email before logging in'
+                    message: 'Vui lòng xác thực email trước khi đăng nhập'
                 };
             }
 
@@ -120,7 +163,7 @@ export class AuthService {
             if (!isPasswordValid) {
                 return {
                     success: false,
-                    message: 'Invalid email or password'
+                    message: 'Email hoặc mật khẩu không đúng'
                 };
             }
 
@@ -141,7 +184,7 @@ export class AuthService {
 
             return {
                 success: true,
-                message: 'Login successful',
+                message: 'Đăng nhập thành công',
                 data: {
                     user: userWithoutPassword,
                     token
@@ -150,7 +193,7 @@ export class AuthService {
         } catch (error) {
             return {
                 success: false,
-                message: 'Login failed'
+                message: 'Đăng nhập thất bại'
             };
         }
     }
@@ -161,16 +204,21 @@ export class AuthService {
             const user = await prisma.user.findFirst({
                 where: {
                     verification_token: verifyData.token,
-                    verification_expires: {
-                        gt: new Date() // Token not expired
-                    }
                 }
             });
 
             if (!user) {
                 return {
                     success: false,
-                    message: 'Invalid or expired verification token'
+                    message: 'Token xác thực không hợp lệ'
+                };
+            }
+
+            if (user.verification_expires && new Date() > user.verification_expires) {
+                console.log('Token is expired');
+                return {
+                    success: false,
+                    message: 'Token xác thực đã hết hạn'
                 };
             }
 
@@ -207,7 +255,7 @@ export class AuthService {
 
             return {
                 success: true,
-                message: 'Email verified successfully',
+                message: 'Xác thực email thành công',
                 data: {
                     user: updatedUser
                 }
@@ -215,8 +263,8 @@ export class AuthService {
         } catch (error) {
             return {
                 success: false,
-                message: 'Email verification failed',
-                error: error instanceof Error ? error.message : 'Unknown error'
+                message: 'Xác thực email thất bại',
+                error: error instanceof Error ? error.message : 'Lỗi không xác định'
             };
         }
     }

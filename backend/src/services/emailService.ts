@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export class EmailService {
     private transporter: nodemailer.Transporter;
@@ -18,7 +21,23 @@ export class EmailService {
     // Send verification email
     async sendVerificationEmail(email: string, name: string, verificationToken: string): Promise<boolean> {
         try {
-            const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}`;
+            // Check if user still exists
+            const user = await prisma.user.findUnique({
+                where: { email },
+                select: { user_id: true, is_verified: true }
+            });
+
+            if (!user) {
+                console.log('Không tìm thấy người dùng, bỏ qua gửi email:', email);
+                return false;
+            }
+
+            if (user.is_verified) {
+                console.log('Người dùng đã được xác thực, bỏ qua gửi email:', email);
+                return false;
+            }
+
+            const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:8081'}/verify-email?token=${verificationToken}`;
 
             const mailOptions = {
                 from: process.env.SMTP_FROM || 'Venture <noreply@venture.com>',
@@ -81,7 +100,7 @@ export class EmailService {
             await this.transporter.sendMail(mailOptions);
             return true;
         } catch (error) {
-            console.error('Error sending verification email:', error);
+            console.error('Lỗi khi gửi email xác thực:', error);
             return false;
         }
     }
@@ -89,6 +108,21 @@ export class EmailService {
     // Send welcome email after verification
     async sendWelcomeEmail(email: string, name: string): Promise<boolean> {
         try {
+            // Check if user still exists
+            const user = await prisma.user.findUnique({
+                where: { email },
+                select: { user_id: true, is_verified: true }
+            });
+
+            if (!user) {
+                console.log('Không tìm thấy người dùng, bỏ qua gửi email chào mừng:', email);
+                return false;
+            }
+
+            if (!user.is_verified) {
+                console.log('Người dùng chưa được xác thực, bỏ qua gửi email chào mừng:', email);
+                return false;
+            }
             const mailOptions = {
                 from: process.env.SMTP_FROM || 'Venture <noreply@Venture.com>',
                 to: email,
@@ -119,10 +153,10 @@ export class EmailService {
               </p>
               
               <ul style="color: #666; line-height: 1.8;">
-                <li>Quản lý thông tin thú cưng</li>
-                <li>Đặt lịch khám bệnh</li>
-                <li>Mua sắm các sản phẩm chăm sóc</li>
-                <li>Tham gia cộng đồng yêu thú cưng</li>
+                <li>Quản lý và đặt tour du lịch tại các địa điểm tham quan khắp Việt Nam</li>
+                <li>Tra cứu tour, xem bản đồ lộ trình 2D nổi bật</li>
+                <li>Dễ dàng lựa chọn tour phù hợp với nhu cầu và sở thích cá nhân</li>
+                <li>Chia sẻ trải nghiệm và đánh giá sau mỗi chuyến đi</li>
               </ul>
               
               <div style="text-align: center; margin: 30px 0;">
@@ -151,7 +185,7 @@ export class EmailService {
             await this.transporter.sendMail(mailOptions);
             return true;
         } catch (error) {
-            console.error('Error sending welcome email:', error);
+            console.error('Lỗi khi gửi email chào mừng:', error);
             return false;
         }
     }
@@ -160,10 +194,10 @@ export class EmailService {
     async testConnection(): Promise<boolean> {
         try {
             await this.transporter.verify();
-            console.log('✅ SMTP connection verified');
+            console.log('✅ Kết nối SMTP thành công');
             return true;
         } catch (error) {
-            console.error('❌ SMTP connection failed:', error);
+            console.error('❌ Kết nối SMTP thất bại:', error);
             return false;
         }
     }

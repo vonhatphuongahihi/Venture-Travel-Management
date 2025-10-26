@@ -1,14 +1,22 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import avatarImg from "@/assets/beach-destination.jpg";
 import { useState, useRef } from "react";
 import { Eye, EyeOff, Camera } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [avatarSrc, setAvatarSrc] = useState<string>(avatarImg);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const onAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -20,11 +28,11 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-       <div className="text-center mt-8 md:mt-12 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Thông tin <span className="text-gradient">Tài khoản</span>
-          </h2>
-        </div>
+      <div className="text-center mt-8 md:mt-12 mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Thông tin <span className="text-gradient">Tài khoản</span>
+        </h2>
+      </div>
 
       <main className="container py-12">
         <div className="flex gap-8">
@@ -49,7 +57,12 @@ const Profile = () => {
               <button className="w-full text-m text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Điều khoản sử dụng</button>
               <button className="w-full text-m mt-3 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Chính sách bảo mật</button>
               <button className="w-full text-m mt-3 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Về VENTURE</button>
-              <button className="w-full text-l text-red-500 text-center py-2 px-3 rounded-md mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white">Đăng xuất</button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-l text-red-500 text-center py-2 px-3 rounded-md mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
+              >
+                Đăng xuất
+              </button>
             </div>
           </aside>
 
@@ -131,7 +144,7 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <input className="rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition" placeholder="Tỉnh/Thành phố" />
                     <input className="rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition" placeholder="Phường/Xã" />
-                    <input className="rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition" placeholder="Số nhà, tên đường" />    
+                    <input className="rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition" placeholder="Số nhà, tên đường" />
                   </div>
                 </div>
 

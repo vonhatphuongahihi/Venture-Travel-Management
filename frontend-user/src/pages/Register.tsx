@@ -1,9 +1,8 @@
-import React from "react";
 import logo from "@/assets/logo.png";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [tab, setTab] = useState<"login" | "register">("register");
@@ -38,6 +37,13 @@ const Register = () => {
 
     if (password.length < 8) {
       showToast('Mật khẩu phải có ít nhất 8 ký tự', 'error');
+      return;
+    }
+
+    // Validate password strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      showToast('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số', 'error');
       return;
     }
 

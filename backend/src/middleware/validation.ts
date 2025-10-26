@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {
@@ -26,7 +26,7 @@ export const registerSchema = Joi.object({
         .messages({
             'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
         }),
-    phone: Joi.string().pattern(/^[\+]?[1-9][\d]{0,15}$/).optional(),
+    phone: Joi.string().pattern(/^[\+]?[0-9][\d]{0,15}$/).optional(),
     address: Joi.string().max(500).optional(),
     date_of_birth: Joi.date().iso().optional(),
     gender: Joi.string().valid('male', 'female', 'other').optional()
@@ -39,4 +39,12 @@ export const loginSchema = Joi.object({
 
 export const verifyEmailSchema = Joi.object({
     token: Joi.string().required()
+});
+
+export const updateProfileSchema = Joi.object({
+    name: Joi.string().min(2).max(100).optional(),
+    phone: Joi.string().pattern(/^[\+]?[0-9][\d]{0,15}$/).optional().allow(''),
+    address: Joi.string().max(500).optional().allow(''),
+    date_of_birth: Joi.date().iso().optional(),
+    gender: Joi.string().valid('male', 'female', 'other').optional().allow('')
 });

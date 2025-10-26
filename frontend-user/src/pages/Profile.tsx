@@ -30,11 +30,10 @@ const Profile = () => {
   });
   
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
-  const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
+    showToast('Đã đăng xuất thành công', 'success');
     navigate('/login');
   };
 
@@ -240,11 +239,6 @@ const Profile = () => {
       formData.gender !== (user.gender || '');
     
     return hasFormChanges || selectedFile !== null;
-  };
-
-  const handleLogout = () => {
-    logout();
-    showToast('Đã đăng xuất thành công', 'success');
   };
 
   return (

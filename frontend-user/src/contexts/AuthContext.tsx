@@ -1,8 +1,8 @@
 import AuthAPI from '@/services/authAPI';
+import GoogleAuthService from '@/services/googleAuthService';
 import UserAPI from '@/services/userAPI';
 import { RegisterRequest, User } from '@/types/api';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import GoogleAuthService from '@/services/googleAuthService';
 
 interface AuthContextType {
   user: User | null;
@@ -130,10 +130,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = () => {
+    GoogleAuthService.signIn();
+  };
+
   const register = async (userData: RegisterRequest) => {
-    const loginWithGoogle = () => {
-      GoogleAuthService.signIn();
-    };
     try {
       setIsLoading(true);
       const response = await AuthAPI.register(userData);

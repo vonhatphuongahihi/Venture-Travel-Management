@@ -12,7 +12,7 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
   // Redirect if already authenticated
@@ -45,6 +45,10 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
   };
 
   return (
@@ -149,13 +153,17 @@ const Login = () => {
             </div>
 
             {/* Google login */}
-            <button className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2">
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
               <img
                 src="https://www.svgrepo.com/show/355037/google.svg"
                 alt="google"
                 className="h-4"
               />
-              Tiếp tục với Google
+              {isLoading ? 'Đang đăng nhập...' : 'Tiếp tục với Google'}
             </button>
 
             {/* Link đăng ký */}

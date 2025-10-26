@@ -14,7 +14,7 @@ model User {
   user_id       String    @id @default(uuid())
   name          String
   email         String    @unique
-  password      String
+  password      String?
   phone         String?
   address       String?
   profile_photo String?
@@ -28,6 +28,10 @@ model User {
   last_login    DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
+  
+  // Google OAuth fields
+  google_id     String?   @unique
+  auth_provider AuthProvider @default(LOCAL)
 
   @@map("users")
 }
@@ -36,4 +40,9 @@ enum Role {
   ADMIN
   USER
   GUEST
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
 }

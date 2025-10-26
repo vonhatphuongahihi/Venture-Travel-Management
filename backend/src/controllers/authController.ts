@@ -17,8 +17,8 @@ export class AuthController {
             }
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
-                'Registration failed',
-                error instanceof Error ? error.message : 'Unknown error'
+                'Đăng ký thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
             ));
         }
     }
@@ -36,8 +36,8 @@ export class AuthController {
             }
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
-                'Login failed',
-                error instanceof Error ? error.message : 'Unknown error'
+                'Đăng nhập thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
             ));
         }
     }
@@ -46,15 +46,22 @@ export class AuthController {
     static async getProfile(req: AuthenticatedRequest, res: Response): Promise<void> {
         try {
             if (!req.user) {
-                res.status(401).json(ResponseUtils.error('User not authenticated'));
+                res.status(401).json(ResponseUtils.error('Người dùng chưa được xác thực'));
                 return;
             }
 
-            res.status(200).json(ResponseUtils.success('Profile retrieved successfully', req.user));
+            // Return user data in the correct format
+            res.status(200).json({
+                success: true,
+                message: 'Lấy thông tin hồ sơ thành công',
+                data: {
+                    user: req.user
+                }
+            });
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
-                'Failed to get profile',
-                error instanceof Error ? error.message : 'Unknown error'
+                'Không thể lấy thông tin hồ sơ',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
             ));
         }
     }
@@ -62,11 +69,11 @@ export class AuthController {
     // Logout user (client-side token removal)
     static async logout(req: Request, res: Response): Promise<void> {
         try {
-            res.status(200).json(ResponseUtils.success('Logout successful'));
+            res.status(200).json(ResponseUtils.success('Đăng xuất thành công'));
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
-                'Logout failed',
-                error instanceof Error ? error.message : 'Unknown error'
+                'Đăng xuất thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
             ));
         }
     }
@@ -84,8 +91,8 @@ export class AuthController {
             }
         } catch (error) {
             res.status(500).json(ResponseUtils.error(
-                'Email verification failed',
-                error instanceof Error ? error.message : 'Unknown error'
+                'Xác thực email thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
             ));
         }
     }

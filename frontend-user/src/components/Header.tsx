@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, Plane, Search, User } from "lucide-react";
 import { useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 import ProvinceDropdown from "./province/ProvinceDropdown";
 import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
@@ -9,6 +10,7 @@ import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <header className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,8 +32,8 @@ const Header = () => {
           <Link
             to="/tour"
             className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
-                ? "text-primary font-semibold"
-                : "hover:text-primary"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
               }`}
           >
             TOUR
@@ -63,21 +65,31 @@ const Header = () => {
 
         {/* Login */}
         <div className="flex items-center space-x-4">
-          <Link to="/login">
-            <Button variant="tour" size="sm" className="hidden sm:flex">
-              <User className="h-4 w-4" />
-              Đăng nhập
-            </Button>
-          </Link>
-          {/* Temporary small profile button to the right of Đăng nhập */}
-          <Link to="/profile" className="hidden sm:inline-flex">
-            <button
-              className="ml-2 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center shadow-sm"
-              aria-label="Hồ sơ"
-            >
-              <User className="h-4 w-4 text-primary" />
-            </button>
-          </Link>
+          {!isAuthenticated ? (
+            <Link to="/login">
+              <Button variant="tour" size="sm" className="hidden sm:flex">
+                <User className="h-4 w-4" />
+                Đăng nhập
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/profile" className="hidden sm:inline-flex">
+              <button
+                className="h-8 w-8 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center shadow-sm overflow-hidden hover:border-primary/40 transition-all"
+                aria-label="Hồ sơ"
+              >
+                {user?.profile_photo ? (
+                  <img
+                    src={user.profile_photo}
+                    alt={user.name || 'Profile'}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User className="h-4 w-4 text-primary" />
+                )}
+              </button>
+            </Link>
+          )}
           {/* Mobile menu button */}
           <Button
             variant="ghost"
@@ -97,8 +109,8 @@ const Header = () => {
             <Link
               to="/tour"
               className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
-                  ? "text-primary font-semibold"
-                  : "hover:text-primary"
+                ? "text-primary font-semibold"
+                : "hover:text-primary"
                 }`}
               onClick={() => setIsMenuOpen(false)}
             >

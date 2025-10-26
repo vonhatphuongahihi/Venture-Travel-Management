@@ -12,7 +12,7 @@ const Register = () => {
   const [confirm, setConfirm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { register, isAuthenticated } = useAuth();
+  const { register, loginWithGoogle, isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
   // Redirect if already authenticated
@@ -66,6 +66,10 @@ const Register = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle();
   };
 
   return (
@@ -179,13 +183,17 @@ const Register = () => {
             </div>
 
             {/* Google login */}
-            <button className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2">
+            <button
+              onClick={handleGoogleLogin}
+              disabled={isLoading}
+              className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
+            >
               <img
                 src="https://www.svgrepo.com/show/355037/google.svg"
                 alt="google"
                 className="h-4"
               />
-              Tiếp tục với Google
+              {isLoading ? 'Đang xử lý...' : 'Tiếp tục với Google'}
             </button>
 
             <p className="text-center text-sm text-slate-500 mt-6">

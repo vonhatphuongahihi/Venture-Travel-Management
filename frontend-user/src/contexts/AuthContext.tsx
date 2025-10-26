@@ -2,6 +2,7 @@ import AuthAPI from '@/services/authAPI';
 import UserAPI from '@/services/userAPI';
 import { RegisterRequest, User } from '@/types/api';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import GoogleAuthService from '@/services/googleAuthService';
 
 interface AuthContextType {
   user: User | null;
@@ -9,6 +10,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string, remember?: boolean) => Promise<{ success: boolean; message: string }>;
   register: (userData: RegisterRequest) => Promise<{ success: boolean; message: string }>;
+  loginWithGoogle: () => void;
   verifyEmail: (token: string) => Promise<{ success: boolean; message: string }>;
   updateUser: (userData: User) => void;
   logout: () => void;
@@ -34,13 +36,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing token on mount
   useEffect(() => {
-    // Kiểm tra localStorage trước (ghi nhớ đăng nhập)
-    let savedToken = localStorage.getItem('token');
-    const isRemembered = localStorage.getItem('remember') === 'true';
+    const loadUserFromStorage = () => {
+      let savedToken = localStorage.getItem('token');
 
-    // Nếu không có token trong localStorage, kiểm tra sessionStorage
+      if (!savedToken) {
+        savedToken = sessionStorage.getItem('token');
+      }
+
+      const savedUser = localStorage.getItem('user');
+      if (savedUser) {
+        try {
+          const user = JSON.parse(savedUser);
+          setUser(user);
+          if (savedToken) {
+            setToken(savedToken);
+          }
+          return true;
+        } catch (error) {
+          localStorage.removeItem('user');
+        }
+      }
+      return false;
+    };
+
+    const userLoaded = loadUserFromStorage();
+    if (userLoaded) {
+      setIsLoading(false);
+      return;
+    }
+
+    let savedToken = localStorage.getItem('token');
     if (!savedToken) {
       savedToken = sessionStorage.getItem('token');
     }
@@ -52,10 +78,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .then((response) => {
           if (response.success && response.data) {
             setUser(response.data);
+            localStorage.setItem('user', JSON.stringify(response.data));
           } else {
-            // Token is invalid, remove it from both storages
             localStorage.removeItem('token');
             localStorage.removeItem('remember');
+            localStorage.removeItem('user');
             sessionStorage.removeItem('token');
             setToken(null);
           }
@@ -63,6 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         .catch(() => {
           localStorage.removeItem('token');
           localStorage.removeItem('remember');
+          localStorage.removeItem('user');
           sessionStorage.removeItem('token');
           setToken(null);
         })
@@ -83,12 +111,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(response.data.user);
         setToken(response.data.token);
 
-        // Lưu token vào localStorage nếu người dùng chọn "Ghi nhớ đăng nhập"
         if (remember) {
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('remember', 'true');
         } else {
-          // Chỉ lưu vào sessionStorage nếu không chọn ghi nhớ
           sessionStorage.setItem('token', response.data.token);
           localStorage.removeItem('remember');
         }
@@ -105,6 +131,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (userData: RegisterRequest) => {
+    const loginWithGoogle = () => {
+      GoogleAuthService.signIn();
+    };
     try {
       setIsLoading(true);
       const response = await AuthAPI.register(userData);
@@ -141,12 +170,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = () => {
     if (token) {
       AuthAPI.logout(token).catch(() => {
-        // Ignore logout API errors
       });
     }
     setUser(null);
     setToken(null);
-    // Xóa token khỏi cả localStorage và sessionStorage
     localStorage.removeItem('token');
     localStorage.removeItem('remember');
     sessionStorage.removeItem('token');
@@ -165,6 +192,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     token,
     isLoading,
     login,
+    loginWithGoogle,
     register,
     verifyEmail,
     updateUser,

@@ -30,6 +30,13 @@ const Profile = () => {
   });
   
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   // Load user profile on component mount
   useEffect(() => {
@@ -243,11 +250,11 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-       <div className="text-center mt-8 md:mt-12 mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Thông tin <span className="text-gradient">Tài khoản</span>
-          </h2>
-        </div>
+      <div className="text-center mt-8 md:mt-12 mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          Thông tin <span className="text-gradient">Tài khoản</span>
+        </h2>
+      </div>
 
       {/* Loading state */}
       {isProfileLoading ? (

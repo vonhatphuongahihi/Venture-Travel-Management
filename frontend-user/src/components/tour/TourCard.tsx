@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Star, Users, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface TourCardProps {
   id: string;
@@ -18,20 +19,22 @@ interface TourCardProps {
   availableSpots: number;
 }
 
-const TourCard = ({ 
-  title, 
-  description, 
-  image, 
-  price, 
-  duration, 
-  location, 
-  rating, 
-  reviewCount, 
+const TourCard = ({
+  id,
+  title,
+  description,
+  image,
+  price,
+  duration,
+  location,
+  rating,
+  reviewCount,
   category,
   status,
   maxParticipants,
-  availableSpots 
+  availableSpots
 }: TourCardProps) => {
+  const navigate = useNavigate();
   const getStatusColor = (status: string) => {
     switch (status) {
       case "upcoming": return "bg-green-100 text-green-800";
@@ -51,11 +54,11 @@ const TourCard = ({
   };
 
   return (
-    <div className="tour-card group cursor-pointer">
+    <div className="tour-card group cursor-pointer" onClick={()=>{navigate(`/tour/${id}`)}}>
       {/* Image */}
       <div className="relative overflow-hidden">
-        <img 
-          src={image} 
+        <img
+          src={image}
           alt={title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
         />
@@ -79,7 +82,7 @@ const TourCard = ({
         <h3 className="text-lg font-semibold line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
-        
+
         <p className="text-muted-foreground text-sm line-clamp-2">
           {description}
         </p>
@@ -90,13 +93,13 @@ const TourCard = ({
             <MapPin className="h-4 w-4 mr-2 text-primary" />
             {location}
           </div>
-          
+
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center text-muted-foreground">
               <Clock className="h-4 w-4 mr-2 text-primary" />
               {duration}
             </div>
-            
+
             <div className="flex items-center">
               <Star className="h-4 w-4 mr-1 fill-yellow-400 text-yellow-400" />
               <span className="font-medium">{rating}</span>
@@ -109,7 +112,7 @@ const TourCard = ({
               <Users className="h-4 w-4 mr-2 text-primary" />
               {availableSpots}/{maxParticipants} chỗ
             </div>
-            
+
             <div className="flex items-center text-muted-foreground">
               <Calendar className="h-4 w-4 mr-2 text-primary" />
               Hàng ngày
@@ -119,7 +122,8 @@ const TourCard = ({
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-border flex gap-2">
-          <Button variant="tour" size="sm" className="flex-1">
+          <Button variant="tour" size="sm" className="flex-1 hover:bg-[#b2e8ff] hover:text-[#fafcff]"
+          onClick={()=>{navigate(`/tour/${id}`)}}>
             Xem chi tiết
           </Button>
           <Button variant="default" size="sm" className="flex-1">

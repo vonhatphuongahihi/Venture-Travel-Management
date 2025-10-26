@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 export class PasswordUtils {
@@ -34,7 +34,7 @@ export class ValidationUtils {
     }
 
     static isValidPhone(phone: string): boolean {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        const phoneRegex = /^[\+]?[0-9][\d]{0,15}$/;
         return phoneRegex.test(phone);
     }
 

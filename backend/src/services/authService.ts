@@ -42,16 +42,34 @@ export class AuthService {
                         console.error('Failed to resend verification email to:', existingUser.email);
                     }
 
+                    // Get updated user data with all required fields
+                    const updatedUser = await prisma.user.findUnique({
+                        where: { user_id: existingUser.user_id },
+                        select: {
+                            user_id: true,
+                            name: true,
+                            email: true,
+                            phone: true,
+                            address: true,
+                            profile_photo: true,
+                            date_of_birth: true,
+                            gender: true,
+                            role: true,
+                            is_active: true,
+                            is_verified: true,
+                            verification_token: true,
+                            verification_expires: true,
+                            last_login: true,
+                            created_at: true,
+                            updated_at: true
+                        }
+                    });
+
                     return {
                         success: true,
                         message: 'Email đã tồn tại nhưng chưa xác thực. Chúng tôi đã gửi lại email xác thực.',
                         data: {
-                            user: {
-                                user_id: existingUser.user_id,
-                                name: existingUser.name,
-                                email: existingUser.email,
-                                is_verified: false
-                            },
+                            user: updatedUser!,
                             token: ''
                         }
                     };

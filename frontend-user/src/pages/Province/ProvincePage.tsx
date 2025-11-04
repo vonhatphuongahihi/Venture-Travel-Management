@@ -3,34 +3,34 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { provinces } from "@/data/provinces";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
 // Import assets
 import heroImage from "@/assets/hero-vietnam.jpg";
-import AttractionsSection from "@/components/province/AttractionsSection";
-import ProvinceToursSection from "@/components/province/ProvinceToursSection";
-import ReviewsSection from "@/components/province/ReviewsSection";
-import WeatherSection from "@/components/province/WeatherSection";
-import { mockAttractions } from "@/data/attractions";
-import { mockTours } from "@/data/tours";
-import { Attraction, Tour } from "@/global.types";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+
+enum ProvincePageTab {
+  EXPLORE = "explore",
+  TOURS = "tours",
+}
 
 const ProvincePage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [sortBy, setSortBy] = useState("Giá (từ thấp đến cao)");
-  const [tours, setTours] = useState<Tour[]>(mockTours);
-  const [attractions, setAttractions] = useState<Attraction[]>(mockAttractions);
+  const location = useLocation();
   const [province, setProvince] = useState(() =>
     provinces.find((p) => p.slug === slug)
   );
   const textRef = useRef(null);
   const [isClamped, setIsClamped] = useState(false);
+  const [currPage, setCurrPage] = useState<ProvincePageTab>(
+    ProvincePageTab.EXPLORE
+  );
 
   useEffect(() => {
     if (textRef.current) {
@@ -40,6 +40,16 @@ const ProvincePage = () => {
       setIsClamped(isOverflowing);
     }
   }, []);
+
+  useEffect(() => {
+    const parts = location.pathname.split("/");
+
+    if (parts.at(-1) === "tours-activities") {
+      setCurrPage(ProvincePageTab.TOURS);
+    } else {
+      setCurrPage(ProvincePageTab.EXPLORE);
+    }
+  }, [location]);
 
   // If province not found, show default or redirect
   if (!province) {
@@ -64,7 +74,7 @@ const ProvincePage = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative !h-72 md:h-96">
+      <div className="relative !h-64 md:h-96">
         <img
           src={heroImage}
           alt={province.name}
@@ -74,7 +84,7 @@ const ProvincePage = () => {
 
         {/* Hero Content */}
         <div className="absolute bottom-0 left-0 right-0 text-white p-6 md:p-8">
-          <div className="container mx-auto max-w-6xl">
+          <div className="container mx-auto max-w-7xl">
             <h1 className="text-3xl md:text-4xl font-bold mb-3 md:mb-4">
               {province.name}
             </h1>
@@ -104,24 +114,41 @@ const ProvincePage = () => {
         </div>
       </div>
 
+      {/* Sticky Tab */}
+      <section>
+        <div className="bg-white border-b border-gray-200 mb-6">
+          <div className="container mx-auto max-w-7xl space-x-5">
+            <div
+              className={cn(
+                "inline-block",
+                currPage === ProvincePageTab.EXPLORE &&
+                  "border-b-primary border-b-2 font-semibold text-primary"
+              )}
+            >
+              <Link to={`/province/${province.slug}`}>
+                <h2 className="text-base py-3 px-1">
+                  Khám phá {province.name}
+                </h2>
+              </Link>
+            </div>
+
+            <div
+              className={cn(
+                "inline-block",
+                currPage === ProvincePageTab.TOURS &&
+                  "border-b-primary border-b-2 font-semibold text-primary"
+              )}
+            >
+              <Link to={`/province/${province.slug}/tours-activities`}>
+                <h2 className="text-base py-3 px-1">Tour & Hoạt động</h2>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Main Content */}
-      <div className="container mx-auto max-w-6xl px-4">
-        {/* Tours Section */}
-        <ProvinceToursSection
-          tours={tours}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
-
-        {/* Attractions Section */}
-        <AttractionsSection province={province} attractions={attractions} />
-
-        {/* Reviews Section */}
-        <ReviewsSection province={province} />
-
-        {/* Weather Section */}
-        <WeatherSection province={province} />
-      </div>
+      <Outlet />
 
       {/* Footer */}
       <Footer />

@@ -16,8 +16,10 @@ import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
 import Map from "./pages/Map";
 import TourDetail from "./pages/TourDetail";
-import ProvincePage from "./pages/ProvincePage";
+import ProvincePage from "./pages/Province/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
+import ExploreProvince from "./pages/Province/ExploreProvince";
+import ProvinceTours from "./pages/Province/ProvinceTours";
 
 const queryClient = new QueryClient();
 
@@ -35,20 +37,26 @@ const App = () => (
               <Route path="/tour/:id" element={<TourDetail />} />
               <Route path="/explore-360" element={<Explore360 />} />
               <Route path="/map" element={<Map />} />
-              <Route path="/province/:slug" element={<ProvincePage />} />
+              <Route path="/province/:slug" element={<ProvincePage />}>
+                <Route index element={<ExploreProvince />} />
+                <Route path="tours-activities" element={<ProvinceTours />} />
+              </Route>
               <Route path="/attraction/:slug" element={<AttractionPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
+              <Route
+                path="/auth/google/success"
+                element={<GoogleAuthSuccess />}
+              />
               <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
-            </Routes >
-          </BrowserRouter >
+            </Routes>
+          </BrowserRouter>
         </ToastProvider>
       </AuthProvider>
-    </TooltipProvider >
-  </QueryClientProvider >
+    </TooltipProvider>
+  </QueryClientProvider>
 );
 
 export default App;

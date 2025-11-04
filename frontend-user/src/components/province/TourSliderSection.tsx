@@ -6,20 +6,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Attraction, Province } from "@/global.types";
+import { Province, Tour } from "@/global.types";
 import React from "react";
-import AttractionCard from "./AttractionCard";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import TourCard from "../tour/TourCard";
 
-interface AttractionsSectionProps {
+interface TourSliderSectionProps {
   province: Province;
-  attractions: Attraction[];
+  tours: Tour[];
 }
 
-const AttractionsSection = ({
-  province,
-  attractions,
-}: AttractionsSectionProps) => {
+const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -46,10 +43,19 @@ const AttractionsSection = ({
   }, [api]);
 
   return (
-    <section>
-      <h2 className="text-2xl font-semibold mb-6">
-        Điểm tham quan hàng đầu ở {province.name}
-      </h2>
+    <section className="pt-5">
+      <div className="flex justify-between mb-6">
+        <h2 className="text-2xl font-semibold ">
+          Hoạt động vui chơi hấp dẫn ở {province.name}
+        </h2>
+
+        <Link
+          to={`/province/${province.slug}/tours-activities`}
+          className="text-sm text-black/50 font-medium hover:underline self-end"
+        >
+          Xem tất cả
+        </Link>
+      </div>
 
       <Carousel
         opts={{
@@ -59,10 +65,10 @@ const AttractionsSection = ({
         className="w-full"
       >
         <CarouselContent className="pt-2">
-          {attractions.map((attraction, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4">
-              <Link to={`/attraction/${attraction.slug}`}>
-                <AttractionCard key={attraction.id} attraction={attraction} />
+          {tours.map((tour, index) => (
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+              <Link to={`/tour/${tour.id}`}>
+                <TourCard key={tour.id} {...tour} />
               </Link>
             </CarouselItem>
           ))}
@@ -74,4 +80,4 @@ const AttractionsSection = ({
   );
 };
 
-export default AttractionsSection;
+export default TourSliderSection;

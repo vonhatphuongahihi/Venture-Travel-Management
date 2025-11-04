@@ -23,7 +23,7 @@ function AttractionHeroSection({ attraction }: AttractionHeroSectionProps) {
   }, []);
 
   return (
-    <section className="max-w-[1160px] mx-auto px-4 py-8">
+    <section className="max-w-7xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Content */}
         <div className="flex flex-col justify-center lg:col-span-3">

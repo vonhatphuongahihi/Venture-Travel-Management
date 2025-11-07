@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -10,18 +10,19 @@ import ToursManage from "./pages/ToursManage";
 import Bookings from "./pages/Bookings";
 import Places from "./pages/Places";
 import Reports from "./pages/Reports";
-import Sidebar from "./components/Sidebar";
+import DashboardLayout from "./components/DashboardLayout";
+import { ToastProvider } from "./contexts/ToastContext";
 
-// Protected Route Component
+
+// Protected Route
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
-  if (isLoading) {
+  if (isLoading)
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
 
   if (!isAuthenticated) {
-    window.location.href = '/login';
+    window.location.href = "/login";
     return null;
   }
 
@@ -31,34 +32,37 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 export default function App() {
   return (
     <AuthProvider>
+       <ToastProvider>
       <BrowserRouter>
         <Routes>
+          {/* Login route */}
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={
-            <ProtectedRoute>
-              <div className="flex">
-                <Sidebar />
-                <div className="ml-60 flex-1">
-                  <Routes>
-                    <Route index element={<Dashboard />} />
-                    <Route path="dashboard" element={<Dashboard />} />
-                    <Route path="users" element={<Users />} />
-                    <Route path="tours" element={<ToursManage />} />
-                    <Route path="tours/create-tour" element={<TourCreate />} />
-                    <Route path="bookings" element={<Bookings />} />
-                    <Route path="attractions" element={<Places />} />
-                    <Route path="reports" element={<Reports />} />
-                    <Route path="settings" element={<Settings />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </div>
-              </div>
-            </ProtectedRoute>
-          } />
+
+          {/* Protected routes */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="users" element={<Users />} />
+            <Route path="tours" element={<ToursManage />} />
+            <Route path="tours/create-tour" element={<TourCreate />} />
+            <Route path="bookings" element={<Bookings />} />
+            <Route path="attractions" element={<Places />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+
+          {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </ToastProvider>
     </AuthProvider>
   );
 }
-

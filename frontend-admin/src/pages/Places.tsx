@@ -1,3 +1,4 @@
+import AddPlaceModal from "@/components/AddPlaceModal";
 import Layout from "@/components/Layout";
 import { ChevronDown, Funnel, MapPin, Search, Trash } from "lucide-react";
 import { useState } from "react";
@@ -95,6 +96,7 @@ export default function Places() {
   const [province, setProvince] = useState<string | "Tất cả">("Tất cả");
   const [sort, setSort] = useState<"Mới nhất" | "Đánh giá cao">("Mới nhất");
   const [places, setPlaces] = useState(MOCK_PLACES);
+  const [openModal, setOpenModal] = useState(false);
 
   const filtered = places
     .filter((p) => {
@@ -178,7 +180,7 @@ export default function Places() {
 
           {/* Thêm điểm đến */}
           <div className="flex items-center justify-end">
-            <button className="inline-flex items-center gap-2 rounded-md bg-sky-500 px-4 py-2 text-white hover:bg-sky-600">
+            <button  onClick={() => setOpenModal(true)} className="inline-flex items-center gap-2 rounded-md bg-sky-500 px-4 py-2 text-white hover:bg-sky-600">
               <span className="text-lg leading-none">+</span>
               <span>Thêm điểm đến</span>
             </button>
@@ -275,6 +277,28 @@ export default function Places() {
         ))}
       </div>
       </div>
+      <AddPlaceModal
+  open={openModal}
+  onClose={() => setOpenModal(false)}
+  onSubmit={(data) => {
+    setPlaces((prev) => [
+      ...prev,
+      {
+        id: String(prev.length + 1),
+        title: data.title,
+        province: data.province,
+        tag: data.category,
+        description: data.description,
+        imageUrl:
+          data.image
+            ? URL.createObjectURL(data.image)
+            : "https://via.placeholder.com/400x200",
+        rating: 0,
+        reviews: 0,
+      },
+    ]);
+  }}
+/>
     </Layout>
   );
 }

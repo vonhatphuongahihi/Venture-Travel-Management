@@ -9,7 +9,14 @@ interface AddPlaceModalProps {
   onSubmit: (data: any) => void;
 }
 
-const CATEGORIES = ["Biển", "Nhà hàng", "Resort", "Rừng", "Bảo tàng", "Khách sạn"];
+const CATEGORIES = [
+  "Biển",
+  "Nhà hàng",
+  "Resort",
+  "Rừng",
+  "Bảo tàng",
+  "Khách sạn",
+];
 const PROVINCES = [
   "TP. Hồ Chí Minh",
   "Hà Nội",
@@ -21,7 +28,11 @@ const PROVINCES = [
   "Lâm Đồng",
 ];
 
-export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModalProps) {
+export default function AddPlaceModal({
+  open,
+  onClose,
+  onSubmit,
+}: AddPlaceModalProps) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -34,7 +45,9 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -50,7 +63,15 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
     }
   };
 
-  const handleCategory = (cat: string) => setForm((f) => ({ ...f, category: cat }));
+  const removeImage = (index: number) => {
+    setForm((f) => ({
+      ...f,
+      images: f.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleCategory = (cat: string) =>
+    setForm((f) => ({ ...f, category: cat }));
 
   const handleSubmit = () => {
     if (!form.title || !form.province || !form.category) {
@@ -64,7 +85,6 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
       imageUrls: form.images.map((img) => URL.createObjectURL(img)),
     });
 
-    // Reset
     setForm({
       title: "",
       description: "",
@@ -91,7 +111,9 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
           <X size={20} />
         </button>
 
-        <h2 className="mb-4 text-lg font-semibold text-gray-800">Thêm điểm đến mới</h2>
+        <h2 className="mb-4 text-lg font-semibold text-gray-800">
+          Thêm điểm đến mới
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Form trái */}
@@ -154,7 +176,9 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
 
             {/* Category buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Loại địa điểm</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Loại địa điểm
+              </label>
               <div className="flex flex-wrap gap-2">
                 {CATEGORIES.map((c) => (
                   <button
@@ -175,28 +199,53 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
 
           {/* Cột phải: ảnh + map */}
           <div className="space-y-4">
-            {/* Upload multiple images with "+" placeholder */}
+            {/* Upload multiple images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh địa điểm</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 flex flex-col gap-2 max-h-[200px] overflow-y-auto relative">
-                <div className="grid grid-cols-2 gap-2">
-                  {form.images.map((img, idx) => (
-                    <img
-                      key={idx}
-                      src={URL.createObjectURL(img)}
-                      alt={`Preview ${idx}`}
-                      className="w-full h-[90px] object-cover rounded-md"
-                    />
-                  ))}
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ảnh địa điểm
+              </label>
 
-                  {/* Ô dấu + */}
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-2 flex flex-col gap-2 max-h-[200px] overflow-y-auto relative">
+                {form.images.length === 0 ? (
                   <div
-                    onClick={() => document.getElementById("file-input")?.click()}
-                    className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md h-[90px] cursor-pointer text-gray-400 hover:bg-gray-50"
+                    onClick={() =>
+                      document.getElementById("file-input")?.click()
+                    }
+                    className="flex flex-col items-center justify-center text-gray-400 h-[100px] cursor-pointer"
                   >
-                    <span className="text-2xl">+</span>
+                    <ImageIcon size={40} />
+                    <p className="text-xs mt-2">Chọn ảnh từ máy</p>
                   </div>
-                </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {form.images.map((img, idx) => (
+                      <div key={idx} className="relative">
+                        <img
+                          src={URL.createObjectURL(img)}
+                          alt={`Preview ${idx}`}
+                          className="w-full h-[90px] object-cover rounded-md"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                        >
+                          x
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Ô dấu + */}
+                    <div
+                      onClick={() =>
+                        document.getElementById("file-input")?.click()
+                      }
+                      className="flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md h-[90px] cursor-pointer text-gray-400 hover:bg-gray-50 text-2xl"
+                    >
+                      +
+                    </div>
+                  </div>
+                )}
 
                 <input
                   id="file-input"
@@ -210,8 +259,13 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
             </div>
 
             {/* Map placeholder */}
-            <div className="rounded-lg bg-gray-50 border border-gray-200 h-[200px] w-full flex items-center justify-center text-sm text-gray-500">
-              Interactive Google Maps integration
+            <div className="rounded-lg border border-gray-200 h-[200px] w-full overflow-hidden">
+              <iframe
+                title="Map"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=106.60%2C10.75%2C106.70%2C10.80&layer=mapnik&marker=10.7769%2C106.7009`}
+                style={{ border: 0, width: "100%", height: "100%" }}
+                loading="lazy"
+              ></iframe>
             </div>
           </div>
         </div>
@@ -219,7 +273,19 @@ export default function AddPlaceModal({ open, onClose, onSubmit }: AddPlaceModal
         {/* Buttons */}
         <div className="mt-5 flex justify-end gap-2">
           <button
-            onClick={onClose}
+            onClick={() => {
+              setForm({
+                title: "",
+                description: "",
+                province: "",
+                address: "",
+                lat: "",
+                lng: "",
+                category: "",
+                images: [],
+              });
+              onClose();
+            }}
             className="rounded-md border border-gray-200 px-4 py-2 text-gray-600 hover:bg-gray-100"
           >
             Hủy

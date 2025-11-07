@@ -46,5 +46,18 @@ export const updateProfileSchema = Joi.object({
     phone: Joi.string().pattern(/^[\+]?[0-9][\d]{0,15}$/).optional().allow(''),
     address: Joi.string().max(500).optional().allow(''),
     date_of_birth: Joi.date().iso().optional(),
-    gender: Joi.string().valid('male', 'female', 'other').optional().allow('')
+    gender: Joi.string().valid('male', 'female', 'other').optional().allow(''),
+    email: Joi.string().email().optional()
+});
+
+export const changePasswordSchema = Joi.object({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
+        .messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
+        })
+});
+
+export const changeEmailSchema = Joi.object({
+    email: Joi.string().email().required()
 });

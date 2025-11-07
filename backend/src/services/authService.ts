@@ -61,7 +61,9 @@ export class AuthService {
                             verification_expires: true,
                             last_login: true,
                             created_at: true,
-                            updated_at: true
+                            updated_at: true,
+                            google_id: true,         
+      auth_provider: true      
                         }
                     });
 
@@ -117,7 +119,9 @@ export class AuthService {
                     verification_expires: true,
                     last_login: true,
                     created_at: true,
-                    updated_at: true
+                    updated_at: true,
+                     google_id: true,         
+      auth_provider: true      
                 }
             });
 
@@ -177,7 +181,17 @@ export class AuthService {
                 };
             }
 
-            const isPasswordValid = await PasswordUtils.comparePassword(loginData.password, user.password);
+            if (!user.password) {
+  return {
+    success: false,
+    message: 'Tài khoản này không có mật khẩu. Vui lòng đăng nhập bằng Google.'
+  };
+}
+
+const isPasswordValid = await PasswordUtils.comparePassword(
+  loginData.password,
+  user.password
+);
             if (!isPasswordValid) {
                 return {
                     success: false,
@@ -264,7 +278,9 @@ export class AuthService {
                     verification_expires: true,
                     last_login: true,
                     created_at: true,
-                    updated_at: true
+                    updated_at: true,
+                     google_id: true,         
+      auth_provider: true      
                 }
             });
 

@@ -272,7 +272,7 @@ const Profile = () => {
             </div>
 
             <nav className="space-y-2">
-              <Link to="#" className="block text-m  py-2 px-3 rounded-md border text-primary border border-primary/50">Hồ sơ của tôi</Link>
+              <Link to="#" className="block text-m  py-2 px-3 rounded-md border text-primary border-primary/50">Hồ sơ của tôi</Link>
               <Link to="#" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Thông báo</Link>
               <Link to="#" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Lịch sử đặt tour</Link>
               <Link to="#" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Cài đặt</Link>
@@ -284,7 +284,7 @@ const Profile = () => {
               <button className="w-full text-m mt-3 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Về VENTURE</button>
               <button 
                 onClick={handleLogout}
-                className="w-full text-l text-red-500 text-center py-2 px-3 rounded-md mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
+                className="w-full text-l text-center py-2 px-3 rounded-md mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
               >
                 Đăng xuất
               </button>

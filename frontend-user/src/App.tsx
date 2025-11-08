@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import VerifyEmail from "./pages/VerifyEmail";
 import GoogleAuthSuccess from "./pages/GoogleAuthSuccess";
 import Profile from "./pages/Profile";
+import BookingHistory from "./pages/BookingHistory";
 import NotFound from "./pages/NotFound";
 import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
@@ -18,6 +19,7 @@ import Map from "./pages/Map";
 import TourDetail from "./pages/TourDetail";
 import ProvincePage from "./pages/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
+import AboutUs from "./pages/AboutUs";
 
 const queryClient = new QueryClient();
 
@@ -37,11 +39,13 @@ const App = () => (
               <Route path="/map" element={<Map />} />
               <Route path="/province/:slug" element={<ProvincePage />} />
               <Route path="/attraction/:slug" element={<AttractionPage />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/booking-history" element={<BookingHistory />} />
               <Route path="*" element={<NotFound />} />
             </Routes >
           </BrowserRouter >

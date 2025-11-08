@@ -47,13 +47,23 @@ const Header = () => {
               }`}>
             BẢN ĐỒ
           </Link>
-          <Link to="/explore-360"
+          <Link
+            to="/explore-360"
             className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
               ? "text-primary font-semibold"
               : "hover:text-primary"
               }`}
           >
             KHÁM PHÁ 360°
+          </Link>
+          <Link
+            to="/about"
+            className={`text-sm font-medium transition-colors ${location.pathname === "/about"
+              ? "text-primary font-semibold"
+              : "hover:text-primary"
+              }`}
+          >
+            VỀ CHÚNG TÔI
           </Link>
           <Link
             to="/contact"
@@ -132,6 +142,13 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               KHÁM PHÁ 360°
+            </Link>
+            <Link
+              to="/about"
+              className="block text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              VỀ CHÚNG TÔI
             </Link>
             <Link
               to="/contact"

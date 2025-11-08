@@ -57,15 +57,6 @@ const Header = () => {
             KHÁM PHÁ 360°
           </Link>
           <Link
-            to="/about"
-            className={`text-sm font-medium transition-colors ${location.pathname === "/about"
-              ? "text-primary font-semibold"
-              : "hover:text-primary"
-              }`}
-          >
-            VỀ CHÚNG TÔI
-          </Link>
-          <Link
             to="/contact"
             className="text-sm font-medium hover:text-primary transition-colors"
           >
@@ -142,13 +133,6 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               KHÁM PHÁ 360°
-            </Link>
-            <Link
-              to="/about"
-              className="block text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              VỀ CHÚNG TÔI
             </Link>
             <Link
               to="/contact"

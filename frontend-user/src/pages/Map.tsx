@@ -774,14 +774,8 @@ const Map = () => {
   const [openEnd, setOpenEnd] = useState(false);
 
   return (
-    <div className="flex flex-col min-h-screen space-y-10">
-      <div
-        className={`transition-all duration-1000 delay-200 ${
-          isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
-      >
+    <div className="flex flex-col min-h-screen space-y-10"> 
         <Header />
-      </div>
       {/*Title*/}
       <div
         className={`flex flex-col text-center justify-center font-['Inter'] transition-all duration-1000 delay-200 ${

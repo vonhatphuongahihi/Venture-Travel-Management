@@ -61,7 +61,9 @@ export class AuthService {
                             verification_expires: true,
                             last_login: true,
                             created_at: true,
-                            updated_at: true
+                            updated_at: true,
+                            google_id: true,
+                            auth_provider: true
                         }
                     });
 
@@ -117,7 +119,9 @@ export class AuthService {
                     verification_expires: true,
                     last_login: true,
                     created_at: true,
-                    updated_at: true
+                    updated_at: true,
+                    google_id: true,
+                    auth_provider: true
                 }
             });
 
@@ -152,7 +156,28 @@ export class AuthService {
     static async login(loginData: LoginRequest): Promise<AuthResponse> {
         try {
             const user = await prisma.user.findUnique({
-                where: { email: loginData.email }
+                where: { email: loginData.email },
+                select: {
+                    user_id: true,
+                    name: true,
+                    email: true,
+                    password: true,
+                    phone: true,
+                    address: true,
+                    profile_photo: true,
+                    date_of_birth: true,
+                    gender: true,
+                    role: true,
+                    is_active: true,
+                    is_verified: true,
+                    verification_token: true,
+                    verification_expires: true,
+                    last_login: true,
+                    created_at: true,
+                    updated_at: true,
+                    google_id: true,
+                    auth_provider: true
+                }
             });
 
             if (!user) {
@@ -174,6 +199,14 @@ export class AuthService {
                 return {
                     success: false,
                     message: 'Vui lòng xác thực email trước khi đăng nhập'
+                };
+            }
+
+            // Check if user has a password (for local authentication)
+            if (!user.password) {
+                return {
+                    success: false,
+                    message: 'Tài khoản này sử dụng phương thức đăng nhập khác'
                 };
             }
 
@@ -264,7 +297,9 @@ export class AuthService {
                     verification_expires: true,
                     last_login: true,
                     created_at: true,
-                    updated_at: true
+                    updated_at: true,
+                    google_id: true,
+                    auth_provider: true
                 }
             });
 

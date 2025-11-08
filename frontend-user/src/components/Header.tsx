@@ -144,13 +144,6 @@ const Header = () => {
               KHÁM PHÁ 360°
             </Link>
             <Link
-              to="/about"
-              className="block text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              VỀ CHÚNG TÔI
-            </Link>
-            <Link
               to="/contact"
               className="block text-sm font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}

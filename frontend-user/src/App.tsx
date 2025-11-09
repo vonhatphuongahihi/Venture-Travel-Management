@@ -49,7 +49,6 @@ const App = () => (
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/checkout" element={<Checkout />} />
-                <Route path="/test" element={<div className="p-8"><h1 className="text-2xl font-bold">Test Page Works!</h1><p>This is a test page to verify routing works.</p></div>} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />

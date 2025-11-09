@@ -17,7 +17,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/users" element={<Users />} />
-        <Route path="tours">
+        <Route path="/tours">
           <Route index element={<ToursManage />} />
           <Route path="create-tour" element={<TourCreate />} />
         </Route>

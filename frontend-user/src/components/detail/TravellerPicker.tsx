@@ -9,12 +9,13 @@ import { useState } from "react";
 import TravellerChoose from "./TravellerChoose";
 
 function TravellerPicker({
-  totalPeople,
-  ticketTypes,
-  setTicketTypes,
-  setTotalPeople,
+  ticketPrices,
+  userTicket,
+  setUserTicket
 }) {
   const [open, setOpen] = useState(false);
+  const [totalPeople, setTotalPeople] = useState(2);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -25,13 +26,13 @@ function TravellerPicker({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <TravellerChoose
-          ticketTypes={ticketTypes}
-          setTicketTypes={setTicketTypes}
-          onConfirm={() => {
+          userTicket={userTicket}
+          ticketPrices={ticketPrices}
+          onConfirm={(pc) => {
             setOpen(false);
-            setTotalPeople(
-              ticketTypes.reduce((sum, tt) => sum + tt.quantity, 0)
-            );
+            setTotalPeople(pc.reduce((sum, curr) => sum + curr.quantity, 0));
+            setUserTicket((prev)=>{return {...prev, priceCategories: pc }});
+            console.log(pc?.map(tc => ({ categoryId: tc.categoryId, name: tc.name, quantity: tc.quantity })))
           }}
         />
       </PopoverContent>

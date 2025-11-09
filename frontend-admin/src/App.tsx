@@ -28,6 +28,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+
 export default function App() {
   return (
     <AuthProvider>

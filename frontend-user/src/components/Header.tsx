@@ -60,10 +60,10 @@ const Header = () => {
             className="text-sm font-medium hover:text-primary transition-colors"
           >
             LIÊN HỆ
-          </a>
-          <a href="/book-tour" className="text-sm font-medium hover:text-primary transition-colors">
+          </Link>
+          <Link to="/book-tour" className="text-sm font-medium hover:text-primary transition-colors">
             ĐĂNG KÝ TOUR
-          </a>
+          </Link>
         </nav>
 
         {/* Login */}

@@ -20,6 +20,8 @@ import TourDetail from "./pages/TourDetail";
 import ProvincePage from "./pages/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
 import AboutUs from "./pages/AboutUs";
+import TermOfUse from "./pages/TermOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,8 @@ const App = () => (
               <Route path="/province/:slug" element={<ProvincePage />} />
               <Route path="/attraction/:slug" element={<AttractionPage />} />
               <Route path="/about" element={<AboutUs />} />
+              <Route path="/terms" element={<TermOfUse/>}/>
+              <Route path="/policy" element={<PrivacyPolicy/>}/>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email" element={<VerifyEmail />} />

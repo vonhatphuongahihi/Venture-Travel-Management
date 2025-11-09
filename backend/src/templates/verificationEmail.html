@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực tài khoản - Venture Travel</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background:#26B8ED; padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px;">Venture</h1>
+            <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Chào mừng bạn đến với Venture!</p>
+        </div>
+
+        <div style="padding: 30px; background: #f8f9fa;">
+            <h2 style="color: #333; margin-top: 0;">Xin chào {{name}}!</h2>
+
+            <p style="color: #666; line-height: 1.6;">
+                Cảm ơn bạn đã đăng ký tài khoản tại Venture. Để hoàn tất quá trình đăng ký,
+                vui lòng xác thực email của bạn bằng cách nhấp vào nút bên dưới:
+            </p>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{verificationUrl}}"
+                   style="background:#26B8ED;
+                          color: white;
+                          padding: 15px 30px;
+                          text-decoration: none;
+                          border-radius: 25px;
+                          font-weight: bold;
+                          display: inline-block;">
+                  Xác thực Email
+                </a>
+            </div>
+
+            <p style="color: #666; line-height: 1.6; font-size: 14px;">
+                Nếu nút trên không hoạt động, bạn có thể copy và paste link sau vào trình duyệt:
+            </p>
+
+            <p style="background: #e9ecef; padding: 15px; border-radius: 5px; word-break: break-all; font-size: 12px; color: #495057;">
+                {{verificationUrl}}
+            </p>
+
+            <p style="color: #666; line-height: 1.6; font-size: 14px;">
+                <strong>Lưu ý:</strong> Link xác thực sẽ hết hạn sau 24 giờ. Nếu bạn không thực hiện xác thực trong thời gian này,
+                bạn sẽ cần đăng ký lại.
+            </p>
+        </div>
+
+        <div style="background: #343a40; padding: 20px; text-align: center;">
+            <p style="color: #adb5bd; margin: 0; font-size: 14px;">
+                © 2024 Venture. Tất cả quyền được bảo lưu.
+            </p>
+            <p style="color: #adb5bd; margin: 5px 0 0 0; font-size: 12px;">
+                Email này được gửi tự động, vui lòng không trả lời.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

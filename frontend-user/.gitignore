@@ -22,5 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.json
+package.json
+.vscode
 
 .vite
+.env

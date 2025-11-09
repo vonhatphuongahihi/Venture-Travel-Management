@@ -214,7 +214,7 @@ const Explore360 = () => {
                 </div>
 
                 {/* Social Media Icons */}
-                <div className="absolute bottom-10 left-10 flex gap-4 hidden lg:flex">
+                <div className="absolute bottom-10 left-10  gap-4 hidden lg:flex">
                     <div className="flex space-x-4">
                         <a
                             href="https://www.instagram.com/tuhy.sapoche.99"

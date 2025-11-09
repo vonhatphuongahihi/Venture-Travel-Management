@@ -70,6 +70,7 @@ input, textarea, button {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
   }
 }
 
@@ -77,10 +78,13 @@ input, textarea, button {
   * {
     @apply border-border;
   }
+
+
   body {
     @apply bg-background text-foreground;
   }
 }
+
 
 .my-quill-new .ql-toolbar {
   border: none;
@@ -105,4 +109,5 @@ input, textarea, button {
   font-size: 16px;
   content: attr(data-placeholder); 
 }
+
 

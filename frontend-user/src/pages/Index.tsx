@@ -28,7 +28,10 @@ const Index = () => {
         <DestinationsSection />
         <MapSection />
       </main>
-      <div className={`transition-all duration-1000 delay-400 ${isPageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div
+        className={`transition-all duration-1000 delay-400 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+      >
         <Footer />
       </div>
     </div>

@@ -21,6 +21,13 @@ export class JWTUtils {
         return jwt.sign(payload, secret, { expiresIn: expiresIn as any });
     }
 
+    static generatePasswordResetToken(payload: { userId: string; email: string; type: string }): string {
+        const secret = process.env.JWT_SECRET || 'fallback-secret';
+        const expiresIn = '1h'; // Password reset tokens expire in 1 hour
+
+        return jwt.sign(payload, secret, { expiresIn });
+    }
+
     static verifyToken(token: string): any {
         const secret = process.env.JWT_SECRET || 'fallback-secret';
         return jwt.verify(token, secret);

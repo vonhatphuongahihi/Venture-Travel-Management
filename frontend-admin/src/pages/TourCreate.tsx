@@ -6,7 +6,7 @@ import FormTextArea from "@/components/tour-create/FormTextArea";
 import ImageUploader from "@/components/tour-create/ImageUploader";
 import { SearchableSelect } from "@/components/tour-create/SearchableSelect";
 import TextEditor from "@/components/tour-create/TextEditor";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, set } from "react-hook-form";
 import { Plus, X } from "lucide-react";
 import {
     Select,
@@ -15,15 +15,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+import TicketFormModal from "@/components/tour-create/TicketFormModal";
 type TourStop = {
     attrationId: string;
     notes: string;
     details: string;
 };
 
-type FormValues = {
+type TourFormValues = {
     provinceId: string;
     name: string;
     about: string;
@@ -41,6 +43,30 @@ type FormValues = {
     pickupPoint: string;
     pickupDetails: string;
     tourStops: TourStop[];
+};
+
+type PriceCategory = {
+    label: string;
+    value: string;
+    description?: string;
+    price: number;
+    quantity: number;
+};
+
+type TicketData = {
+    id?: string;
+    ticketName: string;
+    quantity: number;
+    note: string;
+    prices: PriceCategory[];
+};
+
+type AddTicketModalProps = {
+    open: boolean;
+    onClose: () => void;
+    onAddTicket: (ticket: TicketData) => void;
+    onUpdateTicket: (ticket: TicketData) => void;
+    editingTicket?: TicketData | null;
 };
 
 const provinceOptions = [
@@ -93,7 +119,7 @@ const TourCreate = () => {
         handleSubmit,
         formState: { errors },
         control,
-    } = useForm<FormValues>({
+    } = useForm<TourFormValues>({
         defaultValues: {
             cancellationPolicy: "",
             expectations: "",
@@ -113,13 +139,67 @@ const TourCreate = () => {
     });
 
     const navigate = useNavigate();
-    const onSubmitTour = (data: FormValues) => {
-        console.log(data);
+
+    const [step, setStep] = useState(1);
+
+    const [tourData, setTourData] = useState<TourFormValues | null>(null);
+
+    const onSubmitTour = (data: TourFormValues) => {
+        setStep(2);
+        setTourData(data);
     };
 
-    return (
-        <Layout title="Quản lý tour">
-            <div className="px-[60px] py-2 mb-[100px]">
+    const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+
+    const [tickets, setTickets] = useState<TicketData[]>([]);
+    const [editingTicket, setEditingTicket] = useState<TicketData | null>(null);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [formKey, setFormKey] = useState(0);
+
+    const handleAddTicket = (ticket: TicketData) => {
+        setTickets([...tickets, ticket]);
+    };
+
+    const handleUpdateTicket = (updatedTicket: TicketData) => {
+        if (editingIndex === null) {
+            return;
+        }
+        const updatedTickets = [...tickets];
+        updatedTickets[editingIndex] = updatedTicket;
+        setTickets(updatedTickets);
+    };
+
+    const handleEditTicket = (ticket: TicketData, index: number) => {
+        setEditingTicket(ticket);
+        setEditingIndex(index);
+        setFormKey((prev) => prev + 1);
+        setIsTicketModalOpen(true);
+    };
+
+    const handleDeleteTicket = (index: number) => {
+        const newTickets = [...tickets];
+        newTickets.splice(index, 1);
+        setTickets(newTickets);
+
+        if (editingIndex === null) {
+            return;
+        }
+
+        if (editingIndex === index) {
+            setEditingIndex(null);
+            setEditingTicket(null);
+        } else if (editingIndex > index) {
+            setEditingIndex(editingIndex - 1);
+        }
+    };
+
+    const handleCancelEdit = () => {
+        setEditingTicket(null);
+        setEditingIndex(null);
+    };
+    const TourCreateStep1 = () => {
+        return (
+            <div>
                 <div className="flex items-center justify-between">
                     <h3 className="text-[18px] font-semibold text-primary">Thêm thông tin tour</h3>
                     <div className="flex gap-2">
@@ -143,16 +223,16 @@ const TourCreate = () => {
                             <h2 className="font-semibold text-lg px-6 py-4 border-b">
                                 Thông tin tour
                             </h2>
-                            <div className="space-y-4 p-6 overflow-auto">
+                            <div className="space-y-4 p-6">
                                 <div className="flex gap-2">
                                     <FormInput
                                         label={"Tên tour"}
                                         name={"name"}
                                         register={register}
                                         errors={errors}
-                                        validationRules={{
-                                            required: "Tên là bắt buộc",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Tên là bắt buộc",
+                                        // }}
                                         placeholder={"Tên tour"}
                                         className="flex-1"
                                     ></FormInput>
@@ -161,9 +241,9 @@ const TourCreate = () => {
                                         name={"provinceId"}
                                         control={control}
                                         placeholder={"Chọn thành phố"}
-                                        validationRules={{
-                                            required: "Thành phố là bắt buộc",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Thành phố là bắt buộc",
+                                        // }}
                                         options={provinceOptions}
                                         className="flex-1 flex flex-col"
                                     ></FormSelect>
@@ -174,9 +254,9 @@ const TourCreate = () => {
                                     placeholder="Nhập tổng quan"
                                     errors={errors}
                                     register={register}
-                                    validationRules={{
-                                        required: "Tổng quan là bắt buộc",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Tổng quan là bắt buộc",
+                                    // }}
                                     row={4}
                                 ></FormTextArea>
                                 <div className="flex gap gap-2">
@@ -185,9 +265,9 @@ const TourCreate = () => {
                                         name={"ageRange"}
                                         register={register}
                                         errors={errors}
-                                        validationRules={{
-                                            required: "Độ tuổi là bắt buộc",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Độ tuổi là bắt buộc",
+                                        // }}
                                         placeholder={"VD: 1-80 tuổi"}
                                         className="flex-1"
                                     ></FormInput>
@@ -196,9 +276,9 @@ const TourCreate = () => {
                                         name={"maxGroupSize"}
                                         register={register}
                                         errors={errors}
-                                        validationRules={{
-                                            required: "Số lượng người tối đa là bắt buộc",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Số lượng người tối đa là bắt buộc",
+                                        // }}
                                         placeholder={"Nhập số lượng người tối đa"}
                                         className="flex-1"
                                     ></FormInput>
@@ -207,9 +287,9 @@ const TourCreate = () => {
                                         name={"name"}
                                         register={register}
                                         errors={errors}
-                                        validationRules={{
-                                            required: "Thời lượng tour là bắt buộc",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Thời lượng tour là bắt buộc",
+                                        // }}
                                         placeholder={"VD: 12-13 tiếng, 2 ngày 3 đêm,..."}
                                         className="flex-1"
                                     ></FormInput>
@@ -220,9 +300,9 @@ const TourCreate = () => {
                                     name="languages"
                                     placeholder="Chọn dịch vụ ngôn ngữ"
                                     options={languagesOptionList}
-                                    validationRules={{
-                                        required: "Cần chọn ít nhất một dịch vụ ngôn ngữ",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Cần chọn ít nhất một dịch vụ ngôn ngữ",
+                                    // }}
                                 ></FormMutilpeSelect>
                                 <FormMutilpeSelect
                                     control={control}
@@ -230,9 +310,9 @@ const TourCreate = () => {
                                     name="categories"
                                     placeholder="Chọn danh mục tour"
                                     options={tourCategoryOptionList}
-                                    validationRules={{
-                                        required: "Cần chọn ít nhất một danh mục tour",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Cần chọn ít nhất một danh mục tour",
+                                    // }}
                                 ></FormMutilpeSelect>
                                 <FormTextArea
                                     label="Các điểm nổi bật"
@@ -250,9 +330,9 @@ const TourCreate = () => {
                                         errors={errors}
                                         register={register}
                                         row={5}
-                                        validationRules={{
-                                            required: "Cần nhập các dịch vụ tour bao gồm",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Cần nhập các dịch vụ tour bao gồm",
+                                        // }}
                                     ></FormTextArea>
                                     <FormTextArea
                                         label="Tour không bao gồm"
@@ -261,39 +341,39 @@ const TourCreate = () => {
                                         errors={errors}
                                         register={register}
                                         row={5}
-                                        validationRules={{
-                                            required: "Cần nhập các dịch vụ tour không bao gồm",
-                                        }}
+                                        // validationRules={{
+                                        //     required: "Cần nhập các dịch vụ tour không bao gồm",
+                                        // }}
                                     ></FormTextArea>
                                 </div>
                                 <TextEditor
                                     label={"Những điều đáng mong đợi"}
                                     name="expectations"
                                     placeholder="Những điều đáng mong đợi..."
-                                    validationRules={{
-                                        required: "Lịch trình tour là bắt buộc",
-                                        validate: (value) =>
-                                            (value &&
-                                                typeof value === "string" &&
-                                                value.replace(/<(.|\n)*?>/g, "").trim().length >
-                                                    0) ||
-                                            "Không được để trống",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Lịch trình tour là bắt buộc",
+                                    //     validate: (value) =>
+                                    //         (value &&
+                                    //             typeof value === "string" &&
+                                    //             value.replace(/<(.|\n)*?>/g, "").trim().length >
+                                    //                 0) ||
+                                    //         "Không được để trống",
+                                    // }}
                                     control={control}
                                 ></TextEditor>
                                 <TextEditor
                                     label={"Chính sách hủy vé"}
                                     name="cancellationPolicy"
                                     placeholder="Chính sách hủy vé..."
-                                    validationRules={{
-                                        required: "Chính sách hủy vé là bắt buộc",
-                                        validate: (value) =>
-                                            (value &&
-                                                typeof value === "string" &&
-                                                value.replace(/<(.|\n)*?>/g, "").trim().length >
-                                                    0) ||
-                                            "Không được để trống",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Chính sách hủy vé là bắt buộc",
+                                    //     validate: (value) =>
+                                    //         (value &&
+                                    //             typeof value === "string" &&
+                                    //             value.replace(/<(.|\n)*?>/g, "").trim().length >
+                                    //                 0) ||
+                                    //         "Không được để trống",
+                                    // }}
                                     control={control}
                                 ></TextEditor>
                                 <TextEditor
@@ -311,7 +391,7 @@ const TourCreate = () => {
                             <h2 className="font-semibold text-lg px-6 py-4 border-b">
                                 Thông tin tập trung đón khách
                             </h2>
-                            <div className="space-y-4 p-6 overflow-auto">
+                            <div className="space-y-4 p-6">
                                 <div>
                                     <label
                                         className={`mb-2
@@ -353,9 +433,9 @@ const TourCreate = () => {
                                     placeholder="Thông tin chi tiết"
                                     errors={errors}
                                     register={register}
-                                    validationRules={{
-                                        required: "Thông tin chi tiết khi đón khách là bắt buộc",
-                                    }}
+                                    // validationRules={{
+                                    //     required: "Thông tin chi tiết khi đón khách là bắt buộc",
+                                    // }}
                                     row={4}
                                 ></FormTextArea>
                                 <div>
@@ -400,9 +480,9 @@ const TourCreate = () => {
                                                     name={`tourStops.${index}.notes`}
                                                     register={register}
                                                     errors={errors}
-                                                    validationRules={{
-                                                        required: "Chú thích là bắt buộc",
-                                                    }}
+                                                    // validationRules={{
+                                                    //     required: "Chú thích là bắt buộc",
+                                                    // }}
                                                     placeholder="Nhập chú thích"
                                                 ></FormInput>
                                                 <FormTextArea
@@ -410,9 +490,9 @@ const TourCreate = () => {
                                                     name={`tourStops.${index}.details`}
                                                     register={register}
                                                     errors={errors}
-                                                    validationRules={{
-                                                        required: "Mô tả là bắt buộc",
-                                                    }}
+                                                    // validationRules={{
+                                                    //     required: "Mô tả là bắt buộc",
+                                                    // }}
                                                     placeholder="Nhập mô tả"
                                                 ></FormTextArea>
                                             </div>
@@ -446,10 +526,133 @@ const TourCreate = () => {
                             type="submit"
                             className="ml-auto inline-flex justify-center py-2 px-4 border border-transparent shadow-sm font-medium rounded-md text-white bg-primary"
                         >
-                            Thêm tour
+                            Thêm loại vé
                         </button>
                     </div>
                 </form>
+            </div>
+        );
+    };
+
+    const TourCreateStep2 = () => {
+        return (
+            <div>
+                <h3 className="text-[18px] font-semibold text-primary">Thêm thông tin vé</h3>
+                <div className="bg-white rounded-lg shadow-md mt-6">
+                    <div className="border-b flex px-6 py-4 items-center justify-between">
+                        <h2 className="font-semibold text-lg  ">Thêm loại vé</h2>
+                        <button
+                            onClick={() => {
+                                setIsTicketModalOpen(true);
+                                console.log(1);
+                            }}
+                            className="px-3 py-2 bg-primary rounded-lg text-white flex items-center gap-1 cursor-pointer hover:opacity-80"
+                        >
+                            <Plus className=""></Plus>
+                            Thêm loại vé
+                        </button>
+                    </div>
+                    {tickets.length === 0 ? (
+                        <div className="min-h-[80px] flex items-center justify-center">
+                            <p className="font-semibold">
+                                Chưa có loại vé được thêm. Nhấn "Thêm loại vé" đế bắt đầu
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="p-6 flex flex-col gap-4">
+                            {tickets.map((ticket, index) => (
+                                <div
+                                    key={index}
+                                    className="border rounded-lg bg-white shadow-sm max-w-4xl"
+                                >
+                                    {/* Header */}
+                                    <div className="relative rounded-t-lg p-4 bg-gray-100">
+                                        <div className="w-[62%]">
+                                            <h3 className="text-md font-semibold text-gray-900 line-clamp-1">
+                                                {ticket.ticketName}
+                                            </h3>
+                                            <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+                                                {ticket.note}
+                                            </p>
+                                        </div>
+                                        <div className="absolute top-4 right-4 flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleDeleteTicket(index)}
+                                                className="px-4 py-1.5 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                                            >
+                                                Xóa
+                                            </button>
+                                            <button
+                                                onClick={() => handleEditTicket(ticket, index)}
+                                                className="px-4 py-1.5 bg-cyan-500 text-white text-sm rounded hover:bg-cyan-600 transition-colors"
+                                            >
+                                                Sửa
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4">
+                                        <p className="text-sm font-medium mb-3">
+                                            Bảng giá theo danh mục
+                                        </p>
+
+                                        {/* Price Categories Grid */}
+                                        <div className="flex flex-wrap gap-3">
+                                            {ticket.prices.map((category, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="bg-gray-50 border border-gray-200 rounded p-3"
+                                                >
+                                                    <p className="text-sm font-medium text-gray-700 mb-1">
+                                                        {category.label}
+                                                    </p>
+                                                    <p className="text-lg font-semibold text-primary mb-1">
+                                                        {category.price.toLocaleString("vi-VN")} VNĐ
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {category.quantity} vé
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <TicketFormModal
+                    key={formKey}
+                    open={isTicketModalOpen}
+                    onClose={() => {
+                        setIsTicketModalOpen(false);
+                        setFormKey((prev) => prev + 1);
+                    }}
+                    onAddTicket={(ticket) => handleAddTicket(ticket)}
+                    onUpdateTicket={(ticket) => handleUpdateTicket(ticket)}
+                    editingTicket={editingTicket}
+                    onCancelEdit={handleCancelEdit}
+                ></TicketFormModal>
+                <div className="flex gap-4 mt-4 justify-end">
+                    <button
+                        onClick={() => setStep(1)}
+                        className="text-gray-600 text-base bg-white px-6 py-2 rounded border border-1 border-gray-500"
+                    >
+                        Quay lại
+                    </button>
+                    <button className="bg-primary text-base text-white px-4 py-2 rounded">
+                        Tạo tour
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <Layout title="Quản lý tour">
+            <div className="px-[60px] py-2">
+                {step === 1 && <TourCreateStep1></TourCreateStep1>}
+                {step === 2 && <TourCreateStep2></TourCreateStep2>}
             </div>
         </Layout>
     );

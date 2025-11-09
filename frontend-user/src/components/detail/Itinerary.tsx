@@ -2,30 +2,72 @@ import { TourRoute, TourStop } from "@/types/tourDetailType";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { BusFront } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
+
+function StopDetail({
+  stop,
+  zoomStop,
+}: {
+  stop: TourStop;
+  zoomStop: (geom: [number, number]) => void;
+}) {
+  const [openDetail, setOpenDetail] = useState<boolean>(false);
+  return (
+    <div className="w-full min-h-14 flex items-start space-x-5">
+      <div className="bg-primary flex items-center justify-center w-14 h-14 rounded-full text-white p-2">
+        {stop.stopOrder}
+      </div>
+      <div className="w-[500px] cursor-pointer">
+        <div
+          className="flex items-center justify-between"
+          onClick={() => zoomStop(stop.attractionGeom)}
+        >
+          <p className="font-semibold">{stop.attractionName}</p>
+          <p>{stop.notes}</p>
+        </div>
+        <Collapsible open={openDetail} onOpenChange={setOpenDetail}>
+          <CollapsibleContent>
+            <div className="mb-5">
+              <img
+                src={stop.attractionImage}
+                alt={stop.attractionName}
+                className="w-full h-48 object-cover rounded-lg my-2"
+              />
+              <p className="text-gray-500">{stop.details}</p>
+              <Button className="mt-2 bg-white outline outline-2 text-primary hover:bg-primary/80 hover:text-white">
+                Tìm hiểu thêm về {stop.attractionName}
+              </Button>
+            </div>
+          </CollapsibleContent>
+          <CollapsibleTrigger asChild>
+            <button className="hover:text-primary underline">
+              {openDetail ? "Ẩn bớt" : "Xem chi tiết và hình ảnh"}
+            </button>
+          </CollapsibleTrigger>
+        </Collapsible>
+      </div>
+    </div>
+  );
+}
 
 export default function Itinerary({
   tourStop,
   tourRoute,
+  setPUOpen,
 }: {
   tourStop: TourStop[];
   tourRoute: TourRoute;
+  setPUOpen: (open: boolean) => void;
 }) {
-  {
+  
     const mapRef = useRef<HTMLDivElement>(null);
     const leafletMap = useRef<any>(null);
     const layersRef = useRef<any[]>([]);
-    const [openDetail, setOpenDetail] = useState<boolean[]>([]);
-    useEffect(() => {
-      if (tourStop && tourStop.length > 0) {
-        setOpenDetail(Array(tourStop.length).fill(false));
-      }
-    }, [tourStop]);
 
-    const toggleDetail = (index: number) => {
-      setOpenDetail((prev) =>
-        prev.map((item, i) => (i === index ? !item : item))
-      );
-    };
     useEffect(() => {
       const loadLeaflet = async () => {
         // load CSS
@@ -68,12 +110,17 @@ export default function Itinerary({
 
         // Zoom
         if (tourStop && tourStop.length > 0) {
-            const L = (window as any).L;
-            const bounds = L.latLngBounds(tourStop.map(stop => [stop.attractionGeom[1],stop.attractionGeom[0]]));
-            leafletMap.current.fitBounds(bounds, { padding: [30, 30] }); // padding để không bị sát mép
-          } else {
-            // fallback nếu không có điểm nào
-            leafletMap.current.setView([16.047079, 108.20623], 6); // trung tâm VN
+          const L = (window as any).L;
+          const bounds = L.latLngBounds(
+            tourStop.map((stop) => [
+              stop.attractionGeom[1],
+              stop.attractionGeom[0],
+            ])
+          );
+          leafletMap.current.fitBounds(bounds, { padding: [30, 30] }); // padding để không bị sát mép
+        } else {
+          // fallback nếu không có điểm nào
+          leafletMap.current.setView([16.047079, 108.20623], 6); // trung tâm VN
         }
 
         renderLayers(); // mặc định hiển thị tour
@@ -100,7 +147,7 @@ export default function Itinerary({
       // Thêm các điểm dừng
       tourStop.forEach((stop) => {
         const customIcon = L.divIcon({
-            html: `
+          html: `
               <div style="
                 width: 32px;
                 height: 32px;
@@ -118,10 +165,10 @@ export default function Itinerary({
                 ${stop.stopOrder}
               </div>
             `,
-            className: "", // bỏ class mặc định của Leaflet để tránh style override
-            iconSize: [32, 32],
-            iconAnchor: [16, 16], // tâm icon nằm chính giữa
-          });
+          className: "", // bỏ class mặc định của Leaflet để tránh style override
+          iconSize: [32, 32],
+          iconAnchor: [16, 16], // tâm icon nằm chính giữa
+        });
         const popupContent = `<b>${stop.stopOrder}</b><br>${
           stop.attractionName || ""
         }`;
@@ -141,16 +188,16 @@ export default function Itinerary({
       layersRef.current.push(routeLine);
     };
     const zoomStop = (geom: [number, number]) => {
-        if (!leafletMap.current) return;
-        const L = (window as any).L;
-        const [lng, lat] = geom;
-      
-        leafletMap.current.flyTo([lat, lng], 14, {
-          animate: true,
-          duration: 1.5, // thời gian bay (giây)
-          easeLinearity: 0.25, // độ mượt của đường bay
-        });
-      };
+      if (!leafletMap.current) return;
+      const L = (window as any).L;
+      const [lng, lat] = geom;
+
+      leafletMap.current.flyTo([lat, lng], 14, {
+        animate: true,
+        duration: 1.5, // thời gian bay (giây)
+        easeLinearity: 0.25, // độ mượt của đường bay
+      });
+    };
     return (
       <div className="container mx-auto space-x-5 flex justify-between mt-5">
         {/* Itinerary List */}
@@ -171,6 +218,7 @@ export default function Itinerary({
                     const y =
                       el.getBoundingClientRect().top + window.scrollY - 80; // chừa cho navbar
                     window.scrollTo({ top: y, behavior: "smooth" });
+                    setPUOpen(true);
                   }
                 }}
               >
@@ -180,41 +228,11 @@ export default function Itinerary({
           </div>
           {tourStop.map((stop) => {
             return (
-              <div
+              <StopDetail
+                stop={stop}
+                zoomStop={zoomStop}
                 key={stop.stopOrder}
-                className="w-full min-h-14 flex items-start space-x-5"
-              >
-                <div className="bg-primary flex items-center justify-center w-14 h-14 rounded-full text-white p-2">
-                  {stop.stopOrder}
-                </div>
-                <div className="w-[500px] cursor-pointer">
-                  <div className="flex items-center justify-between" onClick={()=>zoomStop(stop.attractionGeom)}>
-                    <p className="font-semibold">{stop.attractionName}</p>
-                    <p>{stop.notes}</p>
-                  </div>
-                  {openDetail[stop.stopOrder - 1] && (
-                    <div className="mb-5">
-                      <img
-                        src={stop.attractionImage}
-                        alt={stop.attractionName}
-                        className="w-full h-48 object-cover rounded-lg my-2"
-                      />
-                      <p className="text-gray-500">{stop.details}</p>
-                      <Button className="mt-2 bg-white outline outline-2 text-primary hover:bg-primary/80 hover:text-white">
-                        Tìm hiểu thêm về {stop.attractionName}
-                      </Button>
-                    </div>
-                  )}
-                  <button
-                    className="hover:text-primary underline"
-                    onClick={() => toggleDetail(stop.stopOrder - 1)}
-                  >
-                    {openDetail[stop.stopOrder - 1]
-                      ? "Ẩn bớt"
-                      : "Xem chi tiết và hình ảnh"}
-                  </button>
-                </div>
-              </div>
+              />
             );
           })}
         </div>
@@ -224,5 +242,5 @@ export default function Itinerary({
         </div>
       </div>
     );
-  }
+  
 }

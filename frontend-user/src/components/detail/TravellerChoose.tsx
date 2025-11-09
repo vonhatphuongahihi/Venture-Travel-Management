@@ -1,37 +1,95 @@
-import { TicketType } from "@/types/tourDetailType";
+import { PriceCategories, TicketType } from "@/types/tourDetailType";
 import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
 
-export default function TravellerChoose({ticketTypes , setTicketTypes, onConfirm}:{ticketTypes: TicketType[] | undefined, setTicketTypes: (ticketTypes: TicketType[]) => void, onConfirm : () => void}) {
-    const addOne = (t : TicketType) => {
-        setTicketTypes(ticketTypes.map(ticket => ticket.ticketTypeId === t.ticketTypeId ? {...ticket, quantity: ticket.quantity + 1} : ticket));
+export default function TravellerChoose({
+  userTicket,
+  ticketPrices,
+  onConfirm,
+}) {
+  const [priceCategories, setPriceCategories] = useState([]);
+  useEffect(() => {
+    if(userTicket?.priceCategories && userTicket?.priceCategories.length > 0){
+      setPriceCategories(userTicket?.priceCategories);
+      return;
     }
-    const minusOne = (t : TicketType) => {
-        setTicketTypes(ticketTypes.map(ticket => ticket.ticketTypeId === t.ticketTypeId ? {...ticket, quantity: ticket.quantity - 1} : ticket));
-    }
-    return (
-    <div className="w-[400px] bg-white rounded-lg outline outline-1 outline-primary p-5" onClick={()=>{}}>
-      {ticketTypes?.map((t, i) => {
+    const categories = ticketPrices.map((ut) => ut.categoryId);
+    // Lấy các priceCategory từ categoryId trong ticketPrices (mảng categories)
+    const samplePriceCategories: PriceCategories[] = [
+      {
+        categoryId: "pc_001",
+        name: "Người lớn",
+        description: "Từ 12 tuổi trở lên",
+        createdAt: new Date("2025-09-01T10:00:00"),
+      },
+      {
+        categoryId: "pc_002",
+        name: "Trẻ em",
+        description: "Từ 5 đến dưới 12 tuổi",
+        createdAt: new Date("2025-09-01T10:00:00"),
+      },
+    ];
+    setPriceCategories(samplePriceCategories?.map((pc)=>{return {
+      ... pc,
+      quantity: 1,
+    }}));
+  },[]);
+  const addOne = (t) => {
+    setPriceCategories((prev) =>
+      prev.map((pc) =>
+        pc.categoryId === t.categoryId
+          ? { ...pc, quantity: pc.quantity + 1 }
+          : pc
+      )
+    );
+  };
+  const minusOne = (t) => {
+    setPriceCategories((prev) =>
+      prev.map((pc) =>
+        pc.categoryId === t.categoryId
+          ? { ...pc, quantity: pc.quantity - 1 }
+          : pc
+      )
+    );
+  };
+  return (
+    <div
+      className="w-[400px] bg-white rounded-lg outline outline-1 outline-primary p-5"
+      onClick={() => {}}
+    >
+      {priceCategories?.map((t, i) => {
         return (
-          <div className="w-full flex justify-between p-2">
+          <div className="w-full flex justify-between p-2" key={i}>
             <div className="text-left space-y-1 flex-col">
               <p className="capitalize text font-semibold">{t.name}</p>
-              <p className="text-sm text-gray-500">{t.notes}</p>
+              <p className="text-sm text-gray-500">{t.description}</p>
             </div>
             <div className="space-x-2 flex items-center">
-                <button className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400" disabled={t.quantity===0}
-                onClick={()=>minusOne(t)}>
-                    -
-                </button>
-                <span className="w-10 text-center text-lg font-semibold">{t.quantity}</span>
-                <button className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400" disabled={t.quantity===15}
-                onClick={()=>addOne(t)}>
-                    +
-                </button>
+              <button
+                className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400"
+                disabled={priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity === 0}
+                onClick={() => minusOne(t)}
+              >
+                -
+              </button>
+              <span className="w-10 text-center text-lg font-semibold">
+                {priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity ? priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity : 0}
+              </span>
+              <button
+                className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400"
+                disabled={priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity === 15} // Giới hạn tối đa 15 người 1 lần :)
+                onClick={() => addOne(t)}
+              >
+                +
+              </button>
             </div>
           </div>
         );
       })}
-      <Button className="w-full bg-primary rounded-lg text-white hover:bg-[#0891B2] mt-5" onClick={onConfirm}>
+      <Button
+        className="w-full bg-primary rounded-lg text-white hover:bg-[#0891B2] mt-5"
+        onClick={()=>onConfirm(priceCategories)}
+      >
         Xác nhận
       </Button>
     </div>

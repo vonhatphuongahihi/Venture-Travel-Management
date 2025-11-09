@@ -74,7 +74,7 @@ export interface ReviewLikes {
   createdAt: Date; //created_at
 }
 
-export interface TicketType {
+export interface TicketType { // Thường, Cao cấp, ...
   ticketTypeId: string;
   tourId: string; // FK -> tours.tour_id
   name: string;
@@ -83,4 +83,23 @@ export interface TicketType {
   price: number;
   isActive: boolean;
   createdAt: Date; // ISO timestamp
+}
+
+export interface PriceCategories{ // Người lớn, trẻ em, ...
+  categoryId: string;
+  name: string;
+  description?: string;
+  createdAt: Date;
+}
+
+export interface TicketPrices{
+  ticketPriceId: string ;
+  ticketTypeId: string ; // FK -> ticket_types.ticket_type_id
+  categoryId: string ; // FK -> price_categories.category_id
+  notes?: string;
+  price: number;
+  quantity: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt?: Date;
 }

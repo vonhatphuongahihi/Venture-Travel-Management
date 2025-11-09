@@ -21,10 +21,10 @@ export default function BookTourNew() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Hero Section with Navigation */}
       <TourHero
-        backgroundImage="https://placehold.co/1440x763"
+        backgroundImage={MOCK_TOUR_DATA.images[0]}
         title="ĐỒNG HÀNH CÙNG BẠN ĐẾN MỌI MIỀN TỔ QUỐC VIỆT NAM"
       >
         <div className="relative z-10">
@@ -33,7 +33,7 @@ export default function BookTourNew() {
       </TourHero>
 
       {/* Main Content */}
-      <div className="max-w-[1328px] mx-auto my-[72px] shadow-[0px_4px_48px_12px_rgba(0,0,0,0.09)] bg-white p-[38px]">
+      <div className="max-w-[1328px] mx-auto my-[72px] shadow-[0px_4px_48px_12px_rgba(0,0,0,0.09)] bg-card p-[38px] border border-border">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Tour Info */}
           <div className="lg:col-span-2">

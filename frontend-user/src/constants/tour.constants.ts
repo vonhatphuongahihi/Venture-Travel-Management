@@ -1,3 +1,11 @@
+import heroImg from '@/assets/hero-vietnam.jpg';
+import beachImg from '@/assets/beach-destination.jpg';
+import seaImg from '@/assets/landscape-sea.jpg';
+import villageImg from '@/assets/village.jpg';
+import fansipanImg from '@/assets/fansipan.jpg';
+import saigonImg from '@/assets/saigon.jpg';
+import top2 from '@/assets/top-2-destination.png';
+
 // Tour constants and mock data
 export const MOCK_TOUR_DATA = {
   id: 'ninh-binh-tour',
@@ -16,13 +24,13 @@ Ngoài ra, bạn sẽ ghé thăm cố đô Hoa Lư – kinh đô đầu tiên c�
   returnTime: 'Khoảng 06:30 chiều (cùng ngày)',
   dressCode: 'Quần áo thoải mái, nhẹ nhàng',
   images: [
-    'https://placehold.co/670x420',
-    'https://placehold.co/236x240',
-    'https://placehold.co/237x240',
-    'https://placehold.co/236x240',
-    'https://placehold.co/237x240',
-    'https://placehold.co/236x240',
-    'https://placehold.co/236x240',
+    heroImg,
+    beachImg,
+    seaImg,
+    villageImg,
+    fansipanImg,
+    saigonImg,
+    top2,
   ],
   included: [
     'Ăn trưa',

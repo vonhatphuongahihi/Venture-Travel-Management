@@ -29,11 +29,11 @@ export const BookingFormCard = ({
   };
 
   return (
-    <div className="bg-[#EDEDED] p-8 rounded-lg sticky top-4">
-      <h2 className="text-[#54C6EE] text-[42px] font-bold text-center mb-4">
+    <div className="bg-card p-8 rounded-lg sticky top-4 border border-border shadow-lg">
+      <h2 className="text-primary text-[42px] font-bold text-center mb-4">
         {title}
       </h2>
-      <p className="text-center text-black text-[16px] mb-8">{description}</p>
+      <p className="text-center text-muted-foreground text-[16px] mb-8">{description}</p>
 
       <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
         <FormField
@@ -44,7 +44,7 @@ export const BookingFormCard = ({
             placeholder="Tên"
             value={formData.name}
             onChange={(e) => handleChange('name', e.target.value)}
-            className={`bg-white h-[76px] pl-12 ${errors.name ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.name ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -57,7 +57,7 @@ export const BookingFormCard = ({
             placeholder="Email"
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
-            className={`bg-white h-[76px] pl-12 ${errors.email ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.email ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -70,7 +70,7 @@ export const BookingFormCard = ({
             placeholder="Xác nhận email"
             value={formData.confirmEmail}
             onChange={(e) => handleChange('confirmEmail', e.target.value)}
-            className={`bg-white h-[76px] pl-12 ${errors.confirmEmail ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.confirmEmail ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -83,7 +83,7 @@ export const BookingFormCard = ({
             placeholder="Điện thoại"
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
-            className={`bg-white h-[76px] pl-12 ${errors.phone ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.phone ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -96,7 +96,7 @@ export const BookingFormCard = ({
             placeholder="Chọn ngày"
             value={formData.date}
             onChange={(e) => handleChange('date', e.target.value)}
-            className={`bg-white h-[76px] pl-12 ${errors.date ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.date ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -110,7 +110,7 @@ export const BookingFormCard = ({
             placeholder="Số vé"
             value={formData.tickets}
             onChange={(e) => handleChange('tickets', parseInt(e.target.value) || 0)}
-            className={`bg-white h-[76px] pl-12 ${errors.tickets ? 'border-red-500' : ''}`}
+            className={`bg-background h-[76px] pl-12 ${errors.tickets ? 'border-destructive' : ''}`}
           />
         </FormField>
 
@@ -119,7 +119,7 @@ export const BookingFormCard = ({
             value={formData.ticketType}
             onValueChange={(value) => handleChange('ticketType', value)}
           >
-            <SelectTrigger className={`bg-white h-[76px] ${errors.ticketType ? 'border-red-500' : ''}`}>
+            <SelectTrigger className={`bg-background h-[76px] ${errors.ticketType ? 'border-destructive' : ''}`}>
               <SelectValue placeholder="Loại vé" />
             </SelectTrigger>
             <SelectContent>
@@ -137,14 +137,14 @@ export const BookingFormCard = ({
             placeholder="Ghi chú"
             value={formData.note}
             onChange={(e) => handleChange('note', e.target.value)}
-            className="w-full bg-white h-[76px] px-4 pl-12 py-2 rounded-md border resize-none"
+            className="w-full bg-background h-[76px] px-4 pl-12 py-2 rounded-md border border-input resize-none focus:ring-2 focus:ring-ring"
           />
         </FormField>
 
         <Button
           type="button"
           onClick={onCheckAvailability}
-          className="w-full bg-[#DF6951] hover:bg-[#DF6951]/90 text-white h-[56px] rounded-lg"
+          className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground h-[56px] rounded-lg"
         >
           Kiểm tra chỗ trống
         </Button>
@@ -153,7 +153,7 @@ export const BookingFormCard = ({
           type="button"
           onClick={handleBookNow}
           disabled={isSubmitting}
-          className="w-full bg-[#DF6951] hover:bg-[#DF6951]/90 text-white h-[56px] rounded-lg"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground h-[56px] rounded-lg"
         >
           {isSubmitting ? 'Đang xử lý...' : 'Đặt ngay'}
         </Button>
@@ -171,11 +171,11 @@ interface FormFieldProps {
 const FormField = ({ icon, error, children }: FormFieldProps) => (
   <div className="relative">
     {icon && (
-      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 z-10">
+      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground z-10">
         {icon}
       </div>
     )}
     {children}
-    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+    {error && <p className="text-destructive text-sm mt-1">{error}</p>}
   </div>
 );

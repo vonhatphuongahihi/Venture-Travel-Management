@@ -43,7 +43,7 @@ const ReviewsSection = ({ province }: ReviewsSectionProps) => {
   }, [api]);
 
   return (
-    <section className="pt-8">
+    <section>
       <h2 className="text-2xl font-semibold mb-6">
         Đánh giá về các hoạt động ở {province.name}
       </h2>

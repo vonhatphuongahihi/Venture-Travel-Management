@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
 
 const prisma = new PrismaClient();
 
@@ -10,12 +12,30 @@ export class EmailService {
         this.transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || 'smtp.gmail.com',
             port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: false, // true for 465, false for other ports
+            secure: false, 
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS,
             },
         });
+    }
+
+    // Helper method to render HTML template with placeholders
+    private renderTemplate(templateName: string, placeholders: Record<string, string>): string {
+        try {
+            const templatePath = path.join(__dirname, '../templates', `${templateName}.html`);
+            let template = fs.readFileSync(templatePath, 'utf8');
+
+            // Replace placeholders
+            for (const [key, value] of Object.entries(placeholders)) {
+                template = template.replace(new RegExp(`{{${key}}}`, 'g'), value);
+            }
+
+            return template;
+        } catch (error) {
+            console.error('Error rendering template:', error);
+            throw new Error('Failed to render email template');
+        }
     }
 
     // Send verification email
@@ -39,62 +59,17 @@ export class EmailService {
 
             const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:8081'}/verify-email?token=${verificationToken}`;
 
+            // Render email template
+            const htmlContent = this.renderTemplate('verificationEmail', {
+                name: name,
+                verificationUrl: verificationUrl
+            });
+
             const mailOptions = {
                 from: process.env.SMTP_FROM || 'Venture <noreply@venture.com>',
                 to: email,
                 subject: 'Xác thực tài khoản Venture',
-                html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background:#26B8ED; padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">Venture</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Chào mừng bạn đến với Venture!</p>
-            </div>
-            
-            <div style="padding: 30px; background: #f8f9fa;">
-              <h2 style="color: #333; margin-top: 0;">Xin chào ${name}!</h2>
-              
-              <p style="color: #666; line-height: 1.6;">
-                Cảm ơn bạn đã đăng ký tài khoản tại Venture. Để hoàn tất quá trình đăng ký, 
-                vui lòng xác thực email của bạn bằng cách nhấp vào nút bên dưới:
-              </p>
-              
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${verificationUrl}" 
-                   style="background:#26B8ED; 
-                          color: white; 
-                          padding: 15px 30px; 
-                          text-decoration: none; 
-                          border-radius: 25px; 
-                          font-weight: bold;
-                          display: inline-block;">
-                  Xác thực Email
-                </a>
-              </div>
-              
-              <p style="color: #666; line-height: 1.6; font-size: 14px;">
-                Nếu nút trên không hoạt động, bạn có thể copy và paste link sau vào trình duyệt:
-              </p>
-              
-              <p style="background: #e9ecef; padding: 15px; border-radius: 5px; word-break: break-all; font-size: 12px; color: #495057;">
-                ${verificationUrl}
-              </p>
-              
-              <p style="color: #666; line-height: 1.6; font-size: 14px;">
-                <strong>Lưu ý:</strong> Link xác thực sẽ hết hạn sau 24 giờ. Nếu bạn không thực hiện xác thực trong thời gian này, 
-                bạn sẽ cần đăng ký lại.
-              </p>
-            </div>
-            
-            <div style="background: #343a40; padding: 20px; text-align: center;">
-              <p style="color: #adb5bd; margin: 0; font-size: 14px;">
-                © 2024 Venture. Tất cả quyền được bảo lưu.
-              </p>
-              <p style="color: #adb5bd; margin: 5px 0 0 0; font-size: 12px;">
-                Email này được gửi tự động, vui lòng không trả lời.
-              </p>
-            </div>
-          </div>
-        `,
+                html: htmlContent,
             };
 
             await this.transporter.sendMail(mailOptions);
@@ -123,69 +98,68 @@ export class EmailService {
                 console.log('Người dùng chưa được xác thực, bỏ qua gửi email chào mừng:', email);
                 return false;
             }
+
+            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8081';
+
+            // Render email template
+            const htmlContent = this.renderTemplate('welcomeEmail', {
+                name: name,
+                frontendUrl: frontendUrl
+            });
+
             const mailOptions = {
                 from: process.env.SMTP_FROM || 'Venture <noreply@Venture.com>',
                 to: email,
                 subject: 'Chào mừng bạn đến với Venture!',
-                html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background:#26B8ED; padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">Venture</h1>
-              <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Chào mừng bạn đến với Venture!</p>
-            </div>
-            
-            <div style="padding: 30px; background: #f8f9fa;">
-              <h2 style="color: #333; margin-top: 0;">Xin chào ${name}!</h2>
-              
-              <p style="color: #666; line-height: 1.6;">
-                Chúc mừng! Tài khoản của bạn đã được xác thực thành công. 
-                Bây giờ bạn có thể sử dụng đầy đủ các tính năng của Venture.
-              </p>
-              
-              <div style="background: #d4edda; border: 1px solid #c3e6cb; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="color: #155724; margin: 0; font-weight: bold;">
-                  ✅ Tài khoản đã được kích hoạt thành công!
-                </p>
-              </div>
-              
-              <p style="color: #666; line-height: 1.6;">
-                Bạn có thể bắt đầu khám phá các tính năng tuyệt vời của Venture:
-              </p>
-              
-              <ul style="color: #666; line-height: 1.8;">
-                <li>Quản lý và đặt tour du lịch tại các địa điểm tham quan khắp Việt Nam</li>
-                <li>Tra cứu tour, xem bản đồ lộ trình 2D nổi bật</li>
-                <li>Dễ dàng lựa chọn tour phù hợp với nhu cầu và sở thích cá nhân</li>
-                <li>Chia sẻ trải nghiệm và đánh giá sau mỗi chuyến đi</li>
-              </ul>
-              
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:8081'}" 
-                   style="background:#26B8ED; 
-                          color: white; 
-                          padding: 15px 30px; 
-                          text-decoration: none; 
-                          border-radius: 25px; 
-                          font-weight: bold;
-                          display: inline-block;">
-                  Truy cập Venture
-                </a>
-              </div>
-            </div>
-            
-            <div style="background: #343a40; padding: 20px; text-align: center;">
-              <p style="color: #adb5bd; margin: 0; font-size: 14px;">
-                © 2024 Venture. Tất cả quyền được bảo lưu.
-              </p>
-            </div>
-          </div>
-        `,
+                html: htmlContent,
             };
 
             await this.transporter.sendMail(mailOptions);
             return true;
         } catch (error) {
             console.error('Lỗi khi gửi email chào mừng:', error);
+            return false;
+        }
+    }
+
+    // Send password reset email
+    async sendPasswordResetEmail(email: string, name: string, resetToken: string): Promise<boolean> {
+        try {
+            // Check if user still exists
+            const user = await prisma.user.findUnique({
+                where: { email },
+                select: { user_id: true, is_active: true }
+            });
+
+            if (!user) {
+                console.log('Không tìm thấy người dùng, bỏ qua gửi email reset password:', email);
+                return false;
+            }
+
+            if (!user.is_active) {
+                console.log('Người dùng không active, bỏ qua gửi email reset password:', email);
+                return false;
+            }
+
+            const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:8081'}/reset-password?token=${resetToken}`;
+
+            // Render email template
+            const htmlContent = this.renderTemplate('passwordResetEmail', {
+                name: name,
+                resetUrl: resetUrl
+            });
+
+            const mailOptions = {
+                from: process.env.SMTP_FROM || 'Venture <noreply@venture.com>',
+                to: email,
+                subject: 'Đặt lại mật khẩu - Venture Travel',
+                html: htmlContent,
+            };
+
+            await this.transporter.sendMail(mailOptions);
+            return true;
+        } catch (error) {
+            console.error('Lỗi khi gửi email reset password:', error);
             return false;
         }
     }

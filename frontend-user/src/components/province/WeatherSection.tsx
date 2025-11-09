@@ -37,7 +37,7 @@ const weatherSeasons = [
 
 const WeatherSection = ({ province }: WeatherCardProps) => {
   return (
-    <section className="py-8">
+    <section>
       <div className="grid lg:grid-cols-4 gap-8">
         <div className="lg:col-span-3">
           <h2 className="text-2xl font-semibold mb-6">

@@ -46,7 +46,7 @@ const AttractionsSection = ({
   }, [api]);
 
   return (
-    <section className="pt-8">
+    <section>
       <h2 className="text-2xl font-semibold mb-6">
         Điểm tham quan hàng đầu ở {province.name}
       </h2>

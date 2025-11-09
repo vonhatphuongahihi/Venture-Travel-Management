@@ -45,7 +45,7 @@ export interface AuthResponse {
     success: boolean;
     message: string;
     data?: {
-        user: Omit<PrismaUser, 'password'>;
+        user: Omit<PrismaUser, 'password' | 'verification_token' | 'verification_expires' | 'reset_token' | 'reset_expires'>;
         token: string;
     };
 }
@@ -54,7 +54,7 @@ export interface VerifyResponse {
     success: boolean;
     message: string;
     data?: {
-        user: Omit<PrismaUser, 'password'>;
+        user: Omit<PrismaUser, 'password' | 'verification_token' | 'verification_expires' | 'reset_token' | 'reset_expires'>;
     };
     error?: string;
 }
@@ -64,4 +64,46 @@ export interface ApiResponse<T = any> {
     message: string;
     data?: T;
     error?: string;
+}
+
+// Password Reset Types
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ResetPasswordRequest {
+    token: string;
+    newPassword: string;
+}
+
+export interface VerifyResetTokenRequest {
+    token: string;
+}
+
+export interface ForgotPasswordResponse {
+    success: boolean;
+    message: string;
+}
+
+export interface ResetPasswordResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        user: Omit<PrismaUser, 'password'>;
+    };
+}
+
+export interface VerifyResetTokenResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        email: string;
+    };
+}
+
+// JWT Payload types
+export interface PasswordResetJWTPayload {
+    userId: string;
+    email: string;
+    type: 'password_reset';
 }

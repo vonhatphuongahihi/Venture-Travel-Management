@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ToursSection from "@/components/tour/ToursSection";
+import { MapPin, Clock, Mail } from "lucide-react";
 
 // Contact information for the company
 const CONTACT_INFO = {
@@ -22,7 +24,9 @@ const Contact: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
 
   // Handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };
@@ -55,91 +59,140 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fcff] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
+      <div className="w-full">
+        <img
+          src="/src/assets/hero-vietnam-2.jpg"
+          alt="Contact banner"
+          className="w-full h-44 object-cover"
+        />
+      </div>
       <main className="flex-1 flex flex-col items-center justify-center py-10">
         <div className="w-full max-w-3xl px-4">
-      {/* Page title */}
-      <h1 className="text-3xl font-bold mb-6 text-blue-700">Contact Us</h1>
-      {/* Contact information section */}
-      <div className="mb-8 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h2 className="text-xl font-semibold mb-4">Our Contact Information</h2>
-        <ul className="space-y-2">
-          <li><strong>Address:</strong> {CONTACT_INFO.address}</li>
-          <li><strong>Email:</strong> <a href={`mailto:${CONTACT_INFO.email}`} className="text-blue-600 underline">{CONTACT_INFO.email}</a></li>
-          <li><strong>Phone:</strong> <a href={`tel:${CONTACT_INFO.phone}`} className="text-blue-600 underline">{CONTACT_INFO.phone}</a></li>
-        </ul>
-      </div>
-      {/* Contact form section */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <h2 className="text-xl font-semibold mb-4">Send Us a Message</h2>
-        <form onSubmit={handleSubmit} noValidate>
-          {/* Name field */}
-          <div className="mb-4">
-            <label htmlFor="name" className="block font-medium mb-1">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.name ? "border-red-500" : "border-gray-300"}`}
-              placeholder="Your name"
-            />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          {/* Page title */}
+          <h1 className="text-3xl font-bold mb-6 text-primary">
+            Liên hệ với chúng tôi
+          </h1>
+          {/* Contact information section */}
+          <div className="mb-8 bg-card rounded-2xl shadow-lg p-6 border border-border">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">
+              Thông tin liên hệ
+            </h2>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>
+                <strong className="text-foreground">Địa chỉ:</strong>{" "}
+                {CONTACT_INFO.address}
+              </li>
+              <li>
+                <strong className="text-foreground">Email:</strong>{" "}
+                <a
+                  href={`mailto:${CONTACT_INFO.email}`}
+                  className="text-primary underline hover:text-primary/80"
+                >
+                  {CONTACT_INFO.email}
+                </a>
+              </li>
+              <li>
+                <strong className="text-foreground">Điện thoại:</strong>{" "}
+                <a
+                  href={`tel:${CONTACT_INFO.phone}`}
+                  className="text-primary underline hover:text-primary/80"
+                >
+                  {CONTACT_INFO.phone}
+                </a>
+              </li>
+            </ul>
           </div>
-          {/* Email field */}
-          <div className="mb-4">
-            <label htmlFor="email" className="block font-medium mb-1">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.email ? "border-red-500" : "border-gray-300"}`}
-              placeholder="Your email address"
-            />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          {/* Contact form section */}
+          <div className="bg-card rounded-2xl shadow-lg p-6 border border-border">
+            <h2 className="text-xl font-semibold mb-4 text-foreground">
+              Gửi tin nhắn cho chúng tôi
+            </h2>
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Name field */}
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block font-medium mb-1 text-foreground"
+                >
+                  Tên người dùng <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${
+                    errors.name ? "border-destructive" : "border-input"
+                  } bg-background`}
+                  placeholder="Nhập tên của bạn"
+                />
+                {errors.name && (
+                  <p className="text-destructive text-sm mt-1">{errors.name}</p>
+                )}
+              </div>
+              {/* Email field */}
+              <div className="mb-4">
+                <label
+                  htmlFor="email"
+                  className="block font-medium mb-1 text-foreground"
+                >
+                  Email <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${
+                    errors.email ? "border-destructive" : "border-input"
+                  } bg-background`}
+                  placeholder="Nhập địa chỉ email"
+                />
+                {errors.email && (
+                  <p className="text-destructive text-sm mt-1">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+              {/* Message field */}
+              <div className="mb-4">
+                <label
+                  htmlFor="message"
+                  className="block font-medium mb-1 text-foreground"
+                >
+                  Tin nhắn <span className="text-destructive">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${
+                    errors.message ? "border-destructive" : "border-input"
+                  } bg-background`}
+                  placeholder="Nhập tin nhắn của bạn"
+                  rows={5}
+                />
+                {errors.message && (
+                  <p className="text-destructive text-sm mt-1">
+                    {errors.message}
+                  </p>
+                )}
+              </div>
+              {/* Submit button */}
+              <button
+                type="submit"
+                className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90 transition-colors font-semibold disabled:opacity-50"
+                disabled={submitted}
+              >
+                {submitted ? "Đã gửi tin nhắn!" : "Gửi tin nhắn"}
+              </button>
+            </form>
           </div>
-          {/* Message field */}
-          <div className="mb-4">
-            <label htmlFor="message" className="block font-medium mb-1">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              value={form.message}
-              onChange={handleChange}
-              className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 ${errors.message ? "border-red-500" : "border-gray-300"}`}
-              placeholder="Your message"
-              rows={5}
-            />
-            {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
-          </div>
-          {/* Submit button */}
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-semibold"
-            disabled={submitted}
-          >
-            {submitted ? "Message Sent!" : "Send Message"}
-          </button>
-        </form>
-      </div>
-      {/* Optional: Google Maps embed (commented out) */}
-      {/*
-      <div className="mt-8">
-        <iframe
-          title="Company Location"
-          src="https://www.google.com/maps/embed?..."
-          width="100%"
-          height="300"
-          style={{ border: 0 }}
-          allowFullScreen
-          loading="lazy"
-        ></iframe>
-      </div>
-      */}
         </div>
       </main>
       <Footer />

@@ -48,3 +48,16 @@ export const updateProfileSchema = Joi.object({
     date_of_birth: Joi.date().iso().optional(),
     gender: Joi.string().valid('male', 'female', 'other').optional().allow('')
 });
+
+// Password Reset Validation Schemas
+export const forgotPasswordSchema = Joi.object({
+    email: Joi.string().email().required()
+});
+
+export const resetPasswordSchema = Joi.object({
+    token: Joi.string().required(),
+    newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
+        .messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
+        })
+});

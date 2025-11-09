@@ -24,6 +24,7 @@ import TourDetail from "./pages/TourDetail";
 import ProvincePage from "./pages/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
 import AboutUs from "./pages/AboutUs";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -40,18 +41,23 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/tour" element={<Index />} />
                 <Route path="/tour/:id" element={<TourDetail />} />
+                <Route path="/book-tour" element={<BookTourNew />} />
                 <Route path="/explore-360" element={<Explore360 />} />
                 <Route path="/map" element={<Map />} />
                 <Route path="/province/:slug" element={<ProvincePage />} />
                 <Route path="/attraction/:slug" element={<AttractionPage />} />
                 <Route path="/about" element={<AboutUs />} />
-              <Route path="/login" element={<Login />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/test" element={<div className="p-8"><h1 className="text-2xl font-bold">Test Page Works!</h1><p>This is a test page to verify routing works.</p></div>} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
                 <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
-              <Route path="*" element={<NotFound />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="*" element={<NotFound />} />
               </Routes >
             </BrowserRouter >
           </ToastProvider>

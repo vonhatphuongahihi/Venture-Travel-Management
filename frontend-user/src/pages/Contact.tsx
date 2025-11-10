@@ -3,6 +3,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ToursSection from "@/components/tour/ToursSection";
 import { MapPin, Clock, Mail } from "lucide-react";
+import { useSendContactMessage } from "@/services/contact/contactHook";
+import { useToast } from "@/contexts/ToastContext";
 
 // Contact information for the company
 const CONTACT_INFO = {
@@ -13,6 +15,9 @@ const CONTACT_INFO = {
 
 // Main Contact page component
 const Contact: React.FC = () => {
+  const sendContactMessage = useSendContactMessage();
+  const { showToast } = useToast();
+
   // State for form fields
   const [form, setForm] = useState({
     name: "",
@@ -45,17 +50,29 @@ const Contact: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    // Simulate sending message (replace with API call if needed)
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setForm({ name: "", email: "", message: "" });
+    // Send contact message
+    try {
+      setSubmitted(true);
+      await sendContactMessage.mutateAsync({
+        name: form.name,
+        email: form.email,
+        message: form.message,
+      });
+
+      showToast("Message sent successfully!", "success");
+      setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      showToast("Failed to send message. Please try again later.", "error");
+    } finally {
+      setSubmitted(false);
+    }
   };
 
   return (
@@ -189,7 +206,7 @@ const Contact: React.FC = () => {
                 className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90 transition-colors font-semibold disabled:opacity-50"
                 disabled={submitted}
               >
-                {submitted ? "Đã gửi tin nhắn!" : "Gửi tin nhắn"}
+                {submitted ? "Đang gửi tin nhắn..." : "Gửi tin nhắn"}
               </button>
             </form>
           </div>

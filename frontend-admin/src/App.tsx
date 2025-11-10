@@ -1,15 +1,18 @@
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import Bookings from "./pages/Bookings";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Users from "./pages/Users";
+import Places from "./pages/Places";
+import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import TourCreate from "./pages/TourCreate";
 import ToursManage from "./pages/ToursManage";
-import Bookings from "./pages/Bookings";
-import Places from "./pages/Places";
-import Reports from "./pages/Reports";
+import Users from "./pages/Users";
+
+const queryClient = new QueryClient();
 
 // Protected Route Component
 const ProtectedRoute = () => {
@@ -33,24 +36,26 @@ const ProtectedRoute = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute />}>
-            <Route index element={<Dashboard />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="users" element={<Users />} />
-            <Route path="tours" element={<ToursManage />} />
-            <Route path="tours/create-tour" element={<TourCreate />} />
-            <Route path="bookings" element={<Bookings />} />
-            <Route path="attractions" element={<Places />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<ProtectedRoute />}>
+              <Route index element={<Dashboard />} />
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="users" element={<Users />} />
+              <Route path="tours" element={<ToursManage />} />
+              <Route path="tours/create-tour" element={<TourCreate />} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="attractions" element={<Places />} />
+              <Route path="reports" element={<Reports />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }

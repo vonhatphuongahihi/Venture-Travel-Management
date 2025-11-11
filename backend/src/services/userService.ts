@@ -217,16 +217,29 @@ export class UserService {
   // Get users
   static async getUsers(filterParams: GetUsersRequest) {
     try {
-      const { page, limit, search } = filterParams;
+      const { page, limit, search, is_active } = filterParams;
 
-      const filterClause: any = {};
-
-      if (search) {
-        filterClause["where"]["OR"] = [
-          { name: { contains: search.trim(), mode: "insensitive" } },
-          { email: { contains: search.trim(), mode: "insensitive" } },
-        ];
-      }
+      const filterClause: any = {
+        where: {
+          OR: search
+            ? [
+                {
+                  name: {
+                    contains: search.trim().toLowerCase(),
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  email: {
+                    contains: search.trim().toLowerCase(),
+                    mode: "insensitive",
+                  },
+                },
+              ]
+            : undefined,
+          is_active: is_active !== undefined ? is_active : undefined,
+        },
+      };
 
       if (page && limit) {
         filterClause["skip"] = (page - 1) * limit;
@@ -249,6 +262,78 @@ export class UserService {
     } catch (error) {
       return ResponseUtils.error(
         "Failed to get users",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
+
+  static async updateUserStatus(userId: string, isActive: boolean) {
+    try {
+      const user = await prisma.user.update({
+        where: { user_id: userId },
+        data: { is_active: isActive },
+        select: {
+          user_id: true,
+          name: true,
+          email: true,
+          is_active: true,
+        },
+      });
+
+      return ResponseUtils.success("User status updated successfully", user);
+    } catch (error) {
+      return ResponseUtils.error(
+        "Failed to update user status",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
+
+  static async deleteUser(userId: string) {
+    try {
+      await prisma.user.delete({
+        where: { user_id: userId },
+      });
+      return ResponseUtils.success("User deleted successfully");
+    } catch (error) {
+      return ResponseUtils.error(
+        "Failed to delete user",
+        error instanceof Error ? error.message : "Unknown error"
+      );
+    }
+  }
+
+  static async getUserStatistics() {
+    try {
+      const totalUsers = await prisma.user.count();
+      const activeUsers = await prisma.user.count({
+        where: { is_active: true },
+      });
+      const inactiveUsers = await prisma.user.count({
+        where: { is_active: false },
+      });
+      const newUsersInMonth = await prisma.user.count({
+        where: {
+          created_at: {
+            gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            lt: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() + 1,
+              1
+            ),
+          },
+        },
+      });
+
+      return ResponseUtils.success("User statistics retrieved successfully", {
+        totalUsers,
+        activeUsers,
+        inactiveUsers,
+        newUsersInMonth,
+      });
+    } catch (error) {
+      return ResponseUtils.error(
+        "Failed to get user statistics",
         error instanceof Error ? error.message : "Unknown error"
       );
     }

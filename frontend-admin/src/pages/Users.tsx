@@ -13,7 +13,13 @@ import React, { useEffect, useRef, useState } from "react";
 import avatarAdmin from "../assets/avatar-admin.jpg";
 import Layout from "../components/Layout";
 import type { User } from "@/types";
-import { useGetUsers } from "@/services/users/userHook";
+import {
+  useDeleteUser,
+  useGetUsers,
+  useGetUsersStatistics,
+  useToggleUserStatus,
+} from "@/services/users/userHook";
+import { useDebounce } from "@uidotdev/usehooks";
 
 const UsersScreen: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,7 +31,25 @@ const UsersScreen: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: paginatedUsers, error, isError, isLoading } = useGetUsers({});
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const toggleUserStatus = useToggleUserStatus();
+  const deleteUser = useDeleteUser();
+  const { data: userStatistics, isLoading: isLoadingStatistics } =
+    useGetUsersStatistics();
+  const {
+    data: paginatedUsers,
+    error: errorGetUsers,
+    isError: isErrorGetUsers,
+    isLoading: isLoadingGetUsers,
+  } = useGetUsers({
+    search: debouncedSearchTerm || undefined,
+    is_active:
+      statusFilter === "all"
+        ? undefined
+        : statusFilter === "active"
+        ? true
+        : false,
+  });
 
   const statusOptions = [
     { value: "all", label: "Tất cả trạng thái" },
@@ -52,36 +76,10 @@ const UsersScreen: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // const filteredUsers = users.filter((user) => {
-  //   const matchesSearch =
-  //     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     user.email.toLowerCase().includes(searchTerm.toLowerCase());
-  //   const matchesStatus =
-  //     statusFilter === "all" ||
-  //     (statusFilter === "active" && user.status === "active") ||
-  //     (statusFilter === "inactive" && user.status === "inactive");
-  //   return matchesSearch && matchesStatus;
-  // });
-
-  const newUsersThisMonth = 4;
-
   // Handler functions
   const handleViewUser = (user: User) => {
     setSelectedUser(user);
     setShowUserDetail(true);
-  };
-
-  const handleToggleUserStatus = (userId: string) => {
-    // setUsers((prevUsers) =>
-    //   prevUsers.map((user) =>
-    //     user.id === userId
-    //       ? {
-    //           ...user,
-    //           is_active: !user.is_active,
-    //         }
-    //       : user
-    //   )
-    // );
   };
 
   const handleDeleteUser = (user: User) => {
@@ -90,252 +88,267 @@ const UsersScreen: React.FC = () => {
   };
 
   const confirmDelete = () => {
-    // if (userToDelete) {
-    //   setUsers((prevUsers) =>
-    //     prevUsers.filter((user) => user.id !== userToDelete.id)
-    //   );
-    //   setShowDeleteConfirm(false);
-    //   setUserToDelete(null);
-    // }
+    if (userToDelete) {
+      deleteUser.mutate(userToDelete.user_id);
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
+    }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
+  if (isErrorGetUsers) {
     return (
       <div>
-        Error: {error instanceof Error ? error.message : "Unknown error"}
+        Error:{" "}
+        {errorGetUsers instanceof Error
+          ? errorGetUsers.message
+          : "Unknown error"}
       </div>
     );
   }
 
-  const activeUsers = paginatedUsers?.content.filter(
-    (user) => user.is_active === true
-  ).length;
-  const inactiveUsers = paginatedUsers?.content.filter(
-    (user) => user.is_active === false
-  ).length;
-
   return (
     <Layout title="Người dùng">
-      <div className="p-2 space-y-4">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4">
-          {/* Tổng số người dùng */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                <UsersIcon className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-[#0A0A0A] mb-1">
-                  Tổng số người dùng
-                </p>
-                <p className="text-xl font-bold">125</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Số người dùng đang hoạt động */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="bg-green-100 p-2 rounded-lg mr-3">
-                <ShieldCheck className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-[#0A0A0A] mb-1">
-                  Số người dùng đang hoạt động
-                </p>
-                <p className="text-xl font-bold">{activeUsers}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Số người dùng bị vô hiệu */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="bg-red-100 p-2 rounded-lg mr-3">
-                <ShieldX className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <p className="text-sm text-[#0A0A0A] mb-1">
-                  Số người dùng bị vô hiệu
-                </p>
-                <p className="text-xl font-bold">{inactiveUsers}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Số người dùng mới trong tháng */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
-            <div className="flex items-center gap-2">
-              <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                <UserPlus className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-[#0A0A0A] mb-1">
-                  Số người dùng mới trong tháng
-                </p>
-                <p className="text-xl font-bold">{newUsersThisMonth}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Search and Filter Bar */}
-        <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm..."
-                className="w-full pl-10 pr-4 py-2 border-0 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="ml-4 relative" ref={dropdownRef}>
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer hover:border-gray-300 transition-colors min-w-[160px]"
-              >
-                <span>{selectedOption?.label}</span>
-                <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Custom dropdown menu */}
-              {isDropdownOpen && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
-                  {statusOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => {
-                        setStatusFilter(option.value);
-                        setIsDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                        statusFilter === option.value
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+      {isLoadingStatistics ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="p-2 space-y-4">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-4 gap-4">
+            {/* Tổng số người dùng */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                  <UsersIcon className="w-6 h-6 text-blue-600" />
                 </div>
+                <div>
+                  <p className="text-sm text-[#0A0A0A] mb-1">
+                    Tổng số người dùng
+                  </p>
+                  <p className="text-xl font-bold">
+                    {userStatistics?.totalUsers || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Số người dùng đang hoạt động */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="bg-green-100 p-2 rounded-lg mr-3">
+                  <ShieldCheck className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#0A0A0A] mb-1">
+                    Số người dùng đang hoạt động
+                  </p>
+                  <p className="text-xl font-bold">
+                    {userStatistics?.activeUsers || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Số người dùng bị vô hiệu */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="bg-red-100 p-2 rounded-lg mr-3">
+                  <ShieldX className="w-6 h-6 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#0A0A0A] mb-1">
+                    Số người dùng bị vô hiệu
+                  </p>
+                  <p className="text-xl font-bold">
+                    {userStatistics?.inactiveUsers || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Số người dùng mới trong tháng */}
+            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                  <UserPlus className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-[#0A0A0A] mb-1">
+                    Số người dùng mới trong tháng
+                  </p>
+                  <p className="text-xl font-bold">
+                    {userStatistics?.newUsersInMonth || "-"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Search and Filter Bar */}
+          <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm..."
+                  className="w-full pl-10 pr-4 py-2 border-0 bg-gray-50 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="ml-4 relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer hover:border-gray-300 transition-colors min-w-[160px]"
+                >
+                  <span>{selectedOption?.label}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-gray-400 transition-transform ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Custom dropdown menu */}
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                    {statusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setStatusFilter(option.value);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                          statusFilter === option.value
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-900"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              {isLoadingGetUsers ? (
+                <div>
+                  <p>Loading...</p>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead className="bg-white border-b border-gray-200">
+                    <tr>
+                      <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Tên người dùng
+                      </th>
+                      <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Email
+                      </th>
+                      <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Ngày sinh
+                      </th>
+                      <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Vai trò
+                      </th>
+                      <th className="text-center py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Trạng thái
+                      </th>
+                      <th className="text-center py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
+                        Hành động
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {paginatedUsers?.content.map((user) => (
+                      <tr key={user.user_id} className="hover:bg-gray-50">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center">
+                            <img
+                              src={user.profile_photo ?? avatarAdmin}
+                              alt={user.name}
+                              className="w-7 h-7 rounded-full mr-3"
+                            />
+                            <span className="text-sm text-[#0A0A0A]">
+                              {user.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-[#0A0A0A]">
+                          {user.email}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-[#0A0A0A]">
+                          {user.date_of_birth
+                            ? new Date(user.date_of_birth).toLocaleDateString()
+                            : "-"}
+                        </td>
+                        <td className="py-3 px-4 text-sm text-[#0A0A0A]">
+                          {user.role === "ADMIN"
+                            ? "Quản trị viên"
+                            : "Người dùng"}
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          <span
+                            className={`inline-flex px-2 py-[5px] text-[13px] font-medium rounded ${
+                              user.is_active
+                                ? "bg-[#DCFCE7] text-[#008236]"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {user.is_active ? "Đang hoạt động" : "Bị vô hiệu"}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center justify-center space-x-2">
+                            {/* View Button */}
+                            <button
+                              onClick={() => handleViewUser(user)}
+                              className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-200"
+                            >
+                              <Eye className="w-[18px] h-[18px] text-gray-600" />
+                            </button>
+
+                            {/* Toggle Status Button */}
+                            <button
+                              onClick={() => {
+                                toggleUserStatus.mutate({
+                                  userId: user.user_id,
+                                  isActive: !user.is_active,
+                                });
+                              }}
+                              className={`px-3 py-1.5 text-[12px] font-semibold rounded-md border ${
+                                user.is_active
+                                  ? "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200"
+                                  : "bg-green-500 text-white border-green-500 hover:bg-green-600"
+                              }`}
+                            >
+                              {user.is_active ? "Vô hiệu hóa" : "Kích hoạt"}
+                            </button>
+
+                            {/* Delete Button */}
+                            <button
+                              onClick={() => handleDeleteUser(user)}
+                              className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-200"
+                            >
+                              <Trash2 className="w-[18px] h-[18px] text-gray-600" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           </div>
         </div>
-
-        {/* Users Table */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-white border-b border-gray-200">
-                <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Tên người dùng
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Email
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Ngày sinh
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Vai trò
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Trạng thái
-                  </th>
-                  <th className="text-center py-3 px-4 font-semibold text-sm text-[#0A0A0A]">
-                    Hành động
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {paginatedUsers?.content.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="py-3 px-4">
-                      <div className="flex items-center">
-                        <img
-                          src={user.profile_photo ?? avatarAdmin}
-                          alt={user.name}
-                          className="w-7 h-7 rounded-full mr-3"
-                        />
-                        <span className="text-sm text-[#0A0A0A]">
-                          {user.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                      {user.email}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                      {user.date_of_birth
-                        ? new Date(user.date_of_birth).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                      {user.role === "ADMIN" ? "Quản trị viên" : "Người dùng"}
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <span
-                        className={`inline-flex px-2 py-[5px] text-[13px] font-medium rounded ${
-                          user.is_active
-                            ? "bg-[#DCFCE7] text-[#008236]"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {user.is_active ? "Đang hoạt động" : "Bị vô hiệu"}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center justify-center space-x-2">
-                        {/* View Button */}
-                        <button
-                          onClick={() => handleViewUser(user)}
-                          className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-200"
-                        >
-                          <Eye className="w-[18px] h-[18px] text-gray-600" />
-                        </button>
-
-                        {/* Toggle Status Button */}
-                        <button
-                          onClick={() => handleToggleUserStatus(user.id)}
-                          className={`px-3 py-1.5 text-[12px] font-semibold rounded-md border ${
-                            user.is_active
-                              ? "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200"
-                              : "bg-green-500 text-white border-green-500 hover:bg-green-600"
-                          }`}
-                        >
-                          {user.is_active ? "Vô hiệu hóa" : "Kích hoạt"}
-                        </button>
-
-                        {/* Delete Button */}
-                        <button
-                          onClick={() => handleDeleteUser(user)}
-                          className="p-1.5 border border-gray-200 rounded-md hover:bg-gray-200"
-                        >
-                          <Trash2 className="w-[18px] h-[18px] text-gray-600" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* User Detail Popup */}
       {showUserDetail && selectedUser && (

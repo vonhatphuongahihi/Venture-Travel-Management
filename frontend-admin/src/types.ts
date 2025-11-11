@@ -40,10 +40,11 @@ export interface GetUserRequest {
   page?: number;
   limit?: number;
   search?: string;
+  is_active?: boolean;
 }
 
 export interface User {
-  id: string;
+  user_id: string;
   email: string;
   reset_token: string | null;
   google_id: string | null;
@@ -64,4 +65,11 @@ export interface User {
   created_at: Date;
   updated_at: Date;
   auth_provider: AuthProvider;
+}
+
+export interface GetUserStatisticsResponse {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  newUsersInMonth: number;
 }

@@ -1,12 +1,19 @@
 import { UserController } from "@/controllers/userController";
 import { authenticateToken } from "@/middleware/auth";
 import { uploadSingle } from "@/middleware/upload";
-import { updateProfileSchema, validateRequest } from "@/middleware/validation";
+import {
+  getUsersQuerySchema,
+  updateProfileSchema,
+  updateUserStatusSchema,
+  validateQuery,
+  validateRequest,
+} from "@/middleware/validation";
 import { Router } from "express";
 
 const router = Router();
 
-router.get("/", UserController.getUsers);
+router.get("/", validateQuery(getUsersQuerySchema), UserController.getUsers);
+router.get("/statistics", UserController.getUserStatistics);
 router.get("/profile", authenticateToken, UserController.getProfile);
 router.put(
   "/profile",
@@ -20,4 +27,11 @@ router.put(
   uploadSingle("avatar"),
   UserController.updateAvatar
 );
+router.patch(
+  "/:id/status",
+  validateRequest(updateUserStatusSchema),
+  UserController.updateUserStatus
+);
+router.delete("/:id", UserController.deleteUser);
+
 export default router;

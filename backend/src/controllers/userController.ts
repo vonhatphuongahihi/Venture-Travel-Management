@@ -127,4 +127,79 @@ export class UserController {
         );
     }
   }
+
+  static async updateUserStatus(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const userId = req.params.id;
+      const { is_active } = req.body;
+      const result = await UserService.updateUserStatus(userId, is_active);
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to ban user",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  static async deleteUser(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const userId = req.params.id;
+      const result = await UserService.deleteUser(userId);
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(404).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to delete user",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  static async getUserStatistics(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      const result = await UserService.getUserStatistics();
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to get user statistics",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
 }

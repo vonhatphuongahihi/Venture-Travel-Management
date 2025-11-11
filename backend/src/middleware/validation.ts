@@ -18,6 +18,25 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
   };
 };
 
+export const validateQuery = (schema: Joi.ObjectSchema) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const { error, value } = schema.validate(req.query, { convert: true });
+
+    if (error) {
+      res.status(400).json({
+        success: false,
+        message: "Validation error",
+        error: error.details[0].message,
+      });
+      return;
+    }
+
+    req.query = value;
+
+    next();
+  };
+};
+
 // Validation schemas
 export const registerSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
@@ -79,4 +98,15 @@ export const contactMessageSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
   message: Joi.string().min(10).max(1000).required(),
+});
+
+export const getUsersQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).optional(),
+  search: Joi.string().max(100).optional(),
+  is_active: Joi.boolean().optional(),
+});
+
+export const updateUserStatusSchema = Joi.object({
+  is_active: Joi.boolean().required(),
 });

@@ -1,5 +1,6 @@
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import queryClient from "./configs/queryClient";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Bookings from "./pages/Bookings";
 import Dashboard from "./pages/Dashboard";
@@ -11,8 +12,6 @@ import Settings from "./pages/Settings";
 import TourCreate from "./pages/TourCreate";
 import ToursManage from "./pages/ToursManage";
 import Users from "./pages/Users";
-
-const queryClient = new QueryClient();
 
 // Protected Route Component
 const ProtectedRoute = () => {

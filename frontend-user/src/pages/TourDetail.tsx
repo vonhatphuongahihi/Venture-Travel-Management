@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import {
+  PriceCategories,
   Review,
+  TicketPrices,
   TicketType,
   TourDetail,
   TourRoute,
@@ -12,7 +14,6 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
   Bookmark,
-  Calendar,
   CalendarCog,
   ChevronDown,
   Clock,
@@ -34,11 +35,14 @@ import Expectations from "@/components/detail/Expectations";
 import PickUp from "@/components/detail/PickUp";
 import AdditionalInfo from "@/components/detail/AdditionalInfo";
 import CancellationPolicy from "@/components/detail/CancellationPolicy";
-import TravellerChoose from "@/components/detail/TravellerChoose";
-import { DateChooser } from "@/components/map/DateChooser";
 import ImageGallery from "@/components/detail/ImageGallery";
 import Loading from "@/components/detail/Loading";
 import Itinerary from "@/components/detail/Itinerary";
+import PoilcyModal from "@/components/detail/PoilcyModal";
+import DateTourPicker from "@/components/detail/DateTourPicker";
+import TravellerPicker from "@/components/detail/TravellerPicker";
+import ReviewFilter from "@/components/detail/ReviewFilter";
+import TicketTypePicker from "@/components/detail/TicketTypePicker";
 
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +50,21 @@ const TourDetailPage = () => {
   const [tour, setTour] = useState<TourDetail | null>(null);
   const [rating, setRating] = useState<number>(5);
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
+  const [ticketPrices, setTicketPrices] = useState<TicketPrices[]>([]);
+  const [userTicket, setUserTicket] = useState({
+    currentType: null as TicketType | null,
+    priceCategories: [],
+  });
+  const totalPrice = userTicket.priceCategories.reduce((sum, cat) => {
+    // Tìm giá tương ứng với loại vé hiện tại và category
+    const priceObj = ticketPrices.find(
+      tp =>
+        tp.ticketTypeId === userTicket.currentType.ticketTypeId &&
+        tp.categoryId === cat.categoryId
+    );
+  
+    return sum + (priceObj?.price || 0) * cat.quantity;
+  }, 0);
   const [tourStop, setTourStop] = useState<TourStop[]>([]);
   const [tourRoute, setTourRoute] = useState<TourRoute | null>(null);
   const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
@@ -277,29 +295,48 @@ const TourDetailPage = () => {
     const avgRating =
       sampleReviews.reduce((sum, r) => sum + r.rate, 0) / sampleReviews.length;
     setRating(parseFloat(avgRating.toFixed(1)));
-    const sampleTicketTypes: TicketType[] = [
-      {
-        ticketTypeId: "tt_001",
-        tourId: "tour_12345", // FK -> tours.tour_id
-        name: "người lớn",
-        notes: "8-50 tuổi",
-        quantity: 1,
-        price: 9000000,
-        isActive: true,
-        createdAt: new Date("2025-09-01T10:00:00"), // ISO timestamp}
-      },
-      {
-        ticketTypeId: "tt_002",
-        tourId: "tour_12345", // FK -> tours.tour_id
-        name: "trẻ em",
-        notes: "5-7 tuổi",
-        quantity: 0,
-        price: 3500000,
-        isActive: true,
-        createdAt: new Date("2025-09-01T10:00:00"), // ISO timestamp}
-      },
-    ];
-    setTicketTypes(sampleTicketTypes);
+    // Giá vé theo loại vé và hạng mục (người lớn, trẻ em)
+    const sampleTicketPrices: TicketPrices[] = [{
+      ticketPriceId: "tp_001",
+      ticketTypeId: "tt_001", // FK -> ticket_types.ticket_type_id
+      categoryId: "pc_001", // FK -> price_categories.category_id
+      notes: "Vé VIP cho người lớn",
+      price: 9000000,
+      quantity: 30,
+      isActive: true,
+      createdAt: new Date("2025-09-01T10:00:00"),
+    },
+    {
+      ticketPriceId: "tp_002",
+      ticketTypeId: "tt_001", // FK -> ticket_types.ticket_type_id
+      categoryId: "pc_002", // FK -> price_categories.category_id
+      notes: "Vé VIP cho trẻ em",
+      price: 7000000,
+      quantity: 20,
+      isActive: true,
+      createdAt: new Date("2025-09-01T10:00:00"),
+    },
+    {
+      ticketPriceId: "tp_003",
+      ticketTypeId: "tt_002", // FK -> ticket_types.ticket_type_id
+      categoryId: "pc_001", // FK -> price_categories.category_id
+      notes: "Vé Thường cho người lớn",
+      price: 6500000,
+      quantity: 30,
+      isActive: true,
+      createdAt: new Date("2025-09-01T10:00:00"),
+    },
+    {
+      ticketPriceId: "tp_004",
+      ticketTypeId: "tt_002", // FK -> ticket_types.ticket_type_id
+      categoryId: "pc_002", // FK -> price_categories.category_id
+      notes: "Vé Thường cho trẻ em",
+      price: 5000000,
+      quantity: 20,
+      isActive: true,
+      createdAt: new Date("2025-09-01T10:00:00"),
+    }]
+    setTicketPrices(sampleTicketPrices);
     const sampleTourStop: TourStop[] = [
       {
         stopId: "stop_001",
@@ -336,7 +373,7 @@ const TourDetailPage = () => {
         attractionName: "Vịnh Lan Hạ",
         attractionImage:
           "https://media-cdn.tripadvisor.com/media/photo-o/15/6e/b6/30/amazing-bay-and-floating.jpg",
-        attractionGeom: [107.06085380690975, 20.76128804425612], 
+        attractionGeom: [107.06085380690975, 20.76128804425612],
         stopOrder: 4,
         notes: "Dừng chân: 90 phút - Đã bao gồm vé vào cửa",
         details: "Thời gian chèo thuyền kayak và bơi lội",
@@ -389,7 +426,7 @@ const TourDetailPage = () => {
     const sampleTourRoute: TourRoute = {
       route_id: "route_001",
       tour_id: "tour_12345",
-      geom: [        
+      geom: [
         [106.98488883643692, 20.92942105340734],
         [107.02965002429204, 20.966664346785805],
         [105.85328990524339, 21.036013671851823],
@@ -482,11 +519,7 @@ const TourDetailPage = () => {
   }, [sectionChosen]);
 
   ///////////////////// Booking /////////////////////
-  const [totalPeople, setTotalPeople] = useState(1);
-  const [openPeople, setOpenPeople] = useState(false);
-  const [openDate, setOpenDate] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const price = ticketTypes?.reduce((sum, t) => sum + t.price * t.quantity, 0);
   function formatDate(date: Date): string {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
@@ -504,7 +537,6 @@ const TourDetailPage = () => {
 
   ///////////////////// Reviews /////////////////////
   const [filter, setFilter] = useState("Gần đây nhất");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const options = [
     "Gần đây nhất",
     "Được thích nhiều nhất",
@@ -524,11 +556,12 @@ const TourDetailPage = () => {
         return b.createdAt.getTime() - a.createdAt.getTime();
     }
   });
+  const [puOpen, setPUOpen] = useState(false);
 
   const handleLikeReview = () => {};
   const handleGoToUser = () => {};
 
-  if (!tour) return <Loading />
+  if (!tour) return <Loading />;
 
   return (
     <div className="flex flex-col w-full items-center min-h-screen space-y-10">
@@ -625,7 +658,7 @@ const TourDetailPage = () => {
         <div className="relative">
           {/* Sticky Secondary Navbar */}
           <div
-            className={`fixed top-16 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${
+            className={`fixed top-0 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${
               showStickyNav
                 ? "opacity-100 translate-y-0 pointer-events-auto"
                 : "opacity-0 -translate-y-100 pointer-events-none"
@@ -728,28 +761,29 @@ const TourDetailPage = () => {
                     </span>
                   </div>
                 </div>
-                <div className="w-full border-t border-primary my-5"></div>
+                <div className="w-full border-t border-primary mt-5 mb-2"></div>
               </section>
               <section id={"details"} className="rounded px-6 font-['Inter']">
                 <Highlights highlight={tour.highlight} />
                 <Inclusions inclusions={tour.inclusions} />
                 <Exclusions exclusions={tour.exclusions} />
                 <Expectations expectations={tour.expectations} />
-                <div id={"pickUp"}></div>
                 <PickUp
+                  id={"pickUp"}
                   pickUpPoint={tour.pickUpPoint}
                   pickUpDetails={tour.pickUpDetails}
                   endPoint={tour.endPoint}
+                  open={puOpen}
+                  setOpen={setPUOpen}
                 />
                 <AdditionalInfo additionalInfo={tour.additionalInfo} />
-                <div id={"cancelPolicy"}></div>
                 <CancellationPolicy cancelPolicy={tour.cancelPolicy} />
               </section>
             </div>
 
             {/* Right sticky price card */}
             <div id={"booking"} className="col-span-1 font-['Inter']">
-              <div className="sticky top-20 min-h-[360px] h-auto bg-white rounded-xl shadow-xl shadow-primary">
+              <div className="sticky top-2 min-h-[360px] h-auto bg-white rounded-xl shadow-xl shadow-primary">
                 <div className="flex items-center font-semibold font-xl bg-primary w-full h-14 text-white rounded-t-xl p-5">
                   <p className="font-bold text-lg">
                     Chọn ngày và số lượng hành khách
@@ -757,76 +791,17 @@ const TourDetailPage = () => {
                 </div>
                 {/*Date and travellers*/}
                 <div className="py-5 px-4 w-full flex justify-between">
-                  <div className="relative">
-                    <Button
-                      className="flex items-center justify-center w-68 h-12 bg-white hover:bg-gray-300 text-primary relative rounded-3xl outline outline-1 outline-offset-[-1px] outline-primary"
-                      onClick={() => setOpenDate(!openDate)}
-                    >
-                      <Calendar size={24} />
-                      <p>{formatDate(selectedDate)}</p>
-                    </Button>
-                    {openDate && (
-                      <DateChooser
-                        className="absolute left-1/2 -translate-x-full top-full mt-2"
-                        selectedDate={selectedDate}
-                        onDateChange={setSelectedDate}
-                        onClose={() => {
-                          setOpenDate(false);
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div className="relative">
-                    <Button
-                      className="flex items-center justify-center w-20 h-12 bg-white hover:bg-gray-300 text-primary relative rounded-3xl outline outline-1 outline-offset-[-1px] outline-primary"
-                      onClick={() => setOpenPeople(!openPeople)}
-                    >
-                      <Users size={24} />
-                      <p>{totalPeople}</p>
-                    </Button>
-                    {openPeople && (
-                      <div className="absolute top-full mt-2 right-0">
-                        <TravellerChoose
-                          ticketTypes={ticketTypes}
-                          setTicketTypes={setTicketTypes}
-                          onConfirm={() => {
-                            setOpenPeople(false);
-                            setTotalPeople(
-                              ticketTypes.reduce(
-                                (sum, tt) => sum + tt.quantity,
-                                0
-                              )
-                            );
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
+                  <DateTourPicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                  />
+                  <TravellerPicker
+                    userTicket={userTicket}
+                    ticketPrices={ticketPrices}
+                    setUserTicket={setUserTicket}
+                  />
                 </div>
-
-                <div className="px-5 w-full flex flex-col justify-between">
-                  {ticketTypes.map((t, i) => {
-                    return (
-                      <div
-                        key={i}
-                        className={`flex justify-between text-sm mb-2 ${
-                          t.quantity === 0 ? "hidden" : ""
-                        }`}
-                      >
-                        <p>
-                          {t.quantity}{" "}
-                          <span className="capitalize">{t.name}</span> x{" "}
-                          {t.price.toLocaleString("en-US")} ₫
-                        </p>
-                        <p>{(t.quantity * t.price).toLocaleString("en-US")}</p>
-                      </div>
-                    );
-                  })}
-                  <div className="flex justify-between font-semibold text-lg mb-4">
-                    <span>Tổng giá tiền</span>
-                    <span>{price.toLocaleString("en-US")} ₫</span>
-                  </div>
-                </div>
+                <TicketTypePicker userTicket={userTicket} setUserTicket={setUserTicket} ticketPrices={ticketPrices} totalPrice={totalPrice}/>
                 <div className="w-full flex justify-center">
                   <Button className="flex justify-center space-x-2 w-80 text-white rounded-2xl hover:bg-primary/50 border border-2 border-gray-300">
                     <Ticket size={24} />
@@ -838,22 +813,8 @@ const TourDetailPage = () => {
                 <div className="px-5 flex items-start text-xs gap-2 pb-5">
                   <CalendarCog className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p>
-                    <span
-                      className="text-sm font-bold underline cursor-pointer"
-                      onClick={() => {
-                        const el = document.getElementById("cancelPolicy");
-                        if (el) {
-                          const y =
-                            el.getBoundingClientRect().top +
-                            window.scrollY -
-                            80; // chừa cho navbar
-                          window.scrollTo({ top: y, behavior: "smooth" });
-                        }
-                      }}
-                    >
-                      Chính sách hủy
-                    </span>{" "}
-                    – Hủy bất cứ lúc nào trước{" "}
+                    <PoilcyModal cancelPolicy={tour.cancelPolicy} /> – Hủy bất
+                    cứ lúc nào trước{" "}
                     <span className="font-medium">
                       {formatDate(
                         new Date(
@@ -874,7 +835,11 @@ const TourDetailPage = () => {
             <h2 className="text-2xl font-['Inter'] font-bold mb-4">
               Hành trình
             </h2>
-            <Itinerary tourStop={tourStop} tourRoute={tourRoute} />
+            <Itinerary
+              tourStop={tourStop}
+              tourRoute={tourRoute}
+              setPUOpen={setPUOpen}
+            />
           </section>
         </div>
         {/*Reviews*/}
@@ -890,32 +855,7 @@ const TourDetailPage = () => {
                     <Filter size={16} />
                     <p>Bộ lọc</p>
                   </div>
-                  <div
-                    className="flex text-lg font-semibold items-center space-x-2 cursor-pointer hover:text-primary relative"
-                    onClick={() => {
-                      setDropdownOpen(!dropdownOpen);
-                    }}
-                  >
-                    <p>{filter}</p>
-                    <ChevronDown size={16} />
-                    {/* Danh sách dropdown */}
-                    {dropdownOpen && (
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                        {options.map((opt) => (
-                          <button
-                            key={opt}
-                            onClick={() => {
-                              setFilter(opt);
-                              setDropdownOpen(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <ReviewFilter value={filter} setValue={setFilter} options={options}/>
                 </div>
                 {/* Reviews List */}
                 <ul className="mt-4 space-y-2">

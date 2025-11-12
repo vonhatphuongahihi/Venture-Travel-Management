@@ -18,7 +18,7 @@ type SelectInputProps<T extends FieldValues> = {
     label: string;
     name: Path<T>;
     control: Control<T>;
-    validationRules: RegisterOptions<T, Path<T>>;
+    validationRules?: RegisterOptions<T, Path<T>>;
     options: Option[];
     placeholder?: string;
     className?: string;

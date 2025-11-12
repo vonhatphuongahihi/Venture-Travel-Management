@@ -25,6 +25,8 @@ model User {
   is_verified   Boolean   @default(false)
   verification_token String?
   verification_expires DateTime?
+  reset_token   String?   @unique
+  reset_expires DateTime?
   last_login    DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt

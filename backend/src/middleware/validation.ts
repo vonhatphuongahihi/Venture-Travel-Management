@@ -67,6 +67,7 @@ export const verifyEmailSchema = Joi.object({
 });
 
 export const updateProfileSchema = Joi.object({
+
   name: Joi.string().min(2).max(100).optional(),
   phone: Joi.string()
     .pattern(/^[\+]?[0-9][\d]{0,15}$/)
@@ -109,4 +110,5 @@ export const getUsersQuerySchema = Joi.object({
 
 export const updateUserStatusSchema = Joi.object({
   is_active: Joi.boolean().required(),
+
 });

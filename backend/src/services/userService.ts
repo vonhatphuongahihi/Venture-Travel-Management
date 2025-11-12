@@ -1,17 +1,31 @@
+
 import { ResponseUtils } from "@/utils";
 import { PrismaClient } from "@prisma/client";
 import { CloudinaryService } from "./cloudinaryService";
 import { GetUsersRequest } from "@/types";
 
+
 const prisma = new PrismaClient();
 const cloudinaryService = new CloudinaryService();
 
 export interface UpdateProfileRequest {
-  name?: string;
-  phone?: string;
-  address?: string;
-  date_of_birth?: string;
-  gender?: string;
+
+    name?: string;
+    phone?: string;
+    address?: string;
+    date_of_birth?: string;
+    gender?: string;
+    email?: string;
+}
+
+export interface ChangePasswordRequest {
+    oldPassword: string;
+    newPassword: string;
+}
+
+export interface ChangeEmailRequest {
+    email: string;
+
 }
 
 export interface UpdateAvatarResponse {
@@ -337,5 +351,96 @@ export class UserService {
         error instanceof Error ? error.message : "Unknown error"
       );
     }
-  }
+
+
+    // Change password
+    static async changePassword(userId: string, oldPassword: string, newPassword: string) {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { user_id: userId },
+                select: { password: true }
+            });
+
+            if (!user) {
+                return ResponseUtils.error('Người dùng không tồn tại');
+            }
+
+            if (!user.password) {
+                return ResponseUtils.error('Tài khoản này không có mật khẩu. Vui lòng đăng nhập bằng Google.');
+            }
+
+            // Verify old password
+            const isOldPasswordValid = await PasswordUtils.comparePassword(oldPassword, user.password);
+            if (!isOldPasswordValid) {
+                return ResponseUtils.error('Mật khẩu cũ không đúng');
+            }
+
+            // Hash new password
+            const hashedNewPassword = await PasswordUtils.hashPassword(newPassword);
+
+            // Update password
+            await prisma.user.update({
+                where: { user_id: userId },
+                data: {
+                    password: hashedNewPassword,
+                    updated_at: new Date()
+                }
+            });
+
+            return ResponseUtils.success('Đổi mật khẩu thành công');
+        } catch (error) {
+            return ResponseUtils.error(
+                'Đổi mật khẩu thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
+            );
+        }
+    }
+
+    // Change email
+    static async changeEmail(userId: string, newEmail: string) {
+        try {
+            // Check if email already exists
+            const existingUser = await prisma.user.findUnique({
+                where: { email: newEmail }
+            });
+
+            if (existingUser && existingUser.user_id !== userId) {
+                return ResponseUtils.error('Email này đã được sử dụng bởi tài khoản khác');
+            }
+
+            // Update email and reset verification
+            const updatedUser = await prisma.user.update({
+                where: { user_id: userId },
+                data: {
+                    email: newEmail,
+                    is_verified: false, // Reset verification when email changes
+                    updated_at: new Date()
+                },
+                select: {
+                    user_id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    profile_photo: true,
+                    date_of_birth: true,
+                    gender: true,
+                    role: true,
+                    is_active: true,
+                    is_verified: true,
+                    last_login: true,
+                    created_at: true,
+                    updated_at: true
+                }
+            });
+
+            return ResponseUtils.success('Đổi email thành công. Vui lòng xác thực email mới.', updatedUser);
+        } catch (error) {
+            return ResponseUtils.error(
+                'Đổi email thất bại',
+                error instanceof Error ? error.message : 'Lỗi không xác định'
+            );
+        }
+    }
+
 }

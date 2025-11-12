@@ -62,8 +62,10 @@ export class AuthService {
                             last_login: true,
                             created_at: true,
                             updated_at: true,
+
                             google_id: true,
                             auth_provider: true
+
                         }
                     });
 
@@ -120,8 +122,10 @@ export class AuthService {
                     last_login: true,
                     created_at: true,
                     updated_at: true,
+
                     google_id: true,
                     auth_provider: true
+
                 }
             });
 
@@ -202,6 +206,7 @@ export class AuthService {
                 };
             }
 
+
             // Check if user has a password (for local authentication)
             if (!user.password) {
                 return {
@@ -211,6 +216,7 @@ export class AuthService {
             }
 
             const isPasswordValid = await PasswordUtils.comparePassword(loginData.password, user.password);
+
             if (!isPasswordValid) {
                 return {
                     success: false,
@@ -298,8 +304,10 @@ export class AuthService {
                     last_login: true,
                     created_at: true,
                     updated_at: true,
+
                     google_id: true,
                     auth_provider: true
+
                 }
             });
 

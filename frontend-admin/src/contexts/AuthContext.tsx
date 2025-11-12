@@ -6,15 +6,15 @@ interface User {
     user_id: string;
     name: string;
     email: string;
-    phone?: string;
-    address?: string;
-    profile_photo?: string;
-    date_of_birth?: string;
-    gender?: string;
+    phone?: string | null;
+    address?: string | null;
+    profile_photo?: string | null;
+    date_of_birth?: string | null;
+    gender?: string | null;
     role: string;
     is_active: boolean;
     is_verified: boolean;
-    last_login?: string;
+    last_login?: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -25,6 +25,7 @@ interface AuthContextType {
     isLoading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
+    updateUser: (userData: User) => void;
     isAuthenticated: boolean;
 }
 
@@ -139,12 +140,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('user');
     };
 
+    const updateUser = (userData: User) => {
+        setUser(userData);
+        // Cập nhật trong localStorage nếu có token
+        if (localStorage.getItem('token')) {
+            localStorage.setItem('user', JSON.stringify(userData));
+        }
+    };
+
     const value: AuthContextType = {
         user,
         token,
         isLoading,
         login,
         logout,
+        updateUser,
         isAuthenticated: !!user && !!token && user.role === 'ADMIN',
     };
 

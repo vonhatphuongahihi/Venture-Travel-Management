@@ -24,10 +24,9 @@ export class UserAPI {
     userId: string,
     isActive: boolean
   ): Promise<AbstractResponse<User>> {
-    const { data } = await axiosClient.patch(
-      `${UserAPI.prefix}/${userId}/status`,
-      { is_active: isActive }
-    );
+    const { data } = await axiosClient.patch(`${UserAPI.prefix}/${userId}/status`, {
+      isActive: isActive,
+    });
 
     return data;
   }
@@ -38,9 +37,7 @@ export class UserAPI {
     return data;
   }
 
-  static async getUsersStatistics(): Promise<
-    AbstractResponse<GetUserStatisticsResponse>
-  > {
+  static async getUsersStatistics(): Promise<AbstractResponse<GetUserStatisticsResponse>> {
     const { data } = await axiosClient.get(`${UserAPI.prefix}/statistics`);
 
     return data;

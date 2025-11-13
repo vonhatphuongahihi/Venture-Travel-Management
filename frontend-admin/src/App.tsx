@@ -13,11 +13,6 @@ import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import TourCreate from "./pages/TourCreate";
 import ToursManage from "./pages/ToursManage";
-
-import Bookings from "./pages/Bookings";
-import Places from "./pages/Places";
-import Reports from "./pages/Reports";
-import DashboardLayout from "./components/DashboardLayout";
 import { ToastProvider } from "./contexts/ToastContext";
 import Users from "./pages/Users";
 

@@ -1,21 +1,21 @@
 // Shared types for API services
 export interface User {
-  user_id: string;
+  userId: string;
   name: string;
   email: string;
   phone: string | null;
   address: string | null;
-  profile_photo: string | null;
-  date_of_birth: string | null;
+  profilePhoto: string | null;
+  dateOfBirth: string | null;
   gender: string | null;
   role: string;
-  is_active: boolean;
-  is_verified: boolean;
+  isActive: boolean;
+  isVerified: boolean;
   verification_token: string | null;
   verification_expires: Date | null;
-  last_login: string | null;
-  created_at: string;
-  updated_at: string;
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthResponse {
@@ -54,7 +54,7 @@ export interface RegisterRequest {
   password: string;
   phone?: string;
   address?: string;
-  date_of_birth?: string;
+  dateOfBirth?: string;
   gender?: string;
 }
 
@@ -67,6 +67,6 @@ export interface UpdateProfileRequest {
   name?: string;
   phone?: string;
   address?: string;
-  date_of_birth?: string;
+  dateOfBirth?: string;
   gender?: string;
 }

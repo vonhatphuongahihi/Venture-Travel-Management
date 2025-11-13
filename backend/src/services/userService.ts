@@ -1,9 +1,7 @@
-
-import { ResponseUtils } from "@/utils";
+import { PasswordUtils, ResponseUtils } from "@/utils";
 import { PrismaClient } from "@prisma/client";
 import { CloudinaryService } from "./cloudinaryService";
 import { GetUsersRequest } from "@/types";
-
 
 const prisma = new PrismaClient();
 const cloudinaryService = new CloudinaryService();
@@ -27,13 +25,12 @@ export interface UpdateAvatarResponse {
 }
 
 export interface ChangePasswordRequest {
-    oldPassword: string;
-    newPassword: string;
+  oldPassword: string;
+  newPassword: string;
 }
 
 export interface ChangeEmailRequest {
-    email: string;
-
+  email: string;
 }
 
 export class UserService {
@@ -224,7 +221,7 @@ export class UserService {
   // Get users
   static async getUsers(filterParams: GetUsersRequest) {
     try {
-      const { page, limit, search, is_active } = filterParams;
+      const { page, limit, search, isActive } = filterParams;
 
       const filterClause: any = {
         where: {
@@ -244,7 +241,7 @@ export class UserService {
                 },
               ]
             : undefined,
-          is_active: is_active !== undefined ? is_active : undefined,
+          isActive: isActive !== undefined ? isActive : undefined,
         },
       };
 
@@ -277,13 +274,13 @@ export class UserService {
   static async updateUserStatus(userId: string, isActive: boolean) {
     try {
       const user = await prisma.user.update({
-        where: { user_id: userId },
-        data: { is_active: isActive },
+        where: { userId: userId },
+        data: { isActive: isActive },
         select: {
-          user_id: true,
+          userId: true,
           name: true,
           email: true,
-          is_active: true,
+          isActive: true,
         },
       });
 
@@ -299,7 +296,7 @@ export class UserService {
   static async deleteUser(userId: string) {
     try {
       await prisma.user.delete({
-        where: { user_id: userId },
+        where: { userId: userId },
       });
       return ResponseUtils.success("User deleted successfully");
     } catch (error) {
@@ -314,20 +311,16 @@ export class UserService {
     try {
       const totalUsers = await prisma.user.count();
       const activeUsers = await prisma.user.count({
-        where: { is_active: true },
+        where: { isActive: true },
       });
       const inactiveUsers = await prisma.user.count({
-        where: { is_active: false },
+        where: { isActive: false },
       });
       const newUsersInMonth = await prisma.user.count({
         where: {
-          created_at: {
+          createdAt: {
             gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            lt: new Date(
-              new Date().getFullYear(),
-              new Date().getMonth() + 1,
-              1
-            ),
+            lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
           },
         },
       });
@@ -344,96 +337,100 @@ export class UserService {
         error instanceof Error ? error.message : "Unknown error"
       );
     }
+  }
 
+  // Change password
+  static async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { userId: userId },
+        select: { password: true },
+      });
 
-    // Change password
-    static async changePassword(userId: string, oldPassword: string, newPassword: string) {
-        try {
-            const user = await prisma.user.findUnique({
-                where: { user_id: userId },
-                select: { password: true }
-            });
+      if (!user) {
+        return ResponseUtils.error("Người dùng không tồn tại");
+      }
 
-            if (!user) {
-                return ResponseUtils.error('Người dùng không tồn tại');
-            }
+      if (!user.password) {
+        return ResponseUtils.error(
+          "Tài khoản này không có mật khẩu. Vui lòng đăng nhập bằng Google."
+        );
+      }
 
-            if (!user.password) {
-                return ResponseUtils.error('Tài khoản này không có mật khẩu. Vui lòng đăng nhập bằng Google.');
-            }
+      // Verify old password
+      const isOldPasswordValid = await PasswordUtils.comparePassword(oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        return ResponseUtils.error("Mật khẩu cũ không đúng");
+      }
 
-            // Verify old password
-            const isOldPasswordValid = await PasswordUtils.comparePassword(oldPassword, user.password);
-            if (!isOldPasswordValid) {
-                return ResponseUtils.error('Mật khẩu cũ không đúng');
-            }
+      // Hash new password
+      const hashedNewPassword = await PasswordUtils.hashPassword(newPassword);
 
-            // Hash new password
-            const hashedNewPassword = await PasswordUtils.hashPassword(newPassword);
+      // Update password
+      await prisma.user.update({
+        where: { userId: userId },
+        data: {
+          password: hashedNewPassword,
+          updatedAt: new Date(),
+        },
+      });
 
-            // Update password
-            await prisma.user.update({
-                where: { user_id: userId },
-                data: {
-                    password: hashedNewPassword,
-                    updated_at: new Date()
-                }
-            });
-
-            return ResponseUtils.success('Đổi mật khẩu thành công');
-        } catch (error) {
-            return ResponseUtils.error(
-                'Đổi mật khẩu thất bại',
-                error instanceof Error ? error.message : 'Lỗi không xác định'
-            );
-        }
+      return ResponseUtils.success("Đổi mật khẩu thành công");
+    } catch (error) {
+      return ResponseUtils.error(
+        "Đổi mật khẩu thất bại",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
     }
+  }
 
-    // Change email
-    static async changeEmail(userId: string, newEmail: string) {
-        try {
-            // Check if email already exists
-            const existingUser = await prisma.user.findUnique({
-                where: { email: newEmail }
-            });
+  // Change email
+  static async changeEmail(userId: string, newEmail: string) {
+    try {
+      // Check if email already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email: newEmail },
+      });
 
-            if (existingUser && existingUser.user_id !== userId) {
-                return ResponseUtils.error('Email này đã được sử dụng bởi tài khoản khác');
-            }
+      if (existingUser && existingUser.userId !== userId) {
+        return ResponseUtils.error("Email này đã được sử dụng bởi tài khoản khác");
+      }
 
-            // Update email and reset verification
-            const updatedUser = await prisma.user.update({
-                where: { user_id: userId },
-                data: {
-                    email: newEmail,
-                    is_verified: false, // Reset verification when email changes
-                    updated_at: new Date()
-                },
-                select: {
-                    user_id: true,
-                    name: true,
-                    email: true,
-                    phone: true,
-                    address: true,
-                    profile_photo: true,
-                    date_of_birth: true,
-                    gender: true,
-                    role: true,
-                    is_active: true,
-                    is_verified: true,
-                    last_login: true,
-                    created_at: true,
-                    updated_at: true
-                }
-            });
+      // Update email and reset verification
+      const updatedUser = await prisma.user.update({
+        where: { userId: userId },
+        data: {
+          email: newEmail,
+          isVerified: false, // Reset verification when email changes
+          updatedAt: new Date(),
+        },
+        select: {
+          userId: true,
+          name: true,
+          email: true,
+          phone: true,
+          address: true,
+          profilePhoto: true,
+          dateOfBirth: true,
+          gender: true,
+          role: true,
+          isActive: true,
+          isVerified: true,
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
 
-            return ResponseUtils.success('Đổi email thành công. Vui lòng xác thực email mới.', updatedUser);
-        } catch (error) {
-            return ResponseUtils.error(
-                'Đổi email thất bại',
-                error instanceof Error ? error.message : 'Lỗi không xác định'
-            );
-        }
+      return ResponseUtils.success(
+        "Đổi email thành công. Vui lòng xác thực email mới.",
+        updatedUser
+      );
+    } catch (error) {
+      return ResponseUtils.error(
+        "Đổi email thất bại",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
     }
-
+  }
 }

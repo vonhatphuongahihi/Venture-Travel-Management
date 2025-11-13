@@ -18,6 +18,25 @@ export const validateRequest = (schema: Joi.ObjectSchema) => {
   };
 };
 
+export const validateQuery = (schema: Joi.ObjectSchema) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const { error, value } = schema.validate(req.query, { convert: true });
+
+    if (error) {
+      res.status(400).json({
+        success: false,
+        message: "Validation error",
+        error: error.details[0].message,
+      });
+      return;
+    }
+
+    req.query = value;
+
+    next();
+  };
+};
+
 // Validation schemas
 export const registerSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),

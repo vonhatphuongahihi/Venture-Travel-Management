@@ -12,6 +12,7 @@ export interface UpdateProfileRequest {
   address?: string;
   dateOfBirth?: string;
   gender?: string;
+  email?: string;
 }
 
 export interface UpdateAvatarResponse {

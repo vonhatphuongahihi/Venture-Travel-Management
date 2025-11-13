@@ -110,3 +110,15 @@ export const getUsersQuerySchema = Joi.object({
 export const updateUserStatusSchema = Joi.object({
   isActive: Joi.boolean().required(),
 });
+
+export const changePasswordSchema = Joi.object({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
+        .messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
+        })
+});
+
+export const changeEmailSchema = Joi.object({
+    email: Joi.string().email().required()
+});

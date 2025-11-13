@@ -1,7 +1,13 @@
-import { PrismaClient } from '@prisma/client';
-import { PasswordUtils, JWTUtils, generateUserId } from '@/utils';
-import { LoginRequest, RegisterRequest, AuthResponse, VerifyEmailRequest, VerifyResponse } from '@/types';
-import { EmailService } from './emailService';
+import { PrismaClient } from "@prisma/client";
+import { PasswordUtils, JWTUtils, generateUserId } from "@/utils";
+import {
+    LoginRequest,
+    RegisterRequest,
+    AuthResponse,
+    VerifyEmailRequest,
+    VerifyResponse,
+} from "@/types";
+import { EmailService } from "./emailService";
 
 const prisma = new PrismaClient();
 const emailService = new EmailService();
@@ -11,24 +17,26 @@ export class AuthService {
     static async register(userData: RegisterRequest): Promise<AuthResponse> {
         try {
             const existingUser = await prisma.user.findUnique({
-                where: { email: userData.email }
+                where: { email: userData.email },
             });
 
             if (existingUser) {
                 // If user exists but not verified, resend verification email
-                if (!existingUser.is_verified) {
+                if (!existingUser.isVerified) {
                     // Generate new verification token
                     const verificationToken = generateUserId();
                     const verificationExpires = new Date();
-                    verificationExpires.setTime(verificationExpires.getTime() + (24 * 60 * 60 * 1000)); // 24 hours
+                    verificationExpires.setTime(
+                        verificationExpires.getTime() + 24 * 60 * 60 * 1000
+                    ); // 24 hours
 
                     // Update user with new token
                     await prisma.user.update({
-                        where: { user_id: existingUser.user_id },
+                        where: { userId: existingUser.userId },
                         data: {
-                            verification_token: verificationToken,
-                            verification_expires: verificationExpires
-                        }
+                            verificationToken: verificationToken,
+                            verificationExpires: verificationExpires,
+                        },
                     });
 
                     // Send verification email
@@ -39,49 +47,51 @@ export class AuthService {
                     );
 
                     if (!emailSent) {
-                        console.error('Failed to resend verification email to:', existingUser.email);
+                        console.error(
+                            "Failed to resend verification email to:",
+                            existingUser.email
+                        );
                     }
 
                     // Get updated user data with all required fields
                     const updatedUser = await prisma.user.findUnique({
-                        where: { user_id: existingUser.user_id },
+                        where: { userId: existingUser.userId },
                         select: {
-                            user_id: true,
+                            userId: true,
                             name: true,
                             email: true,
                             phone: true,
                             address: true,
-                            profile_photo: true,
-                            date_of_birth: true,
+                            profilePhoto: true,
+                            dateOfBirth: true,
                             gender: true,
                             role: true,
-                            is_active: true,
-                            is_verified: true,
-                            verification_token: true,
-                            verification_expires: true,
-                            last_login: true,
-                            created_at: true,
-                            updated_at: true,
-
-                            google_id: true,
-                            auth_provider: true
-
-                        }
+                            isActive: true,
+                            isVerified: true,
+                            verificationToken: true,
+                            verificationExpires: true,
+                            lastLogin: true,
+                            createdAt: true,
+                            updatedAt: true,
+                            googleId: true,
+                            authProvider: true,
+                        },
                     });
 
                     return {
                         success: true,
-                        message: 'Email đã tồn tại nhưng chưa xác thực. Chúng tôi đã gửi lại email xác thực.',
+                        message:
+                            "Email đã tồn tại nhưng chưa xác thực. Chúng tôi đã gửi lại email xác thực.",
                         data: {
                             user: updatedUser!,
-                            token: ''
-                        }
+                            token: "",
+                        },
                     };
                 } else {
                     // User exists and is already verified
                     return {
                         success: false,
-                        message: 'Email đã được sử dụng'
+                        message: "Email đã được sử dụng",
                     };
                 }
             }
@@ -91,7 +101,7 @@ export class AuthService {
             // Generate verification token
             const verificationToken = generateUserId();
             const verificationExpires = new Date();
-            verificationExpires.setTime(verificationExpires.getTime() + (24 * 60 * 60 * 1000));
+            verificationExpires.setTime(verificationExpires.getTime() + 24 * 60 * 60 * 1000);
 
             const user = await prisma.user.create({
                 data: {
@@ -100,33 +110,31 @@ export class AuthService {
                     password: hashedPassword,
                     phone: userData.phone,
                     address: userData.address,
-                    date_of_birth: userData.date_of_birth ? new Date(userData.date_of_birth) : null,
+                    dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth) : null,
                     gender: userData.gender,
-                    verification_token: verificationToken,
-                    verification_expires: verificationExpires
+                    verificationToken: verificationToken,
+                    verificationExpires: verificationExpires,
                 },
                 select: {
-                    user_id: true,
+                    userId: true,
                     name: true,
                     email: true,
                     phone: true,
                     address: true,
-                    profile_photo: true,
-                    date_of_birth: true,
+                    profilePhoto: true,
+                    dateOfBirth: true,
                     gender: true,
                     role: true,
-                    is_active: true,
-                    is_verified: true,
-                    verification_token: true,
-                    verification_expires: true,
-                    last_login: true,
-                    created_at: true,
-                    updated_at: true,
-
-                    google_id: true,
-                    auth_provider: true
-
-                }
+                    isActive: true,
+                    isVerified: true,
+                    verificationToken: true,
+                    verificationExpires: true,
+                    lastLogin: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    googleId: true,
+                    authProvider: true,
+                },
             });
 
             // Send verification email
@@ -137,21 +145,21 @@ export class AuthService {
             );
 
             if (!emailSent) {
-                console.error('Failed to send verification email to:', userData.email);
+                console.error("Failed to send verification email to:", userData.email);
             }
 
             return {
                 success: true,
-                message: 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.',
+                message: "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
                 data: {
                     user,
-                    token: '' // No token until email is verified
-                }
+                    token: "", // No token until email is verified
+                },
             };
         } catch (error) {
             return {
                 success: false,
-                message: 'Đăng ký thất bại',
+                message: "Đăng ký thất bại",
             };
         }
     }
@@ -162,47 +170,47 @@ export class AuthService {
             const user = await prisma.user.findUnique({
                 where: { email: loginData.email },
                 select: {
-                    user_id: true,
+                    userId: true,
                     name: true,
                     email: true,
                     password: true,
                     phone: true,
                     address: true,
-                    profile_photo: true,
-                    date_of_birth: true,
+                    profilePhoto: true,
+                    dateOfBirth: true,
                     gender: true,
                     role: true,
-                    is_active: true,
-                    is_verified: true,
-                    verification_token: true,
-                    verification_expires: true,
-                    last_login: true,
-                    created_at: true,
-                    updated_at: true,
-                    google_id: true,
-                    auth_provider: true
-                }
+                    isActive: true,
+                    isVerified: true,
+                    verificationToken: true,
+                    verificationExpires: true,
+                    lastLogin: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    googleId: true,
+                    authProvider: true,
+                },
             });
 
             if (!user) {
                 return {
                     success: false,
-                    message: 'Email hoặc mật khẩu không đúng'
+                    message: "Email hoặc mật khẩu không đúng",
                 };
             }
 
-            if (!user.is_active) {
+            if (!user.isActive) {
                 return {
                     success: false,
-                    message: 'Tài khoản đã bị vô hiệu hóa'
+                    message: "Tài khoản đã bị vô hiệu hóa",
                 };
             }
 
             // Check if email is verified
-            if (!user.is_verified) {
+            if (!user.isVerified) {
                 return {
                     success: false,
-                    message: 'Vui lòng xác thực email trước khi đăng nhập'
+                    message: "Vui lòng xác thực email trước khi đăng nhập",
                 };
             }
 
@@ -211,7 +219,7 @@ export class AuthService {
             if (!user.password) {
                 return {
                     success: false,
-                    message: 'Tài khoản này sử dụng phương thức đăng nhập khác'
+                    message: "Tài khoản này sử dụng phương thức đăng nhập khác",
                 };
             }
 
@@ -220,37 +228,37 @@ export class AuthService {
             if (!isPasswordValid) {
                 return {
                     success: false,
-                    message: 'Email hoặc mật khẩu không đúng'
+                    message: "Email hoặc mật khẩu không đúng",
                 };
             }
 
             // Update last login
             await prisma.user.update({
-                where: { user_id: user.user_id },
-                data: { last_login: new Date() }
+                where: { userId: user.userId },
+                data: { lastLogin: new Date() },
             });
 
             // Generate JWT token
             const token = JWTUtils.generateToken({
-                userId: user.user_id,
+                userId: user.userId,
                 email: user.email,
-                role: user.role
+                role: user.role,
             });
 
             const { password, ...userWithoutPassword } = user;
 
             return {
                 success: true,
-                message: 'Đăng nhập thành công',
+                message: "Đăng nhập thành công",
                 data: {
                     user: userWithoutPassword,
-                    token
-                }
+                    token,
+                },
             };
         } catch (error) {
             return {
                 success: false,
-                message: 'Đăng nhập thất bại'
+                message: "Đăng nhập thất bại",
             };
         }
     }
@@ -260,55 +268,53 @@ export class AuthService {
         try {
             const user = await prisma.user.findFirst({
                 where: {
-                    verification_token: verifyData.token,
-                }
+                    verificationToken: verifyData.token,
+                },
             });
 
             if (!user) {
                 return {
                     success: false,
-                    message: 'Token xác thực không hợp lệ'
+                    message: "Token xác thực không hợp lệ",
                 };
             }
 
-            if (user.verification_expires && new Date() > user.verification_expires) {
-                console.log('Token is expired');
+            if (user.verificationExpires && new Date() > user.verificationExpires) {
+                console.log("Token is expired");
                 return {
                     success: false,
-                    message: 'Token xác thực đã hết hạn'
+                    message: "Token xác thực đã hết hạn",
                 };
             }
 
             // Update user as verified
             const updatedUser = await prisma.user.update({
-                where: { user_id: user.user_id },
+                where: { userId: user.userId },
                 data: {
-                    is_verified: true,
-                    verification_token: null,
-                    verification_expires: null
+                    isVerified: true,
+                    verificationToken: null,
+                    verificationExpires: null,
                 },
                 select: {
-                    user_id: true,
+                    userId: true,
                     name: true,
                     email: true,
                     phone: true,
                     address: true,
-                    profile_photo: true,
-                    date_of_birth: true,
+                    profilePhoto: true,
+                    dateOfBirth: true,
                     gender: true,
                     role: true,
-                    is_active: true,
-                    is_verified: true,
-                    verification_token: true,
-                    verification_expires: true,
-                    last_login: true,
-                    created_at: true,
-                    updated_at: true,
-
-                    google_id: true,
-                    auth_provider: true
-
-                }
+                    isActive: true,
+                    isVerified: true,
+                    verificationToken: true,
+                    verificationExpires: true,
+                    lastLogin: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    googleId: true,
+                    authProvider: true,
+                },
             });
 
             // Send welcome email
@@ -316,16 +322,16 @@ export class AuthService {
 
             return {
                 success: true,
-                message: 'Xác thực email thành công',
+                message: "Xác thực email thành công",
                 data: {
-                    user: updatedUser
-                }
+                    user: updatedUser,
+                },
             };
         } catch (error) {
             return {
                 success: false,
-                message: 'Xác thực email thất bại',
-                error: error instanceof Error ? error.message : 'Lỗi không xác định'
+                message: "Xác thực email thất bại",
+                error: error instanceof Error ? error.message : "Lỗi không xác định",
             };
         }
     }

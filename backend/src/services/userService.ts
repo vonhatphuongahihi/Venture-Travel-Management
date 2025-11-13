@@ -9,13 +9,21 @@ const prisma = new PrismaClient();
 const cloudinaryService = new CloudinaryService();
 
 export interface UpdateProfileRequest {
+  name?: string;
+  phone?: string;
+  address?: string;
+  dateOfBirth?: string;
+  gender?: string;
+}
 
-    name?: string;
-    phone?: string;
-    address?: string;
-    date_of_birth?: string;
-    gender?: string;
-    email?: string;
+export interface UpdateAvatarResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    profilePhoto: string;
+    user: any;
+  };
+  error?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -26,16 +34,6 @@ export interface ChangePasswordRequest {
 export interface ChangeEmailRequest {
     email: string;
 
-}
-
-export interface UpdateAvatarResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    profile_photo: string;
-    user: any;
-  };
-  error?: string;
 }
 
 export class UserService {
@@ -62,44 +60,41 @@ export class UserService {
       }
 
       if (
-        updateData.date_of_birth !== undefined &&
-        updateData.date_of_birth !== null &&
-        updateData.date_of_birth !== ""
+        updateData.dateOfBirth !== undefined &&
+        updateData.dateOfBirth !== null &&
+        updateData.dateOfBirth !== ""
       ) {
         try {
-          cleanData.date_of_birth = new Date(updateData.date_of_birth);
+          cleanData.dateOfBirth = new Date(updateData.dateOfBirth);
         } catch (error) {
-          console.error("Invalid date format:", updateData.date_of_birth);
+          console.error("Invalid date format:", updateData.dateOfBirth);
         }
       }
 
-      cleanData.updated_at = new Date();
+      cleanData.updatedAt = new Date();
 
       const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
+        where: { userId: userId },
         data: cleanData,
         select: {
-          user_id: true,
+          userId: true,
           name: true,
           email: true,
           phone: true,
           address: true,
-          profile_photo: true,
-          date_of_birth: true,
+          profilePhoto: true,
+          dateOfBirth: true,
           gender: true,
           role: true,
-          is_active: true,
-          is_verified: true,
-          last_login: true,
-          created_at: true,
-          updated_at: true,
+          isActive: true,
+          isVerified: true,
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
 
-      return ResponseUtils.success(
-        "Cập nhật thông tin thành công",
-        updatedUser
-      );
+      return ResponseUtils.success("Cập nhật thông tin thành công", updatedUser);
     } catch (error) {
       return ResponseUtils.error(
         "Cập nhật thông tin thất bại",
@@ -116,8 +111,8 @@ export class UserService {
     try {
       // Get current user to check existing avatar
       const currentUser = await prisma.user.findUnique({
-        where: { user_id: userId },
-        select: { profile_photo: true, name: true },
+        where: { userId: userId },
+        select: { profilePhoto: true, name: true },
       });
 
       if (!currentUser) {
@@ -138,10 +133,8 @@ export class UserService {
       );
 
       // Delete old avatar if exists
-      if (currentUser.profile_photo) {
-        const oldPublicId = cloudinaryService.extractPublicId(
-          currentUser.profile_photo
-        );
+      if (currentUser.profilePhoto) {
+        const oldPublicId = cloudinaryService.extractPublicId(currentUser.profilePhoto);
         if (oldPublicId) {
           await cloudinaryService.deleteImage(oldPublicId).catch(() => {
             // Ignore deletion errors
@@ -152,26 +145,26 @@ export class UserService {
 
       // Update user profile photo in database
       const updatedUser = await prisma.user.update({
-        where: { user_id: userId },
+        where: { userId: userId },
         data: {
-          profile_photo: uploadResult.secure_url,
-          updated_at: new Date(),
+          profilePhoto: uploadResult.secure_url,
+          updatedAt: new Date(),
         },
         select: {
-          user_id: true,
+          userId: true,
           name: true,
           email: true,
           phone: true,
           address: true,
-          profile_photo: true,
-          date_of_birth: true,
+          profilePhoto: true,
+          dateOfBirth: true,
           gender: true,
           role: true,
-          is_active: true,
-          is_verified: true,
-          last_login: true,
-          created_at: true,
-          updated_at: true,
+          isActive: true,
+          isVerified: true,
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
 
@@ -179,7 +172,7 @@ export class UserService {
         success: true,
         message: "Cập nhật ảnh đại diện thành công",
         data: {
-          profile_photo: uploadResult.secure_url,
+          profilePhoto: uploadResult.secure_url,
           user: updatedUser,
         },
       };
@@ -196,22 +189,22 @@ export class UserService {
   static async getProfile(userId: string) {
     try {
       const user = await prisma.user.findUnique({
-        where: { user_id: userId },
+        where: { userId: userId },
         select: {
-          user_id: true,
+          userId: true,
           name: true,
           email: true,
           phone: true,
           address: true,
-          profile_photo: true,
-          date_of_birth: true,
+          profilePhoto: true,
+          dateOfBirth: true,
           gender: true,
           role: true,
-          is_active: true,
-          is_verified: true,
-          last_login: true,
-          created_at: true,
-          updated_at: true,
+          isActive: true,
+          isVerified: true,
+          lastLogin: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
 

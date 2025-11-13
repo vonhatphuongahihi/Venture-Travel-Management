@@ -118,6 +118,5 @@ export interface GetUsersRequest {
   page?: number;
   limit?: number;
   search?: string;
-  is_active?: boolean;
-
+  isActive?: boolean;
 }

@@ -74,3 +74,20 @@ export const resetPasswordSchema = Joi.object({
         "Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number",
     }),
 });
+
+export const contactMessageSchema = Joi.object({
+  name: Joi.string().min(2).max(100).required(),
+  email: Joi.string().email().required(),
+  message: Joi.string().min(10).max(1000).required(),
+});
+
+export const getUsersQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).optional(),
+  limit: Joi.number().integer().min(1).optional(),
+  search: Joi.string().max(100).optional(),
+  isActive: Joi.boolean().optional(),
+});
+
+export const updateUserStatusSchema = Joi.object({
+  isActive: Joi.boolean().required(),
+});

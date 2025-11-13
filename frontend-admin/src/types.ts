@@ -40,11 +40,11 @@ export interface GetUserRequest {
   page?: number;
   limit?: number;
   search?: string;
-  is_active?: boolean;
+  isActive?: boolean;
 }
 
 export interface User {
-  user_id: string;
+  userId: string;
   email: string;
   reset_token: string | null;
   google_id: string | null;
@@ -52,18 +52,18 @@ export interface User {
   password: string | null;
   phone: string | null;
   address: string | null;
-  profile_photo: string | null;
-  date_of_birth: Date | null;
+  profilePhoto: string | null;
+  dateOfBirth: Date | null;
   gender: string | null;
   role: Role;
-  is_active: boolean;
-  is_verified: boolean;
+  isActive: boolean;
+  isVerified: boolean;
   verification_token: string | null;
   verification_expires: Date | null;
   reset_expires: Date | null;
-  last_login: Date | null;
-  created_at: Date;
-  updated_at: Date;
+  lastLogin: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
   auth_provider: AuthProvider;
 }
 

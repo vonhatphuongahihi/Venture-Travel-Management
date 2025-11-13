@@ -46,8 +46,8 @@ type TourFormValues = {
 };
 
 type PriceCategory = {
-    label: string;
-    value: string;
+    name: string;
+    categoryId: string;
     description?: string;
     price: number;
     quantity: number;
@@ -55,18 +55,10 @@ type PriceCategory = {
 
 type TicketData = {
     id?: string;
-    ticketName: string;
+    name: string;
     quantity: number;
-    note: string;
+    notes: string;
     prices: PriceCategory[];
-};
-
-type AddTicketModalProps = {
-    open: boolean;
-    onClose: () => void;
-    onAddTicket: (ticket: TicketData) => void;
-    onUpdateTicket: (ticket: TicketData) => void;
-    editingTicket?: TicketData | null;
 };
 
 const provinceOptions = [
@@ -569,10 +561,10 @@ const TourCreate = () => {
                                     <div className="relative rounded-t-lg p-4 bg-gray-100">
                                         <div className="w-[62%]">
                                             <h3 className="text-md font-semibold text-gray-900 line-clamp-1">
-                                                {ticket.ticketName}
+                                                {ticket.name}
                                             </h3>
                                             <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
-                                                {ticket.note}
+                                                {ticket.notes}
                                             </p>
                                         </div>
                                         <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -604,7 +596,7 @@ const TourCreate = () => {
                                                     className="bg-gray-50 border border-gray-200 rounded p-3"
                                                 >
                                                     <p className="text-sm font-medium text-gray-700 mb-1">
-                                                        {category.label}
+                                                        {category.name}
                                                     </p>
                                                     <p className="text-lg font-semibold text-primary mb-1">
                                                         {category.price.toLocaleString("vi-VN")} VNĐ

@@ -7,8 +7,8 @@ import FormTextArea from "./FormTextArea";
 import FormInput from "./FormInput";
 
 type PriceCategory = {
-    label: string;
-    value: string;
+    name: string;
+    categoryId: string;
     description?: string;
     price: number;
     quantity: number;
@@ -16,9 +16,9 @@ type PriceCategory = {
 
 type TicketData = {
     id?: string;
-    ticketName: string;
+    name: string;
     quantity: number;
-    note: string;
+    notes: string;
     prices: PriceCategory[];
 };
 
@@ -32,9 +32,9 @@ type TicketFormModalProps = {
 };
 
 const CATEGORY_OPTIONS = [
-    { label: "Người lớn", value: "adult", description: "Từ 18 đến 60 tuổi" },
-    { label: "Trẻ em", value: "child", description: "Dưới 18 tuổi" },
-    { label: "Người cao tuổi", value: "senior", description: "Trên 60 tuổi" },
+    { name: "Người lớn", categoryId: "adult", description: "Từ 18 đến 60 tuổi" },
+    { name: "Trẻ em", categoryId: "child", description: "Dưới 18 tuổi" },
+    { name: "Người cao tuổi", categoryId: "senior", description: "Trên 60 tuổi" },
 ];
 
 const TicketFormModal = ({
@@ -53,9 +53,9 @@ const TicketFormModal = ({
         formState: { errors },
     } = useForm<TicketData>({
         defaultValues: {
-            ticketName: "",
+            name: "",
             quantity: 0,
-            note: "",
+            notes: "",
             prices: [],
         },
     });
@@ -65,8 +65,8 @@ const TicketFormModal = ({
         name: "prices",
     });
 
-    const handleToggleCategory = (cat: { label: string; value: string; description?: string }) => {
-        const existingIndex = fields.findIndex((field) => field.value === cat.value);
+    const handleToggleCategory = (cat: { name: string; categoryId: string; description?: string }) => {
+        const existingIndex = fields.findIndex((field) => field.categoryId === cat.categoryId);
         if (existingIndex !== -1) {
             remove(existingIndex);
         } else {
@@ -76,16 +76,16 @@ const TicketFormModal = ({
     useEffect(() => {
         if (editingTicket) {
             reset({
-                ticketName: editingTicket.ticketName,
+                name: editingTicket.name,
                 quantity: editingTicket.quantity,
-                note: editingTicket.note,
+                notes: editingTicket.notes,
                 prices: editingTicket.prices,
             });
         } else {
             reset({
-                ticketName: "",
+                name: "",
                 quantity: 0,
-                note: "",
+                notes: "",
                 prices: [],
             });
         }
@@ -118,7 +118,7 @@ const TicketFormModal = ({
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <FormInput
                         label="Tên loại vé"
-                        name="ticketName"
+                        name="name"
                         register={register}
                         errors={errors}
                         placeholder="Nhập tên loại vé"
@@ -142,7 +142,7 @@ const TicketFormModal = ({
 
                     <FormTextArea
                         label="Ghi chú"
-                        name="note"
+                        name="notes"
                         register={register}
                         errors={errors}
                         placeholder="Nhập ghi chú"
@@ -163,19 +163,19 @@ const TicketFormModal = ({
                                         {CATEGORY_OPTIONS.map((cate) => {
                                             return (
                                                 <div
-                                                    key={cate.value}
+                                                    key={cate.categoryId}
                                                     className="px-2 py-1 cursor-pointer hover:bg-gray-100 flex items-center justify-between"
                                                     onClick={() => handleToggleCategory(cate)}
                                                 >
                                                     <div className="flex items-baseline gap-1">
                                                         <span className="font-semibold">
-                                                            {cate.label}
+                                                            {cate.name}
                                                         </span>
                                                         <span className="text-sm">({cate.description})</span>
                                                     </div>
                                                     {fields
-                                                        .map((p) => p.value)
-                                                        .includes(cate.value) && (
+                                                        .map((p) => p.categoryId)
+                                                        .includes(cate.categoryId) && (
                                                         <Check className="ml-auto w-[14px]" />
                                                     )}
                                                 </div>
@@ -189,7 +189,7 @@ const TicketFormModal = ({
                         <div className="space-y-3 mt-3">
                             {fields.map((field, index) => (
                                 <div
-                                    key={field.value}
+                                    key={field.categoryId}
                                     className="relative border-primary border-l-2 rounded"
                                 >
                                     <button
@@ -201,7 +201,7 @@ const TicketFormModal = ({
                                     </button>
                                     <div className="py-4 pl-[24px] pr-4 border-t border-r border-b space-y-4 rounded ">
                                         <div className="">
-                                            <p className="font-semibold">{field.label}</p>
+                                            <p className="font-semibold">{field.name}</p>
                                             <p className="text-sm text-gray-500 mb-2">
                                                 {field.description}
                                             </p>

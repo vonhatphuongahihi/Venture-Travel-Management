@@ -1,19 +1,25 @@
-import { Router, Request, Response } from 'express';
-import passport from 'passport';
-import { PrismaClient } from '@prisma/client';
-import { JWTUtils } from '../utils';
+import { Router, Request, Response } from "express";
+import passport from "passport";
+import { PrismaClient } from "@prisma/client";
+import { JWTUtils } from "../utils";
 
 const router = Router();
 const prisma = new PrismaClient();
 
 // Google OAuth login
-router.get('/google', passport.authenticate('google', {
-    scope: ['profile', 'email']
-}));
+router.get(
+    "/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+    })
+);
 
 // Google OAuth callback
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed` }),
+router.get(
+    "/google/callback",
+    passport.authenticate("google", {
+        failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed`,
+    }),
     async (req: Request, res: Response) => {
         try {
             const user = req.user as any;
@@ -24,28 +30,28 @@ router.get('/google/callback',
 
             // Generate JWT token
             const token = JWTUtils.generateToken({
-                userId: user.user_id,
+                userId: user.userId,
                 email: user.email,
-                role: user.role
+                role: user.role,
             });
 
             // Update last login
             await prisma.user.update({
-                where: { user_id: user.user_id },
-                data: { last_login: new Date() }
+                where: { userId: user.userId },
+                data: { lastLogin: new Date() },
             });
 
             // Redirect to frontend with token
             res.redirect(`${process.env.FRONTEND_URL}/auth/google/success?token=${token}`);
         } catch (error) {
-            console.error('Google OAuth callback error:', error);
+            console.error("Google OAuth callback error:", error);
             res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
         }
     }
 );
 
 // Google OAuth success handler (for frontend)
-router.get('/google/success', (req: Request, res: Response) => {
+router.get("/google/success", (req: Request, res: Response) => {
     const token = req.query.token as string;
 
     if (!token) {

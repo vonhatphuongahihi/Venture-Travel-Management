@@ -214,6 +214,7 @@ export class AuthService {
                 };
             }
 
+
             // Check if user has a password (for local authentication)
             if (!user.password) {
                 return {
@@ -222,10 +223,8 @@ export class AuthService {
                 };
             }
 
-            const isPasswordValid = await PasswordUtils.comparePassword(
-                loginData.password,
-                user.password
-            );
+            const isPasswordValid = await PasswordUtils.comparePassword(loginData.password, user.password);
+
             if (!isPasswordValid) {
                 return {
                     success: false,

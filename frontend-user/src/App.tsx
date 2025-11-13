@@ -21,10 +21,14 @@ import SplashScreen from "./components/SplashScreen";
 import Explore360 from "./pages/Explore360";
 import Map from "./pages/Map";
 import TourDetail from "./pages/TourDetail";
-import ProvincePage from "./pages/ProvincePage";
+import ProvincePage from "./pages/Province/ProvincePage";
 import { AttractionPage } from "./pages/AttractionPage";
 import AboutUs from "./pages/AboutUs";
 import ResetPassword from "./pages/ResetPassword";
+import ExploreProvince from "./pages/Province/ExploreProvince";
+import ProvinceTours from "./pages/Province/ProvinceTours";
+import TermOfUse from "./pages/TermOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -44,26 +48,34 @@ const App = () => (
                 <Route path="/book-tour" element={<BookTourNew />} />
                 <Route path="/explore-360" element={<Explore360 />} />
                 <Route path="/map" element={<Map />} />
-                <Route path="/province/:slug" element={<ProvincePage />} />
+                <Route path="/province/:slug" element={<ProvincePage />}>
+                  <Route index element={<ExploreProvince />} />
+                  <Route path="tours-activities" element={<ProvinceTours />} />
+                </Route>
                 <Route path="/attraction/:slug" element={<AttractionPage />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/terms" element={<TermOfUse/>}/>
+                <Route path="/policy" element={<PrivacyPolicy/>}/>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />
-                <Route path="/auth/google/success" element={<GoogleAuthSuccess />} />
+                <Route
+                  path="/auth/google/success"
+                  element={<GoogleAuthSuccess />}
+                />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/booking-history" element={<BookingHistory />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes >
-            </BrowserRouter >
+              </Routes>
+            </BrowserRouter>
           </ToastProvider>
         </AuthProvider>
       </TooltipProvider>
     </BookingProvider>
-  </QueryClientProvider >
+  </QueryClientProvider>
 );
 
 export default App;

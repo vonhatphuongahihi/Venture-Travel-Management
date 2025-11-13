@@ -25,6 +25,7 @@ interface AuthContextType {
     isLoading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
+    updateUser: (userData: User) => void;
     isAuthenticated: boolean;
 }
 
@@ -142,13 +143,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem("user");
     };
 
+    const updateUser = (userData: User) => {
+        setUser(userData);
+        // Cập nhật trong localStorage nếu có token
+        if (localStorage.getItem('token')) {
+            localStorage.setItem('user', JSON.stringify(userData));
+        }
+    };
+
     const value: AuthContextType = {
         user,
         token,
         isLoading,
         login,
         logout,
-        isAuthenticated: !!user && !!token && user.role === "ADMIN",
+        updateUser,
+        isAuthenticated: !!user && !!token && user.role === 'ADMIN',
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

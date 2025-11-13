@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import AttractionHeroSection from "@/components/attraction/AttractionHeroSection.tsx";
-import AttractionToursSection from "@/components/attraction/AttractionToursSection.tsx";
 import AttractionReviewsSection from "@/components/attraction/AttractionReviewsSection.tsx";
+import AttractionToursSection from "@/components/attraction/AttractionToursSection.tsx";
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Tour, Review, Attraction } from "@/global.types";
-import { mockTours } from "@/data/tours";
-import { mockReviews } from "@/data/reviews";
 import { mockAttractions } from "@/data/attractions";
+import { mockReviews } from "@/data/reviews";
+import { mockTours } from "@/data/tours";
+import { Attraction, Review, Tour } from "@/global.types";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export function AttractionPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -97,7 +97,7 @@ export function AttractionPage() {
 
       <main>
         {/* Breadcrumb */}
-        <div className="max-w-[1160px] mx-auto px-4 py-4">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbItems.map((item, index) => (
@@ -121,21 +121,12 @@ export function AttractionPage() {
         </div>
 
         {/* Hero Section */}
-        <AttractionHeroSection attraction={attraction} />
-
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
-          <div className="max-w-[1160px] mx-auto px-4">
-            <nav className="flex">
-              <div className="px-0 py-3 text-sm font-medium border-b-2 border-[#26B8ED] text-[#26B8ED]">
-                Tour & Hoạt động
-              </div>
-            </nav>
-          </div>
+        <div className="border-b border-gray-200">
+          <AttractionHeroSection attraction={attraction} />
         </div>
 
         {/* Content */}
-        <div className="max-w-[1160px] mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <AttractionToursSection tours={tours} />
           <AttractionReviewsSection
             reviews={reviews}

@@ -21,16 +21,9 @@ export class EmailService {
   }
 
   // Helper method to render HTML template with placeholders
-  private renderTemplate(
-    templateName: string,
-    placeholders: Record<string, string>
-  ): string {
+  private renderTemplate(templateName: string, placeholders: Record<string, string>): string {
     try {
-      const templatePath = path.join(
-        __dirname,
-        "../templates",
-        `${templateName}.html`
-      );
+      const templatePath = path.join(__dirname, "../templates", `${templateName}.html`);
       let template = fs.readFileSync(templatePath, "utf8");
 
       // Replace placeholders
@@ -55,7 +48,7 @@ export class EmailService {
       // Check if user still exists
       const user = await prisma.user.findUnique({
         where: { email },
-        select: { user_id: true, is_verified: true },
+        select: { userId: true, isVerified: true },
       });
 
       if (!user) {
@@ -63,7 +56,7 @@ export class EmailService {
         return false;
       }
 
-      if (user.is_verified) {
+      if (user.isVerified) {
         console.log("Người dùng đã được xác thực, bỏ qua gửi email:", email);
         return false;
       }
@@ -99,22 +92,16 @@ export class EmailService {
       // Check if user still exists
       const user = await prisma.user.findUnique({
         where: { email },
-        select: { user_id: true, is_verified: true },
+        select: { userId: true, isVerified: true },
       });
 
       if (!user) {
-        console.log(
-          "Không tìm thấy người dùng, bỏ qua gửi email chào mừng:",
-          email
-        );
+        console.log("Không tìm thấy người dùng, bỏ qua gửi email chào mừng:", email);
         return false;
       }
 
-      if (!user.is_verified) {
-        console.log(
-          "Người dùng chưa được xác thực, bỏ qua gửi email chào mừng:",
-          email
-        );
+      if (!user.isVerified) {
+        console.log("Người dùng chưa được xác thực, bỏ qua gửi email chào mừng:", email);
         return false;
       }
 
@@ -142,31 +129,21 @@ export class EmailService {
   }
 
   // Send password reset email
-  async sendPasswordResetEmail(
-    email: string,
-    name: string,
-    resetToken: string
-  ): Promise<boolean> {
+  async sendPasswordResetEmail(email: string, name: string, resetToken: string): Promise<boolean> {
     try {
       // Check if user still exists
       const user = await prisma.user.findUnique({
         where: { email },
-        select: { user_id: true, is_active: true },
+        select: { userId: true, isActive: true },
       });
 
       if (!user) {
-        console.log(
-          "Không tìm thấy người dùng, bỏ qua gửi email reset password:",
-          email
-        );
+        console.log("Không tìm thấy người dùng, bỏ qua gửi email reset password:", email);
         return false;
       }
 
-      if (!user.is_active) {
-        console.log(
-          "Người dùng không active, bỏ qua gửi email reset password:",
-          email
-        );
+      if (!user.isActive) {
+        console.log("Người dùng không active, bỏ qua gửi email reset password:", email);
         return false;
       }
 
@@ -196,11 +173,7 @@ export class EmailService {
   }
 
   // Contact email
-  async sendContactEmail(
-    name: string,
-    email: string,
-    message: string
-  ): Promise<boolean> {
+  async sendContactEmail(name: string, email: string, message: string): Promise<boolean> {
     try {
       const htmlContent = this.renderTemplate("contactEmail", {
         username: name,

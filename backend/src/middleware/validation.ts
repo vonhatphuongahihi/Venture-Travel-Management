@@ -53,7 +53,7 @@ export const registerSchema = Joi.object({
     .pattern(/^[\+]?[0-9][\d]{0,15}$/)
     .optional(),
   address: Joi.string().max(500).optional(),
-  date_of_birth: Joi.date().iso().optional(),
+  dateOfBirth: Joi.date().iso().optional(),
   gender: Joi.string().valid("male", "female", "other").optional(),
 });
 
@@ -73,7 +73,7 @@ export const updateProfileSchema = Joi.object({
     .optional()
     .allow(""),
   address: Joi.string().max(500).optional().allow(""),
-  date_of_birth: Joi.date().iso().optional(),
+  dateOfBirth: Joi.date().iso().optional(),
   gender: Joi.string().valid("male", "female", "other").optional().allow(""),
 });
 
@@ -104,9 +104,21 @@ export const getUsersQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).optional(),
   search: Joi.string().max(100).optional(),
-  is_active: Joi.boolean().optional(),
+  isActive: Joi.boolean().optional(),
 });
 
 export const updateUserStatusSchema = Joi.object({
-  is_active: Joi.boolean().required(),
+  isActive: Joi.boolean().required(),
+});
+
+export const changePasswordSchema = Joi.object({
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
+        .messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
+        })
+});
+
+export const changeEmailSchema = Joi.object({
+    email: Joi.string().email().required()
 });

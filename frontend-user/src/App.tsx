@@ -27,6 +27,8 @@ import AboutUs from "./pages/AboutUs";
 import ResetPassword from "./pages/ResetPassword";
 import ExploreProvince from "./pages/Province/ExploreProvince";
 import ProvinceTours from "./pages/Province/ProvinceTours";
+import TermOfUse from "./pages/TermOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +56,8 @@ const App = () => (
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/terms" element={<TermOfUse/>}/>
+                <Route path="/policy" element={<PrivacyPolicy/>}/>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify-email" element={<VerifyEmail />} />

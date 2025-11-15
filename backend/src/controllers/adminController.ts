@@ -1,17 +1,25 @@
-import { UpdateProfileRequest, UserService } from "@/services/userService";
-import { AuthenticatedRequest, GetUsersRequest } from "@/types";
+import {
+  UpdateProfileRequest,
+  ChangePasswordRequest,
+  ChangeEmailRequest,
+  UserService,
+} from "@/services/userService";
+import { AuthenticatedRequest } from "@/types";
 import { ResponseUtils } from "@/utils";
 import { Response } from "express";
 
-export class UserController {
-  // Get user profile
-  static async getProfile(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<void> {
+export class AdminController {
+  // Get admin profile
+  static async getProfile(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       if (!req.user) {
         res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      // Check if user is ADMIN
+      if (req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("Access denied. Admin role required"));
         return;
       }
 
@@ -34,22 +42,22 @@ export class UserController {
     }
   }
 
-  // Update user profile
-  static async updateProfile(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<void> {
+  // Update admin profile
+  static async updateProfile(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       if (!req.user) {
         res.status(401).json(ResponseUtils.error("User not authenticated"));
         return;
       }
 
+      // Check if user is ADMIN
+      if (req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("Access denied. Admin role required"));
+        return;
+      }
+
       const updateData: UpdateProfileRequest = req.body;
-      const result = await UserService.updateProfile(
-        req.user.userId,
-        updateData
-      );
+      const result = await UserService.updateProfile(req.user.userId, updateData);
 
       if (result.success) {
         res.status(200).json(result);
@@ -68,14 +76,17 @@ export class UserController {
     }
   }
 
-  // Update user avatar
-  static async updateAvatar(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<void> {
+  // Update admin avatar
+  static async updateAvatar(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       if (!req.user) {
         res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      // Check if user is ADMIN
+      if (req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("Access denied. Admin role required"));
         return;
       }
 
@@ -103,13 +114,22 @@ export class UserController {
     }
   }
 
-  // Get users
-  static async getUsers(
-    req: AuthenticatedRequest,
-    res: Response
-  ): Promise<void> {
+  // Change password
+  static async changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const result = await UserService.getUsers(req.query);
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      // Check if user is ADMIN
+      if (req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("Access denied. Admin role required"));
+        return;
+      }
+
+      const { oldPassword, newPassword }: ChangePasswordRequest = req.body;
+      const result = await UserService.changePassword(req.user.userId, oldPassword, newPassword);
 
       if (result.success) {
         res.status(200).json(result);
@@ -121,18 +141,29 @@ export class UserController {
         .status(500)
         .json(
           ResponseUtils.error(
-            "Failed to get users",
+            "Failed to change password",
             error instanceof Error ? error.message : "Unknown error"
           )
         );
     }
   }
 
-  static async updateUserStatus(req: AuthenticatedRequest, res: Response): Promise<void> {
+  // Change email
+  static async changeEmail(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
-      const userId = req.params.id;
-      const { isActive } = req.body;
-      const result = await UserService.updateUserStatus(userId, isActive);
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      // Check if user is ADMIN
+      if (req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("Access denied. Admin role required"));
+        return;
+      }
+
+      const { email }: ChangeEmailRequest = req.body;
+      const result = await UserService.changeEmail(req.user.userId, email);
 
       if (result.success) {
         res.status(200).json(result);
@@ -144,50 +175,7 @@ export class UserController {
         .status(500)
         .json(
           ResponseUtils.error(
-            "Failed to ban user",
-            error instanceof Error ? error.message : "Unknown error"
-          )
-        );
-    }
-  }
-
-  static async deleteUser(req: AuthenticatedRequest, res: Response): Promise<void> {
-    try {
-      const userId = req.params.id;
-      const result = await UserService.deleteUser(userId);
-
-      if (result.success) {
-        res.status(200).json(result);
-      } else {
-        res.status(404).json(result);
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .json(
-          ResponseUtils.error(
-            "Failed to delete user",
-            error instanceof Error ? error.message : "Unknown error"
-          )
-        );
-    }
-  }
-
-  static async getUserStatistics(req: AuthenticatedRequest, res: Response): Promise<void> {
-    try {
-      const result = await UserService.getUserStatistics();
-
-      if (result.success) {
-        res.status(200).json(result);
-      } else {
-        res.status(400).json(result);
-      }
-    } catch (error) {
-      res
-        .status(500)
-        .json(
-          ResponseUtils.error(
-            "Failed to get user statistics",
+            "Failed to change email",
             error instanceof Error ? error.message : "Unknown error"
           )
         );

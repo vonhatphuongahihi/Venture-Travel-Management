@@ -23,14 +23,15 @@ async function main() {
             email: 'admin@venturetravel.com',
             password: adminPassword,
             role: 'ADMIN',
-            is_active: true,
+            isActive: true,
+            isVerified: true,
             phone: '+84365486141',
             address: 'Ho Chi Minh City, Vietnam'
         }
     });
 
     console.log('✅ Admin user created:', {
-        id: adminUser.user_id,
+        id: adminUser.userId,
         name: adminUser.name,
         email: adminUser.email,
         role: adminUser.role

@@ -34,8 +34,7 @@ const UsersScreen: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const toggleUserStatus = useToggleUserStatus();
   const deleteUser = useDeleteUser();
-  const { data: userStatistics, isLoading: isLoadingStatistics } =
-    useGetUsersStatistics();
+  const { data: userStatistics, isLoading: isLoadingStatistics } = useGetUsersStatistics();
   const {
     data: paginatedUsers,
     error: errorGetUsers,
@@ -43,12 +42,7 @@ const UsersScreen: React.FC = () => {
     isLoading: isLoadingGetUsers,
   } = useGetUsers({
     search: debouncedSearchTerm || undefined,
-    is_active:
-      statusFilter === "all"
-        ? undefined
-        : statusFilter === "active"
-        ? true
-        : false,
+    isActive: statusFilter === "all" ? undefined : statusFilter === "active" ? true : false,
   });
 
   const statusOptions = [
@@ -57,17 +51,12 @@ const UsersScreen: React.FC = () => {
     { value: "inactive", label: "Bị vô hiệu" },
   ];
 
-  const selectedOption = statusOptions.find(
-    (option) => option.value === statusFilter
-  );
+  const selectedOption = statusOptions.find((option) => option.value === statusFilter);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
@@ -89,7 +78,7 @@ const UsersScreen: React.FC = () => {
 
   const confirmDelete = () => {
     if (userToDelete) {
-      deleteUser.mutate(userToDelete.user_id);
+      deleteUser.mutate(userToDelete.userId);
       setShowDeleteConfirm(false);
       setUserToDelete(null);
     }
@@ -97,12 +86,7 @@ const UsersScreen: React.FC = () => {
 
   if (isErrorGetUsers) {
     return (
-      <div>
-        Error:{" "}
-        {errorGetUsers instanceof Error
-          ? errorGetUsers.message
-          : "Unknown error"}
-      </div>
+      <div>Error: {errorGetUsers instanceof Error ? errorGetUsers.message : "Unknown error"}</div>
     );
   }
 
@@ -121,12 +105,8 @@ const UsersScreen: React.FC = () => {
                   <UsersIcon className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#0A0A0A] mb-1">
-                    Tổng số người dùng
-                  </p>
-                  <p className="text-xl font-bold">
-                    {userStatistics?.totalUsers || "-"}
-                  </p>
+                  <p className="text-sm text-[#0A0A0A] mb-1">Tổng số người dùng</p>
+                  <p className="text-xl font-bold">{userStatistics?.totalUsers || "-"}</p>
                 </div>
               </div>
             </div>
@@ -138,12 +118,8 @@ const UsersScreen: React.FC = () => {
                   <ShieldCheck className="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#0A0A0A] mb-1">
-                    Số người dùng đang hoạt động
-                  </p>
-                  <p className="text-xl font-bold">
-                    {userStatistics?.activeUsers || "-"}
-                  </p>
+                  <p className="text-sm text-[#0A0A0A] mb-1">Số người dùng đang hoạt động</p>
+                  <p className="text-xl font-bold">{userStatistics?.activeUsers || "-"}</p>
                 </div>
               </div>
             </div>
@@ -155,12 +131,8 @@ const UsersScreen: React.FC = () => {
                   <ShieldX className="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#0A0A0A] mb-1">
-                    Số người dùng bị vô hiệu
-                  </p>
-                  <p className="text-xl font-bold">
-                    {userStatistics?.inactiveUsers || "-"}
-                  </p>
+                  <p className="text-sm text-[#0A0A0A] mb-1">Số người dùng bị vô hiệu</p>
+                  <p className="text-xl font-bold">{userStatistics?.inactiveUsers || "-"}</p>
                 </div>
               </div>
             </div>
@@ -172,12 +144,8 @@ const UsersScreen: React.FC = () => {
                   <UserPlus className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#0A0A0A] mb-1">
-                    Số người dùng mới trong tháng
-                  </p>
-                  <p className="text-xl font-bold">
-                    {userStatistics?.newUsersInMonth || "-"}
-                  </p>
+                  <p className="text-sm text-[#0A0A0A] mb-1">Số người dùng mới trong tháng</p>
+                  <p className="text-xl font-bold">{userStatistics?.newUsersInMonth || "-"}</p>
                 </div>
               </div>
             </div>
@@ -267,41 +235,33 @@ const UsersScreen: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {paginatedUsers?.content.map((user) => (
-                      <tr key={user.user_id} className="hover:bg-gray-50">
+                      <tr key={user.userId} className="hover:bg-gray-50">
                         <td className="py-3 px-4">
                           <div className="flex items-center">
                             <img
-                              src={user.profile_photo ?? avatarAdmin}
+                              src={user.profilePhoto ?? avatarAdmin}
                               alt={user.name}
                               className="w-7 h-7 rounded-full mr-3"
                             />
-                            <span className="text-sm text-[#0A0A0A]">
-                              {user.name}
-                            </span>
+                            <span className="text-sm text-[#0A0A0A]">{user.name}</span>
                           </div>
                         </td>
+                        <td className="py-3 px-4 text-sm text-[#0A0A0A]">{user.email}</td>
                         <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                          {user.email}
+                          {user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : "-"}
                         </td>
                         <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                          {user.date_of_birth
-                            ? new Date(user.date_of_birth).toLocaleDateString()
-                            : "-"}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-[#0A0A0A]">
-                          {user.role === "ADMIN"
-                            ? "Quản trị viên"
-                            : "Người dùng"}
+                          {user.role === "ADMIN" ? "Quản trị viên" : "Người dùng"}
                         </td>
                         <td className="py-3 px-4 text-center">
                           <span
                             className={`inline-flex px-2 py-[5px] text-[13px] font-medium rounded ${
-                              user.is_active
+                              user.isActive
                                 ? "bg-[#DCFCE7] text-[#008236]"
                                 : "bg-gray-100 text-gray-800"
                             }`}
                           >
-                            {user.is_active ? "Đang hoạt động" : "Bị vô hiệu"}
+                            {user.isActive ? "Đang hoạt động" : "Bị vô hiệu"}
                           </span>
                         </td>
                         <td className="py-3 px-4">
@@ -318,17 +278,17 @@ const UsersScreen: React.FC = () => {
                             <button
                               onClick={() => {
                                 toggleUserStatus.mutate({
-                                  userId: user.user_id,
-                                  isActive: !user.is_active,
+                                  userId: user.userId,
+                                  isActive: !user.isActive,
                                 });
                               }}
                               className={`px-3 py-1.5 text-[12px] font-semibold rounded-md border ${
-                                user.is_active
+                                user.isActive
                                   ? "bg-gray-100 text-gray-900 border-gray-200 hover:bg-gray-200"
                                   : "bg-green-500 text-white border-green-500 hover:bg-green-600"
                               }`}
                             >
-                              {user.is_active ? "Vô hiệu hóa" : "Kích hoạt"}
+                              {user.isActive ? "Vô hiệu hóa" : "Kích hoạt"}
                             </button>
 
                             {/* Delete Button */}
@@ -356,9 +316,7 @@ const UsersScreen: React.FC = () => {
           <div className="bg-white rounded-xl p-5 w-[640px] max-h-[90vh] overflow-y-auto relative">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-lg font-semibold text-black">
-                Chi tiết người dùng
-              </h2>
+              <h2 className="text-lg font-semibold text-black">Chi tiết người dùng</h2>
               <button
                 onClick={() => setShowUserDetail(false)}
                 className="p-1 hover:bg-gray-100 rounded"
@@ -376,9 +334,7 @@ const UsersScreen: React.FC = () => {
                     Tên người dùng
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
-                    <span className="text-black text-[14px]">
-                      {selectedUser.name}
-                    </span>
+                    <span className="text-black text-[14px]">{selectedUser.name}</span>
                   </div>
                 </div>
                 <div>
@@ -386,9 +342,7 @@ const UsersScreen: React.FC = () => {
                     Email
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
-                    <span className="text-black text-[14px]">
-                      {selectedUser.email}
-                    </span>
+                    <span className="text-black text-[14px]">{selectedUser.email}</span>
                   </div>
                 </div>
               </div>
@@ -411,10 +365,8 @@ const UsersScreen: React.FC = () => {
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
                     <span className="text-black text-[14px]">
-                      {selectedUser.date_of_birth
-                        ? new Date(
-                            selectedUser.date_of_birth
-                          ).toLocaleDateString()
+                      {selectedUser.dateOfBirth
+                        ? new Date(selectedUser.dateOfBirth).toLocaleDateString()
                         : "-"}
                     </span>
                   </div>
@@ -428,9 +380,7 @@ const UsersScreen: React.FC = () => {
                     Giới tính
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
-                    <span className="text-black text-[14px]">
-                      {selectedUser.gender || "Nam"}
-                    </span>
+                    <span className="text-black text-[14px]">{selectedUser.gender || "Nam"}</span>
                   </div>
                 </div>
                 <div>
@@ -438,9 +388,7 @@ const UsersScreen: React.FC = () => {
                     Vai trò
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
-                    <span className="text-black text-[14px]">
-                      {selectedUser.role}
-                    </span>
+                    <span className="text-black text-[14px]">{selectedUser.role}</span>
                   </div>
                 </div>
                 <div>
@@ -449,7 +397,7 @@ const UsersScreen: React.FC = () => {
                   </label>
                   <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
                     <span className="text-black text-[14px]">
-                      {selectedUser.is_active ? "Đang hoạt động" : "Bị vô hiệu"}
+                      {selectedUser.isActive ? "Đang hoạt động" : "Bị vô hiệu"}
                     </span>
                   </div>
                 </div>
@@ -462,8 +410,7 @@ const UsersScreen: React.FC = () => {
                 </label>
                 <div className="bg-[#e4f8ff] border border-[#09bcfd] rounded-md px-3 py-2">
                   <span className="text-black text-[14px]">
-                    {selectedUser.address ||
-                      "Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh"}
+                    {selectedUser.address || "Linh Trung, Thủ Đức, Thành phố Hồ Chí Minh"}
                   </span>
                 </div>
               </div>
@@ -480,12 +427,10 @@ const UsersScreen: React.FC = () => {
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
                 <Trash2 className="h-6 w-6 text-red-600" />
               </div>
-              <h3 className="text-lg font-semibold text-black mb-2">
-                Xóa người dùng
-              </h3>
+              <h3 className="text-lg font-semibold text-black mb-2">Xóa người dùng</h3>
               <p className="text-sm text-gray-500 mb-6">
-                Bạn có chắc chắn muốn xóa người dùng "{userToDelete.name}"? Hành
-                động này không thể hoàn tác.
+                Bạn có chắc chắn muốn xóa người dùng "{userToDelete.name}"? Hành động này không thể
+                hoàn tác.
               </p>
               <div className="flex justify-center space-x-3">
                 <button

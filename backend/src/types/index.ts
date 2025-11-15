@@ -3,19 +3,19 @@ import { Request } from "express";
 
 // Custom user type for authenticated requests
 export interface AuthUser {
-  user_id: string;
+  userId: string;
   name: string;
   email: string;
   phone: string | null;
   address: string | null;
-  profile_photo: string | null;
-  date_of_birth: Date | null;
+  profilePhoto: string | null;
+  dateOfBirth: Date | null;
   gender: string | null;
   role: string;
-  is_active: boolean;
-  last_login: Date | null;
-  created_at: Date;
-  updated_at: Date;
+  isActive: boolean;
+  lastLogin: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -33,7 +33,7 @@ export interface RegisterRequest {
   password: string;
   phone?: string;
   address?: string;
-  date_of_birth?: string;
+  dateOfBirth?: string;
   gender?: string;
 }
 
@@ -47,11 +47,7 @@ export interface AuthResponse {
   data?: {
     user: Omit<
       PrismaUser,
-      | "password"
-      | "verification_token"
-      | "verification_expires"
-      | "reset_token"
-      | "reset_expires"
+      "password" | "verificationToken" | "verificationExpires" | "resetToken" | "resetExpires"
     >;
     token: string;
   };
@@ -63,11 +59,7 @@ export interface VerifyResponse {
   data?: {
     user: Omit<
       PrismaUser,
-      | "password"
-      | "verification_token"
-      | "verification_expires"
-      | "reset_token"
-      | "reset_expires"
+      "password" | "verificationToken" | "verificationExpires" | "resetToken" | "resetExpires"
     >;
   };
   error?: string;
@@ -126,5 +118,5 @@ export interface GetUsersRequest {
   page?: number;
   limit?: number;
   search?: string;
-  is_active?: boolean;
+  isActive?: boolean;
 }

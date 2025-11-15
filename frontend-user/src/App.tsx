@@ -12,7 +12,7 @@ import Register from "./pages/Register";
 import VerifyEmail from "./pages/VerifyEmail";
 import GoogleAuthSuccess from "./pages/GoogleAuthSuccess";
 import Profile from "./pages/Profile";
-import BookingHistory from "./pages/BookingHistory";
+import BookingHistory from "./pages/BookingHistory/BookingHistory";
 import NotFound from "./pages/NotFound";
 import Contact from "./pages/Contact";
 import BookTourNew from "./pages/BookTourNew";

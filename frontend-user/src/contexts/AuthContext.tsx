@@ -1,45 +1,23 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AuthAPI from '@/services/authAPI';
 import GoogleAuthService from '@/services/googleAuthService';
+import UserAPI from '@/services/userAPI';
+import { RegisterRequest, User } from '@/types/api';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 
-interface User {
-  user_id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  address?: string;
-  profile_photo?: string;
-  date_of_birth?: string;
-  gender?: string;
-  role: string;
-  is_active: boolean;
-  is_verified: boolean;
-  last_login?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string, remember?: boolean) => Promise<{ success: boolean; message: string }>;
+  register: (userData: RegisterRequest) => Promise<{ success: boolean; message: string }>;
   loginWithGoogle: () => void;
-  register: (userData: any) => Promise<{ success: boolean; message: string }>;
   verifyEmail: (token: string) => Promise<{ success: boolean; message: string }>;
+  updateUser: (userData: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -88,11 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (savedToken) {
       setToken(savedToken);
       // Verify token and get user profile
-      AuthAPI.getProfile(savedToken)
+      UserAPI.getProfile(savedToken)
         .then((response) => {
           if (response.success && response.data) {
-            setUser(response.data.user);
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            setUser(response.data);
+            localStorage.setItem('user', JSON.stringify(response.data));
           } else {
             localStorage.removeItem('token');
             localStorage.removeItem('remember');
@@ -148,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     GoogleAuthService.signIn();
   };
 
-  const register = async (userData: any) => {
+  const register = async (userData: RegisterRequest) => {
     try {
       setIsLoading(true);
       const response = await AuthAPI.register(userData);
@@ -194,6 +172,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     sessionStorage.removeItem('token');
   };
 
+  const updateUser = (userData: User) => {
+    setUser(userData);
+    // Cập nhật trong localStorage nếu có token
+    if (localStorage.getItem('token')) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -202,6 +188,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loginWithGoogle,
     register,
     verifyEmail,
+    updateUser,
     logout,
     isAuthenticated: !!user && !!token,
   };

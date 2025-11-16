@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
 export class PasswordUtils {
@@ -21,6 +21,13 @@ export class JWTUtils {
         return jwt.sign(payload, secret, { expiresIn: expiresIn as any });
     }
 
+    static generatePasswordResetToken(payload: { userId: string; email: string; type: string }): string {
+        const secret = process.env.JWT_SECRET || 'fallback-secret';
+        const expiresIn = '1h'; // Password reset tokens expire in 1 hour
+
+        return jwt.sign(payload, secret, { expiresIn });
+    }
+
     static verifyToken(token: string): any {
         const secret = process.env.JWT_SECRET || 'fallback-secret';
         return jwt.verify(token, secret);
@@ -34,7 +41,7 @@ export class ValidationUtils {
     }
 
     static isValidPhone(phone: string): boolean {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        const phoneRegex = /^[\+]?[0-9][\d]{0,15}$/;
         return phoneRegex.test(phone);
     }
 

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tin nhắn liên hệ mới - Venture Travel</title>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif">
+    <div style="max-width: 600px; margin: 0 auto">
+      <div style="background: #26b8ed; padding: 30px; text-align: center">
+        <h1 style="color: white; margin: 0; font-size: 28px">Venture</h1>
+        <p style="color: white; margin: 10px 0 0 0; font-size: 16px">
+          Tin nhắn liên hệ mới
+        </p>
+      </div>
+
+      <div style="padding: 30px; background: #f8f9fa">
+        <h2 style="color: #333; margin-top: 0">
+          📩 Bạn có tin nhắn mới từ khách hàng
+        </h2>
+
+        <div
+          style="
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+          "
+        >
+          <p style="color: #0c5460; margin: 0; font-weight: bold">
+            ℹ️ Thông tin người gửi
+          </p>
+        </div>
+
+        <div
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+          "
+        >
+          <p style="color: #333; margin: 10px 0; line-height: 1.8">
+            <strong style="color: #26b8ed">👤 Tên người gửi:</strong><br />
+            <span style="color: #666">{{username}}</span>
+          </p>
+
+          <p style="color: #333; margin: 10px 0; line-height: 1.8">
+            <strong style="color: #26b8ed">📧 Email:</strong><br />
+            <span style="color: #666">{{email}}</span>
+          </p>
+        </div>
+
+        <div
+          style="
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+          "
+        >
+          <p style="color: #856404; margin: 0; font-weight: bold">
+            💬 Nội dung tin nhắn
+          </p>
+        </div>
+
+        <div
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+          "
+        >
+          <p
+            style="
+              color: #666;
+              line-height: 1.8;
+              margin: 0;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+            "
+          >
+            {{message}}
+          </p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0">
+          <a
+            href="mailto:{{email}}"
+            style="
+              background: #26b8ed;
+              color: white;
+              padding: 15px 30px;
+              text-decoration: none;
+              border-radius: 25px;
+              font-weight: bold;
+              display: inline-block;
+            "
+          >
+            Trả lời Email
+          </a>
+        </div>
+
+        <p
+          style="
+            color: #999;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 30px;
+            text-align: center;
+          "
+        >
+          Email này được gửi từ hệ thống liên hệ của Venture Travel<br />
+          Thời gian nhận: {{timestamp}}
+        </p>
+      </div>
+
+      <div style="background: #343a40; padding: 20px; text-align: center">
+        <p style="color: #adb5bd; margin: 0; font-size: 14px">
+          © 2024 Venture Travel. Tất cả quyền được bảo lưu.
+        </p>
+        <p style="color: #adb5bd; margin: 5px 0 0 0; font-size: 12px">
+          Email này được gửi tự động từ hệ thống quản lý liên hệ.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

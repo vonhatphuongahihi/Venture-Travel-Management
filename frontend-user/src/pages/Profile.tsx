@@ -1,8 +1,8 @@
 import avatarImg from "@/assets/beach-destination.jpg";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { useAuth } from "@/hooks/useAuth";
 import UserAPI from "@/services/userAPI";
 import { Camera, Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +14,7 @@ const Profile = () => {
   const navigate = useNavigate();
   
   const [showPassword, setShowPassword] = useState(false);
-  const [avatarSrc, setAvatarSrc] = useState<string>(user?.profile_photo || avatarImg);
+  const [avatarSrc, setAvatarSrc] = useState<string>(user?.profilePhoto || avatarImg);
   const [isLoading, setIsLoading] = useState(false);
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -25,7 +25,7 @@ const Profile = () => {
     name: user?.name || '',
     phone: user?.phone || '',
     address: user?.address || '',
-    date_of_birth: user?.date_of_birth || '',
+    dateOfBirth: user?.dateOfBirth || '',
     gender: user?.gender || ''
   });
   
@@ -49,10 +49,10 @@ const Profile = () => {
         name: user.name || '',
         phone: user.phone || '',
         address: user.address || '',
-        date_of_birth: user.date_of_birth || '',
+        dateOfBirth: user.dateOfBirth || '',
         gender: user.gender || ''
       });
-      setAvatarSrc(user.profile_photo || avatarImg);
+      setAvatarSrc(user.profilePhoto || avatarImg);
     }
   }, [user, token, navigate]);
 
@@ -74,10 +74,10 @@ const Profile = () => {
           name: userData.name || '',
           phone: userData.phone || '',
           address: userData.address || '',
-          date_of_birth: userData.date_of_birth || '',
+          dateOfBirth: userData.dateOfBirth || '',
           gender: userData.gender || ''
         });
-        setAvatarSrc(userData.profile_photo || avatarImg);
+        setAvatarSrc(userData.profilePhoto || avatarImg);
         return userData; // Return the user data
       }
     } catch (error) {
@@ -86,7 +86,9 @@ const Profile = () => {
       setIsProfileLoading(false);
     }
     return null;
-  };  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -150,7 +152,7 @@ const Profile = () => {
         phone: formData.phone?.trim() || '',
         address: formData.address?.trim() || '',
         gender: formData.gender?.trim() || '',
-        date_of_birth: formData.date_of_birth?.trim() || ''
+        dateOfBirth: formData.dateOfBirth?.trim() || ''
       };
 
       // Remove empty strings
@@ -216,12 +218,12 @@ const Profile = () => {
         name: user.name || '',
         phone: user.phone || '',
         address: user.address || '',
-        date_of_birth: user.date_of_birth || '',
+        dateOfBirth: user.dateOfBirth || '',
         gender: user.gender || ''
       });
       
       // Reset avatar
-      setAvatarSrc(user.profile_photo || avatarImg);
+      setAvatarSrc(user.profilePhoto || avatarImg);
     }
     
     setSelectedFile(null);
@@ -235,7 +237,7 @@ const Profile = () => {
       formData.name !== (user.name || '') ||
       formData.phone !== (user.phone || '') ||
       formData.address !== (user.address || '') ||
-      formData.date_of_birth !== (user.date_of_birth || '') ||
+      formData.dateOfBirth !== (user.dateOfBirth || '') ||
       formData.gender !== (user.gender || '');
     
     return hasFormChanges || selectedFile !== null;
@@ -264,7 +266,7 @@ const Profile = () => {
           {/* Sidebar */}
           <aside className="w-64 bg-white/80 rounded-lg p-4 shadow-lg hover:shadow-xl transition-shadow duration-200">
             <div className="flex items-center gap-3 mb-6 mt-6">
-              <img src={user?.profile_photo || avatarImg} alt="avatar" className="h-12 w-12 rounded-full object-cover" />
+              <img src={user?.profilePhoto || avatarImg} alt="avatar" className="h-12 w-12 rounded-full object-cover" />
               <div>
                 <div className="text-m font-medium">{user?.name || 'Người dùng'}</div>
                 <div className="text-xs text-slate-600">Thành viên</div>
@@ -397,9 +399,9 @@ const Profile = () => {
                   <div>
                     <label className="block text-sm text-slate-600 mb-1">Ngày sinh:</label>
                     <input
-                      name="date_of_birth"
+                      name="dateOfBirth"
                       type="date"
-                      value={formData.date_of_birth ? formData.date_of_birth.split('T')[0] : ''}
+                      value={formData.dateOfBirth ? formData.dateOfBirth.split('T')[0] : ''}
                       onChange={handleInputChange}
                       className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition"
                     />

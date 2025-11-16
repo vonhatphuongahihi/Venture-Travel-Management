@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Menu, Plane, Search, User } from "lucide-react";
-import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
-import ProvinceDropdown from "./province/ProvinceDropdown";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { Menu, Plane, User } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
+import ProvinceDropdown from "./province/ProvinceDropdown";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);

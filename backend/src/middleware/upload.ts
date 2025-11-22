@@ -27,7 +27,7 @@ const upload = multer({
 export const uploadSingle = (fieldName: string) => {
     return (req: Request, res: Response, next: NextFunction): void => {
         const uploadMiddleware = upload.single(fieldName);
-        
+
         uploadMiddleware(req, res, (error: any) => {
             if (error instanceof multer.MulterError) {
                 if (error.code === 'LIMIT_FILE_SIZE') {
@@ -58,7 +58,7 @@ export const uploadSingle = (fieldName: string) => {
 export const uploadMultiple = (fieldName: string, maxCount: number = 10) => {
     return (req: Request, res: Response, next: NextFunction): void => {
         const uploadMiddleware = upload.array(fieldName, maxCount);
-        
+
         uploadMiddleware(req, res, (error: any) => {
             if (error instanceof multer.MulterError) {
                 if (error.code === 'LIMIT_FILE_SIZE') {

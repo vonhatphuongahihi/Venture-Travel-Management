@@ -10,29 +10,21 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReviewCard from "./ReviewCard";
+import { reviewService } from "@/services/review.service";
+import { imageUploadService } from "@/services/imageUpload.service";
+import { useToast } from "@/contexts/ToastContext";
+import { tourService } from "@/services/tour.service";
 
 interface ReviewDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  // booking
+  tourId?: string;
+  tourName?: string;
+  tourImage?: string;
+  tourDescription?: string;
+  attractionIds?: string[]; // IDs of attractions in the tour for reviews
+  onSuccess?: () => void; // Callback when review is submitted successfully
 }
-
-const mockData = {
-  name: "Khám Phá Vịnh Hạ Long - Hành Trình Kỳ Quan Thế Giới",
-  description:
-    "Trải nghiệm vẻ đẹp hùng vĩ của Di sản Thiên nhiên Thế giới với những hang động kỳ bí, làng chài truyền thống và hoàng hôn tuyệt đẹp trên vịnh. Tour bao gồm du thuyền sang trọng, các hoạt động thể thao nước và bữa tiệc hải sản tươi ngon.",
-  image: halongImg,
-  type: "tour",
-  destinations: [
-    {
-      name: "Vịnh Hạ Long",
-      description:
-        "Vịnh Hạ Long là một vịnh nhỏ thuộc phần bờ tây vịnh Bắc Bộ tại khu vực biển Đông Bắc Việt Nam, bao gồm vùng biển đảo của thành phố Hạ Long thuộc tỉnh Quảng Ninh. Trung tâm vịnh có tọa độ 20°10' vĩ độ Bắc và 107°12' kinh độ Đông. Vịnh Hạ Long nổi tiếng với hàng nghìn hòn đảo đá vôi kỳ vĩ và hang động tuyệt đẹp, được UNESCO công nhận là Di sản Thiên nhiên Thế giới.",
-      image: halongImg,
-      type: "destination",
-    },
-  ],
-};
 
 interface ReviewData {
   rating: number;
@@ -42,11 +34,74 @@ interface ReviewData {
   itemType: "tour" | "destination";
 }
 
-const ReviewDialog = ({ open, setOpen }: ReviewDialogProps) => {
+interface TourData {
+  name: string;
+  description: string;
+  image: string;
+  type: "tour" | "destination";
+}
+
+const ReviewDialog = ({
+  open,
+  setOpen,
+  tourId,
+  tourName,
+  tourImage,
+  tourDescription,
+  attractionIds = [],
+  onSuccess
+}: ReviewDialogProps) => {
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [resetKey, setResetKey] = useState(0);
+  const [tourData, setTourData] = useState<TourData | null>(null);
+  const [attractionsData, setAttractionsData] = useState<TourData[]>([]);
   const reviewDataRef = useRef<Map<string, ReviewData>>(new Map());
+
+  // Load tour data when dialog opens
+  useEffect(() => {
+    const loadTourData = async () => {
+      if (!open || !tourId) return;
+
+      try {
+        // Fetch tour details
+        const tour = await tourService.getTourById(tourId);
+
+        if (tour) {
+          setTourData({
+            name: tour.title || tourName || "Tour",
+            description: tour.description || tourDescription || "",
+            image: tour.images?.[0] || tourImage || halongImg,
+            type: "tour",
+          });
+
+          // Load attractions data if needed
+          // For now, we'll use empty array as destinations are optional
+          setAttractionsData([]);
+        } else {
+          // Fallback to provided props
+          setTourData({
+            name: tourName || "Tour",
+            description: tourDescription || "",
+            image: tourImage || halongImg,
+            type: "tour",
+          });
+        }
+      } catch (error) {
+        console.error("Error loading tour data:", error);
+        // Fallback to provided props
+        setTourData({
+          name: tourName || "Tour",
+          description: tourDescription || "",
+          image: tourImage || halongImg,
+          type: "tour",
+        });
+      }
+    };
+
+    loadTourData();
+  }, [open, tourId, tourName, tourImage, tourDescription]);
 
   const handleReviewChange = useCallback((itemId: string, data: ReviewData) => {
     reviewDataRef.current.set(itemId, data);
@@ -65,44 +120,105 @@ const ReviewDialog = ({ open, setOpen }: ReviewDialogProps) => {
   const handleSubmit = async () => {
     setErrorMessage("");
 
-    // Validate all reviews
-    const totalReviews = 1 + mockData.destinations.length; // tour + destinations
-    const submittedReviews = reviewDataRef.current.size;
-
-    if (submittedReviews < totalReviews) {
-      setErrorMessage("Vui lòng đánh giá tất cả các mục trước khi gửi.");
+    if (!tourId) {
+      setErrorMessage("Không tìm thấy thông tin tour.");
       return;
     }
 
-    // Validate each review has content
-    for (const [itemId, review] of reviewDataRef.current.entries()) {
-      if (!review.reviewText.trim()) {
-        setErrorMessage("Vui lòng điền nội dung đánh giá cho tất cả các mục.");
-        return;
-      }
-      if (review.rating === 0) {
-        setErrorMessage("Vui lòng chọn số sao đánh giá cho tất cả các mục.");
-        return;
-      }
+    // Validate tour review exists
+    const tourReview = reviewDataRef.current.get("tour-main");
+    if (!tourReview) {
+      setErrorMessage("Vui lòng đánh giá tour trước khi gửi.");
+      return;
+    }
+
+    // Validate tour review has content
+    if (!tourReview.reviewText.trim()) {
+      setErrorMessage("Vui lòng điền nội dung đánh giá cho tour.");
+      return;
+    }
+
+    if (tourReview.rating === 0) {
+      setErrorMessage("Vui lòng chọn số sao đánh giá cho tour.");
+      return;
+    }
+
+    // Validate content length
+    if (tourReview.reviewText.trim().length < 10) {
+      setErrorMessage("Nội dung đánh giá phải có ít nhất 10 ký tự.");
+      return;
     }
 
     setIsLoading(true);
 
     try {
-      // Giả lập gửi API
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Upload images if any
+      let imageUrls: string[] = [];
+      if (tourReview.images && tourReview.images.length > 0) {
+        try {
+          imageUrls = await imageUploadService.uploadImages(tourReview.images);
+        } catch (error: any) {
+          console.error("Error uploading images:", error);
+          setErrorMessage(error.message || "Có lỗi khi upload ảnh. Vui lòng thử lại.");
+          setIsLoading(false);
+          return;
+        }
+      }
 
-      // Log data để kiểm tra
-      console.log(
-        "Submitting reviews:",
-        Array.from(reviewDataRef.current.entries())
-      );
+      // Create tour review
+      await reviewService.createTourReview({
+        tourId,
+        rate: tourReview.rating,
+        content: tourReview.reviewText.trim(),
+        images: imageUrls,
+      });
+
+      // Handle attraction reviews if any
+      for (const [itemId, review] of reviewDataRef.current.entries()) {
+        if (itemId !== "tour-main" && review.itemType === "destination") {
+          // Extract attraction ID from itemId (format: "destination-{index}")
+          const attractionIndex = parseInt(itemId.replace("destination-", ""));
+          const attractionId = attractionIds[attractionIndex];
+
+          if (attractionId && review.reviewText.trim() && review.rating > 0) {
+            // Upload images for attraction review
+            let attractionImageUrls: string[] = [];
+            if (review.images && review.images.length > 0) {
+              try {
+                attractionImageUrls = await imageUploadService.uploadImages(review.images);
+              } catch (error) {
+                console.error("Error uploading attraction images:", error);
+                // Continue without images
+              }
+            }
+
+            // Create attraction review
+            await reviewService.createAttractionReview({
+              attractionId,
+              rate: review.rating,
+              content: review.reviewText.trim(),
+              images: attractionImageUrls,
+            });
+          }
+        }
+      }
 
       // Success
+      showToast("Đánh giá đã được gửi thành công!", "success");
       setOpen(false);
       reviewDataRef.current.clear();
-    } catch (error) {
-      setErrorMessage("Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.");
+
+      // Notify parent component if callback is provided
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: any) {
+      console.error("Error submitting review:", error);
+      setErrorMessage(
+        error.response?.data?.message ||
+        error.message ||
+        "Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -114,29 +230,43 @@ const ReviewDialog = ({ open, setOpen }: ReviewDialogProps) => {
         <DialogTitle className="text-xl font-bold">Đánh giá</DialogTitle>
 
         <div className="mt-4 space-y-6">
-          {/* ReviewCard component content */}
-          <ReviewCard
-            key={`tour-main-${resetKey}`}
-            data={mockData}
-            itemId="tour-main"
-            onReviewChange={handleReviewChange}
-          />
-
-          <Separator className="my-4" />
-
-          {mockData.destinations.map((destination, index) => (
-            <React.Fragment key={`destination-${index}`}>
+          {/* Tour Review */}
+          {tourData && (
+            <>
               <ReviewCard
-                key={`destination-${index}-${resetKey}`}
-                data={destination}
-                itemId={`destination-${index}`}
+                key={`tour-main-${resetKey}`}
+                data={tourData}
+                itemId="tour-main"
                 onReviewChange={handleReviewChange}
               />
-              {index !== mockData.destinations.length - 1 && (
-                <Separator className="my-4" />
+
+              {/* Attractions reviews (optional) */}
+              {attractionsData.length > 0 && (
+                <>
+                  <Separator className="my-4" />
+                  {attractionsData.map((destination, index) => (
+                    <React.Fragment key={`destination-${index}`}>
+                      <ReviewCard
+                        key={`destination-${index}-${resetKey}`}
+                        data={destination}
+                        itemId={`destination-${index}`}
+                        onReviewChange={handleReviewChange}
+                      />
+                      {index !== attractionsData.length - 1 && (
+                        <Separator className="my-4" />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </>
               )}
-            </React.Fragment>
-          ))}
+            </>
+          )}
+
+          {!tourData && (
+            <div className="text-center py-8 text-gray-500">
+              Đang tải thông tin tour...
+            </div>
+          )}
         </div>
 
         {errorMessage && (

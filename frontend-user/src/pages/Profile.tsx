@@ -277,6 +277,7 @@ const Profile = () => {
                 <Link to="#" className="block text-m  py-2 px-3 rounded-md border text-primary border-primary/50">Hồ sơ của tôi</Link>
                 <Link to="#" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Thông báo</Link>
                 <Link to="/booking-history" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Lịch sử đặt tour</Link>
+                <Link to="/favorite-tours" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Tour yêu thích</Link>
                 <Link to="#" className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Cài đặt</Link>
               </nav>
 

@@ -48,11 +48,15 @@ import { tourService } from "@/services/tour.service";
 import { reviewService } from "@/services/review.service";
 import ReviewDialog from "@/pages/BookingHistory/ReviewDialog";
 import ShareDialog from "@/components/detail/ShareDialog";
+import { useAuth } from "@/contexts/AuthContext";
+import UserAPI from "@/services/userAPI";
+import { useToast } from "@/contexts/ToastContext";
 
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
+  const { user, token, updateUser } = useAuth();
+  const { showToast } = useToast();
   ///////////////////// Fetch /////////////////////
   const [tour, setTour] = useState<TourDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -275,7 +279,54 @@ const TourDetailPage = () => {
   const handleWriteReview = () => {
     setOpenReviewDialog(true);
   };
-  const handleSave = () => { };
+  const handleSave = async () => {
+    if (!user || !token) {
+      showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'error');
+      navigate('/login');
+      return;
+    }
+
+    if (!id) {
+      showToast('Tour ID không hợp lệ', 'error');
+      return;
+    }
+
+    setIsSavingFavorite(true);
+    try {
+      const response = await UserAPI.toggleFavoriteTour(token, id);
+
+      if (response.success && response.data) {
+        setIsFavorite(response.data.isFavorite);
+        showToast(
+          response.data.isFavorite
+            ? 'Đã thêm vào danh sách yêu thích'
+            : 'Đã xóa khỏi danh sách yêu thích',
+          'success'
+        );
+
+        // Update user context if favoriteTours is available
+        if (user && updateUser && response.data.favoriteTours) {
+          updateUser({ ...user, favoriteTours: response.data.favoriteTours });
+        }
+      } else {
+        showToast(response.message || 'Thất bại khi lưu tour', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving favorite tour:', error);
+      showToast('Thất bại khi lưu tour', 'error');
+    } finally {
+      setIsSavingFavorite(false);
+    }
+  };
+
+  // Check if tour is favorite when component mounts or user changes
+  useEffect(() => {
+    if (user && user.favoriteTours && id) {
+      setIsFavorite(user.favoriteTours.includes(id));
+    } else {
+      setIsFavorite(false);
+    }
+  }, [user, id]);
 
   ///////////////////// Gallery /////////////////////
   const [showGallery, setShowGallery] = useState(false);
@@ -388,6 +439,8 @@ const TourDetailPage = () => {
   const [puOpen, setPUOpen] = useState(false);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isSavingFavorite, setIsSavingFavorite] = useState(false);
 
   // Handle like/unlike review
   const handleLikeReview = async (reviewId: string) => {
@@ -468,11 +521,14 @@ const TourDetailPage = () => {
               <p className="font-['Inter']">Đánh giá</p>
             </Button>
             <Button
-              className="hover:bg-primary/40 hover:text-white flex items-center space-x-1"
+              className={`${isFavorite ? 'bg-primary text-white' : 'hover:bg-primary/40 hover:text-white'} flex items-center space-x-1`}
               onClick={handleSave}
+              disabled={isSavingFavorite || !user}
             >
-              <Bookmark size={16} />
-              <p className="font-['Inter']">Lưu</p>
+              <Bookmark size={16} className={isFavorite ? 'fill-white' : ''} />
+              <p className="font-['Inter']">
+                {isSavingFavorite ? 'Đang lưu...' : isFavorite ? 'Đã lưu' : 'Lưu'}
+              </p>
             </Button>
           </div>
         </div>

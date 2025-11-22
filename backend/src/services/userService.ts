@@ -308,7 +308,6 @@ export class UserService {
           name: true,
           images: true,
           about: true,
-          provinceId: true,
           duration: true,
           categories: true,
           createdAt: true,

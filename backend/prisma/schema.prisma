@@ -43,8 +43,8 @@ model Province {
   region      String
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
+  description String       @default("")
   attractions Attraction[]
-  tours       Tour[]
 
   @@map("provinces")
 }
@@ -70,7 +70,6 @@ model Attraction {
 
 model Tour {
   tourId                String       @id @default(uuid()) @map("tour_id")
-  provinceId            String       @map("province_id")
   name                  String
   images                String[]
   about                 String
@@ -102,7 +101,6 @@ model Tour {
   end                   Point?       @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
   pickupArea            Polygon      @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
   pickup                Point        @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
-  province              Province     @relation(fields: [provinceId], references: [provinceId])
 
   @@map("tours")
 }
@@ -160,15 +158,15 @@ model TicketPrice {
 }
 
 model Point {
-  pointId       String         @id @default(uuid()) @map("point_id")
-  latitude      Float
-  longitude     Float
-  arcPoints     ArcPoint[]
-  attractions   Attraction[]
-  nodes         Node?
-  polygonPoints PolygonPoint[]
-  endPointTours Tour[]         @relation("TourEndPoint")
-  pickupTours   Tour[]         @relation("TourPickupPoint")
+  pointId        String         @id @default(uuid()) @map("point_id")
+  latitude       Float
+  longitude      Float
+  arcPoints      ArcPoint[]
+  attractions    Attraction[]
+  nodes          Node?
+  polygon_points PolygonPoint[]
+  endPointTours  Tour[]         @relation("TourEndPoint")
+  pickupTours    Tour[]         @relation("TourPickupPoint")
 
   @@map("points")
 }
@@ -206,19 +204,19 @@ model ArcPoint {
 
 model Polygon {
   polygonId       String         @id @default(uuid()) @map("polygon_id")
-  polygonPoints   PolygonPoint[]
+  polygon_points  PolygonPoint[]
   tourPickUpAreas Tour[]
 
   @@map("polygons")
 }
 
 model PolygonPoint {
-  polygonId String  @map("polygonId")
-  pointId   String  @map("pointId")
-  point     Point   @relation(fields: [pointId], references: [pointId])
-  polygon   Polygon @relation(fields: [polygonId], references: [polygonId])
+  point_id   String
+  polygon_id String
+  points     Point   @relation(fields: [point_id], references: [pointId])
+  polygons   Polygon @relation(fields: [polygon_id], references: [polygonId])
 
-  @@id([polygonId, pointId])
+  @@id([polygon_id, point_id])
   @@map("polygon_points")
 }
 

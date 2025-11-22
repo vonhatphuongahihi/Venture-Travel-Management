@@ -45,7 +45,6 @@ export class TourService {
                 }
                 const newTour = await tx.tour.create({
                     data: {
-                        provinceId: data.provinceId,
                         name: data.name,
                         images: data.images,
                         about: data.about,
@@ -257,14 +256,6 @@ export class TourService {
      * Validate dữ liệu tour
      */
     private async validateTourData(data: CreateTourRequest) {
-        // Kiểm tra province tồn tại
-        const province = await this.prisma.province.findUnique({
-            where: { provinceId: data.provinceId },
-        });
-        if (!province) {
-            throw new Error("Province không tồn tại");
-        }
-
         // Kiểm tra các attraction tồn tại
         if (data.tourStops && data.tourStops.length > 0) {
             const attractionIds = data.tourStops.map((stop) => stop.attractionId);

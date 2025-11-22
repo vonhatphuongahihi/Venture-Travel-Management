@@ -3,14 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { tourService, Tour } from "@/services/tour.service";
+import beachImage from "@/assets/beach-destination.jpg";
+import culturalImage from "@/assets/cultural-festival.jpg";
 
 const ToursSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isVisible, setIsVisible] = useState(false);
-  const [tours, setTours] = useState<Tour[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -30,53 +28,17 @@ const ToursSection = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Fetch tours from API
-  useEffect(() => {
-    const fetchTours = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const params: any = {
-          limit: 12,
-          isActive: 'true',
-        };
-
-        // Apply category filter if not "all"
-        if (activeFilter !== 'all') {
-          const categoryMap: { [key: string]: string } = {
-            "beach": "Biển đảo",
-            "cultural": "Văn hóa",
-            "mountain": "Núi rừng",
-            "city": "Thành phố"
-          };
-          params.category = categoryMap[activeFilter] || activeFilter;
-        }
-
-        const result = await tourService.getAllTours(params);
-        setTours(result.tours);
-      } catch (err) {
-        console.error('Error fetching tours:', err);
-        setError('Không thể tải danh sách tour');
-        setTours([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTours();
-  }, [activeFilter]);
-
   const filters = [
-    { id: "all", label: "Tất cả", count: tours.length },
-    { id: "beach", label: "Biển đảo", count: tours.filter(t => t.category?.includes("Biển đảo")).length },
-    { id: "cultural", label: "Văn hóa", count: tours.filter(t => t.category?.includes("Văn hóa")).length },
-    { id: "mountain", label: "Núi rừng", count: tours.filter(t => t.category?.includes("Núi rừng")).length },
-    { id: "city", label: "Thành phố", count: tours.filter(t => t.category?.includes("Thành phố")).length },
+    { id: "all", label: "Tất cả", count: 120 },
+    { id: "beach", label: "Biển đảo", count: 45 },
+    { id: "cultural", label: "Văn hóa", count: 32 },
+    { id: "mountain", label: "Núi rừng", count: 28 },
+    { id: "city", label: "Thành phố", count: 15 },
   ];
 
   // Count tours by category
   const getTourCount = (filterId: string) => {
-    if (filterId === "all") return tours.length;
+    if (filterId === "all") return filters.find(f => f.id === "all")?.count || 120;
 
     const categoryMap: { [key: string]: string } = {
       "beach": "Biển đảo",
@@ -88,7 +50,81 @@ const ToursSection = () => {
     return tours.filter(tour => tour.category === categoryMap[filterId]).length;
   };
 
-  const filteredTours = tours;
+  // Mock tour data
+  const tours = [
+    {
+      id: "1",
+      title: "Vịnh Hạ Long - Kỳ quan thiên nhiên thế giới",
+      description: "Khám phá vẻ đẹp huyền bí của Vịnh Hạ Long với những hang động kỳ thú và làng chài truyền thống. Trải nghiệm đêm trên du thuyền sang trọng.",
+      image: beachImage,
+      price: 2500000,
+      duration: "2 ngày 1 đêm",
+      location: "Quảng Ninh",
+      rating: 4.8,
+      reviewCount: 234,
+      category: "Biển đảo",
+      status: "ongoing" as const,
+      maxParticipants: 20,
+      availableSpots: 5
+    },
+    {
+      id: "2",
+      title: "Hội An - Phố cổ đèn lồng",
+      description: "Dạo bước trên những con phố cổ kính với ánh đèn lồng lung linh. Thưởng thức ẩm thực đường phố và tham quan làng nghề thủ công truyền thống.",
+      image: culturalImage,
+      price: 1800000,
+      duration: "3 ngày 2 đêm",
+      location: "Quảng Nam",
+      rating: 4.9,
+      reviewCount: 189,
+      category: "Văn hóa",
+      status: "upcoming" as const,
+      maxParticipants: 25,
+      availableSpots: 12
+    },
+    {
+      id: "3",
+      title: "Sapa - Ruộng bậc thang mùa nước đổ",
+      description: "Trekking qua những thửa ruộng bậc thang xanh mướt, gặp gỡ đồng bào dân tộc thiểu số và trải nghiệm văn hóa độc đáo vùng cao Tây Bắc.",
+      image: beachImage,
+      price: 2200000,
+      duration: "4 ngày 3 đêm",
+      location: "Lào Cai",
+      rating: 4.7,
+      reviewCount: 156,
+      category: "Núi rừng",
+      status: "upcoming" as const,
+      maxParticipants: 15,
+      availableSpots: 8
+    },
+    {
+      id: "4",
+      title: "Phú Quốc - Thiên đường nghỉ dưỡng",
+      description: "Thư giãn tại những bãi biển tuyệt đẹp, khám phá rừng nguyên sinh và thưởng thức hải sản tươi ngon. Trải nghiệm cáp treo vượt biển dài nhất thế giới.",
+      image: beachImage,
+      price: 3200000,
+      duration: "5 ngày 4 đêm",
+      location: "Kiên Giang",
+      rating: 4.6,
+      reviewCount: 298,
+      category: "Biển đảo",
+      status: "completed" as const,
+      maxParticipants: 30,
+      availableSpots: 0
+    }
+  ];
+
+  const filteredTours = activeFilter === "all"
+    ? tours
+    : tours.filter(tour => {
+      const categoryMap: { [key: string]: string } = {
+        "beach": "Biển đảo",
+        "cultural": "Văn hóa",
+        "mountain": "Núi rừng",
+        "city": "Thành phố"
+      };
+      return tour.category === categoryMap[activeFilter];
+    });
 
   return (
     <section ref={sectionRef} id="tours" className="py-16">
@@ -146,38 +182,9 @@ const ToursSection = () => {
 
         {/* Tours Grid */}
         <div className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {loading ? (
-            <div className="col-span-full flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-          ) : error ? (
-            <div className="col-span-full text-center py-12 text-red-500">
-              <p>{error}</p>
-            </div>
-          ) : filteredTours.length === 0 ? (
-            <div className="col-span-full text-center py-12 text-muted-foreground">
-              <p>Chưa có tour nào</p>
-            </div>
-          ) : (
-            filteredTours.map((tour) => (
-              <TourCard
-                key={tour.id}
-                id={tour.id}
-                title={tour.title}
-                description={tour.description}
-                image={tour.image}
-                price={tour.price}
-                duration={tour.duration}
-                location={tour.location}
-                rating={tour.rating}
-                reviewCount={tour.reviewCount}
-                category={tour.category || "Tour du lịch"}
-                status={tour.status}
-                maxParticipants={tour.maxParticipants}
-                availableSpots={tour.availableSpots}
-              />
-            ))
-          )}
+          {filteredTours.map((tour) => (
+            <TourCard key={tour.id} {...tour} />
+          ))}
         </div>
 
         {/* Load More */}

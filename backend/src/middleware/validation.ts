@@ -112,47 +112,13 @@ export const updateUserStatusSchema = Joi.object({
 });
 
 export const changePasswordSchema = Joi.object({
-  oldPassword: Joi.string().required(),
-  newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
-    .messages({
-      'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
-    })
+    oldPassword: Joi.string().required(),
+    newPassword: Joi.string().min(8).pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/).required()
+        .messages({
+            'string.pattern.base': 'Password must contain at least 8 characters, 1 uppercase, 1 lowercase, and 1 number'
+        })
 });
 
 export const changeEmailSchema = Joi.object({
-  email: Joi.string().email().required()
-});
-
-// Review Validation Schemas
-// Note: tourId is in URL params, not in body
-export const createTourReviewSchema = Joi.object({
-  rate: Joi.number().integer().min(1).max(5).required(),
-  content: Joi.string().min(10).max(2000).required(),
-  images: Joi.array().items(Joi.string().uri()).max(10).optional().default([]),
-});
-
-export const updateTourReviewSchema = Joi.object({
-  rate: Joi.number().integer().min(1).max(5).optional(),
-  content: Joi.string().min(10).max(2000).optional(),
-  images: Joi.array().items(Joi.string().uri()).max(10).optional(),
-});
-
-// Note: attractionId is in URL params, not in body
-export const createAttractionReviewSchema = Joi.object({
-  rate: Joi.number().integer().min(1).max(5).required(),
-  content: Joi.string().min(10).max(2000).required(),
-  images: Joi.array().items(Joi.string().uri()).max(10).optional().default([]),
-});
-
-export const updateAttractionReviewSchema = Joi.object({
-  rate: Joi.number().integer().min(1).max(5).optional(),
-  content: Joi.string().min(10).max(2000).optional(),
-  images: Joi.array().items(Joi.string().uri()).max(10).optional(),
-});
-
-export const getReviewsQuerySchema = Joi.object({
-  page: Joi.number().integer().min(1).optional(),
-  limit: Joi.number().integer().min(1).max(100).optional(),
-  sortBy: Joi.string().valid('createdAt', 'rate').optional(),
-  order: Joi.string().valid('asc', 'desc').optional(),
+    email: Joi.string().email().required()
 });

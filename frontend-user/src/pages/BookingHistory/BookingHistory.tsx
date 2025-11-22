@@ -17,7 +17,6 @@ const BookingHistory = () => {
 
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   const getStatusText = (status) => {
     switch (status) {
@@ -338,7 +337,6 @@ const BookingHistory = () => {
                               <button
                                 className="px-4 py-1 text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
                                 onClick={() => {
-                                  setSelectedBooking(booking);
                                   setOpenReviewDialog(true);
                                 }}
                               >
@@ -368,14 +366,7 @@ const BookingHistory = () => {
 
       <Footer />
 
-      <ReviewDialog 
-        open={openReviewDialog} 
-        setOpen={setOpenReviewDialog}
-        tourId={selectedBooking?.tourCode || selectedBooking?.tourId}
-        tourName={selectedBooking?.tourName}
-        tourImage={selectedBooking?.tourImage}
-        tourDescription={selectedBooking?.description}
-      />
+      <ReviewDialog open={openReviewDialog} setOpen={setOpenReviewDialog} />
     </div>
   );
 };

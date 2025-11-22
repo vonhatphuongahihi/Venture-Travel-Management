@@ -15,13 +15,13 @@ export default function RatingDisplay({ rating }: { rating: number }) {
         {Array(fullStars)
           .fill(0)
           .map((_, i) => (
-            <Star key={`full-${i}`} className="fill-primary text-primary" />
+            <Star key={`full-${i}`} className="text-primary" />
           ))}
-        {halfStar && <Star className="fill-primary/50 text-primary/50" />}
+        {halfStar && <Star className="text-primary/50" />}
         {Array(emptyStars)
           .fill(0)
           .map((_, i) => (
-            <Star key={`empty-${i}`} className="fill-gray-300 text-gray-300" />
+            <Star key={`empty-${i}`} className="text-gray-300" />
           ))}
       </div>
     </div>

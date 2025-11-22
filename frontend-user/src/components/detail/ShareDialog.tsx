@@ -53,7 +53,7 @@ const ShareDialog = ({ open, setOpen, tourId, tourName, tourImage }: ShareDialog
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="max-w-2xl bg-white text-gray-900 border-gray-200">
-                <DialogTitle className="text-xl font-bold mb-4 text-gray-900">Chia sẻ tour</DialogTitle>
+                <DialogTitle className="text-xl font-bold mb-4 text-[#26B8ED]">Chia sẻ tour</DialogTitle>
 
                 {/* Share Options */}
                 <div className="flex justify-center gap-6 mb-6">

@@ -507,21 +507,21 @@ const TourDetailPage = () => {
           </div>
           <div className="flex items-center space-x-2">
             <Button
-              className="bg-white text-primary hover:bg-gray-200 flex items-center space-x-1"
+              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1"
               onClick={handleShare}
             >
               <Share2 size={16} />
               <p className="font-['Inter']">Chia sẻ</p>
             </Button>
             <Button
-              className="bg-white text-primary hover:bg-gray-200 flex items-center space-x-1"
+              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1"
               onClick={handleWriteReview}
             >
               <PenLine size={16} />
               <p className="font-['Inter']">Đánh giá</p>
             </Button>
             <Button
-              className={`${isFavorite ? 'bg-primary text-white' : 'hover:bg-primary/40 hover:text-white'} flex items-center space-x-1`}
+              className={`${isFavorite ? 'bg-[#26B8ED] text-white' : 'hover:bg-gray-200 bg-gray-100 text-primary'} flex items-center space-x-1`}
               onClick={handleSave}
               disabled={isSavingFavorite || !user}
             >

@@ -49,7 +49,8 @@ export interface TourRoute {
     tour_id: string;
     geom: [number, number][];
     // LineString → mảng [lng, lat]
-    createdAt: Date;
+    createdAt?: Date;
+    created_at?: Date; // Support both formats
 }
 
 export interface Review {
@@ -63,6 +64,7 @@ export interface Review {
     content: string; //content
     images: string[]; //images
     likesCount: number; //likes_count
+    liked: boolean; //whether current user liked this review
     createdAt: Date; //created_at
     updatedAt: Date; //updatedAt
 }

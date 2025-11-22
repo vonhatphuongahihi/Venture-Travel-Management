@@ -8,27 +8,29 @@ datasource db {
 }
 
 model User {
-  userId              String       @id @default(uuid()) @map("user_id")
+  userId              String              @id @default(uuid()) @map("user_id")
   name                String
-  email               String       @unique
+  email               String              @unique
   password            String?
   phone               String?
   address             String?
-  profilePhoto        String?      @map("profile_photo")
-  dateOfBirth         DateTime?    @map("date_of_birth")
+  profilePhoto        String?             @map("profile_photo")
+  dateOfBirth         DateTime?           @map("date_of_birth")
   gender              String?
-  role                Role         @default(USER)
-  isActive            Boolean      @default(true) @map("is_active")
-  isVerified          Boolean      @default(false) @map("is_verified")
-  verificationToken   String?      @map("verification_token")
-  verificationExpires DateTime?    @map("verification_expires")
-  resetToken          String?      @unique @map("reset_token")
-  resetExpires        DateTime?    @map("reset_expires")
-  lastLogin           DateTime?    @map("last_login")
-  createdAt           DateTime     @default(now()) @map("created_at")
-  updatedAt           DateTime     @updatedAt @map("updated_at")
-  googleId            String?      @unique @map("google_id")
-  authProvider        AuthProvider @default(LOCAL) @map("auth_provider")
+  role                Role                @default(USER)
+  isActive            Boolean             @default(true) @map("is_active")
+  isVerified          Boolean             @default(false) @map("is_verified")
+  verificationToken   String?             @map("verification_token")
+  verificationExpires DateTime?           @map("verification_expires")
+  resetToken          String?             @unique @map("reset_token")
+  resetExpires        DateTime?           @map("reset_expires")
+  lastLogin           DateTime?           @map("last_login")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+  googleId            String?             @unique @map("google_id")
+  authProvider        AuthProvider        @default(LOCAL) @map("auth_provider")
+  tourReviews         TourReview[]
+  attractionReviews   AttractionReview[]
 
   @@map("users")
 }
@@ -47,19 +49,20 @@ model Province {
 }
 
 model Attraction {
-  attractionId String     @id @map("attraction_id")
+  attractionId String              @id @map("attraction_id")
   name         String
   images       String[]
   address      String
   description  String
   geom         String
-  provinceId   String     @map("province_id")
+  provinceId   String              @map("province_id")
   category     String
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  point        Point      @relation(fields: [geom], references: [pointId])
-  province     Province   @relation(fields: [provinceId], references: [provinceId])
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  point        Point               @relation(fields: [geom], references: [pointId])
+  province     Province            @relation(fields: [provinceId], references: [provinceId])
   tourStops    TourStop[]
+  reviews      AttractionReview[]
 
   @@map("attractions")
 }
@@ -94,6 +97,7 @@ model Tour {
   exclusions            String[]
   ticketTypes           TicketType[]
   tourStops             TourStop[]
+  reviews               TourReview[]
   end                   Point?       @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
   pickupArea            Polygon      @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
   pickup                Point        @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
@@ -221,6 +225,42 @@ enum Role {
   ADMIN
   USER
   GUEST
+}
+
+model TourReview {
+  reviewId   String   @id @default(uuid()) @map("review_id")
+  userId     String   @map("user_id")
+  tourId     String   @map("tour_id")
+  rate       Int
+  content    String
+  images     String[]
+  likes      String[] @default([]) // Array of user_id who liked this review
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  user       User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  tour       Tour     @relation(fields: [tourId], references: [tourId], onDelete: Cascade)
+
+  @@index([tourId])
+  @@index([userId])
+  @@map("tour_reviews")
+}
+
+model AttractionReview {
+  reviewId     String     @id @default(uuid()) @map("review_id")
+  userId       String     @map("user_id")
+  attractionId String     @map("attraction_id")
+  rate         Int
+  content      String
+  images       String[]
+  likes        String[]   @default([]) // Array of user_id who liked this review
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  user         User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  attraction   Attraction @relation(fields: [attractionId], references: [attractionId], onDelete: Cascade)
+
+  @@index([attractionId])
+  @@index([userId])
+  @@map("attraction_reviews")
 }
 
 enum AuthProvider {

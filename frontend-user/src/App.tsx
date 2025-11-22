@@ -30,6 +30,7 @@ import ResetPassword from "./pages/ResetPassword";
 import TermOfUse from "./pages/TermOfUse";
 import TourDetail from "./pages/TourDetail";
 import VerifyEmail from "./pages/VerifyEmail";
+import FavoriteTour from "./pages/FavoriteTour";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
                   />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/booking-history" element={<BookingHistory />} />
+                  <Route path="/favorite-tours" element={<FavoriteTour />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

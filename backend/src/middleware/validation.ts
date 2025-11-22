@@ -150,6 +150,13 @@ export const updateAttractionReviewSchema = Joi.object({
   images: Joi.array().items(Joi.string().uri()).max(10).optional(),
 });
 
+export const toggleFavoriteTourSchema = Joi.object({
+  tourId: Joi.string().uuid().required().messages({
+    'string.uuid': '"tourId" must be a valid UUID',
+    'any.required': '"tourId" is required',
+  }),
+});
+
 export const getReviewsQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
   limit: Joi.number().integer().min(1).max(100).optional(),

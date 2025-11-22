@@ -203,6 +203,7 @@ export class UserService {
           lastLogin: true,
           createdAt: true,
           updatedAt: true,
+          favoriteTours: true,
         },
       });
 
@@ -219,6 +220,113 @@ export class UserService {
     }
   }
 
+  // Toggle favorite tour (add or remove)
+  static async toggleFavoriteTour(userId: string, tourId: string) {
+    try {
+      // Check if tour exists
+      const tour = await prisma.tour.findUnique({
+        where: { tourId: tourId },
+      });
+
+      if (!tour) {
+        return ResponseUtils.error("Tour không tồn tại");
+      }
+
+      // Get current user with favorite tours
+      const user = await prisma.user.findUnique({
+        where: { userId: userId },
+        select: { favoriteTours: true },
+      });
+
+      if (!user) {
+        return ResponseUtils.error("Người dùng không tồn tại");
+      }
+
+      // Toggle favorite tour
+      const currentFavorites = user.favoriteTours || [];
+      const isFavorite = currentFavorites.includes(tourId);
+
+      let newFavorites: string[];
+      if (isFavorite) {
+        // Remove from favorites
+        newFavorites = currentFavorites.filter((id) => id !== tourId);
+      } else {
+        // Add to favorites
+        newFavorites = [...currentFavorites, tourId];
+      }
+
+      // Update user
+      const updatedUser = await prisma.user.update({
+        where: { userId: userId },
+        data: { favoriteTours: newFavorites },
+        select: {
+          favoriteTours: true,
+        },
+      });
+
+      return ResponseUtils.success(
+        isFavorite ? "Đã xóa khỏi danh sách yêu thích" : "Đã thêm vào danh sách yêu thích",
+        {
+          favoriteTours: updatedUser.favoriteTours,
+          isFavorite: !isFavorite,
+        }
+      );
+    } catch (error) {
+      return ResponseUtils.error(
+        "Thất bại khi cập nhật tour yêu thích",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
+    }
+  }
+
+  // Get favorite tours with details
+  static async getFavoriteTours(userId: string) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { userId: userId },
+        select: { favoriteTours: true },
+      });
+
+      if (!user) {
+        return ResponseUtils.error("Người dùng không tồn tại");
+      }
+
+      const favoriteTourIds = user.favoriteTours || [];
+
+      if (favoriteTourIds.length === 0) {
+        return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", []);
+      }
+
+      // Get tour details
+      const favoriteTours = await prisma.tour.findMany({
+        where: {
+          tourId: { in: favoriteTourIds },
+          isActive: true,
+        },
+        select: {
+          tourId: true,
+          name: true,
+          images: true,
+          about: true,
+          provinceId: true,
+          duration: true,
+          categories: true,
+          createdAt: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", favoriteTours);
+    } catch (error) {
+      return ResponseUtils.error(
+        "Lấy danh sách tour yêu thích thất bại",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
+    }
+  }
+
   // Get users
   static async getUsers(filterParams: GetUsersRequest) {
     try {
@@ -228,19 +336,19 @@ export class UserService {
         where: {
           OR: search
             ? [
-                {
-                  name: {
-                    contains: search.trim().toLowerCase(),
-                    mode: "insensitive",
-                  },
+              {
+                name: {
+                  contains: search.trim().toLowerCase(),
+                  mode: "insensitive",
                 },
-                {
-                  email: {
-                    contains: search.trim().toLowerCase(),
-                    mode: "insensitive",
-                  },
+              },
+              {
+                email: {
+                  contains: search.trim().toLowerCase(),
+                  mode: "insensitive",
                 },
-              ]
+              },
+            ]
             : undefined,
           isActive: isActive !== undefined ? isActive : undefined,
         },

@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import { provinces, type Province } from "@/data/provinces";
+import { useProvinces } from "@/contexts/ProvinceContext";
+import type { Province } from "@/global.types";
 
 interface ProvinceDropdownProps {
   className?: string;
@@ -15,6 +16,7 @@ const ProvinceDropdown = ({
   isMobile = false,
   onItemClick,
 }: ProvinceDropdownProps) => {
+  const { provinces, loading } = useProvinces();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -165,7 +167,12 @@ const ProvinceDropdown = ({
                 isMobile ? "grid-cols-2 gap-3" : "grid-cols-4 gap-4"
               }`}
             >
-              {provinces.map((province: Province) => (
+              {loading ? (
+                <div className="col-span-full text-center py-4 text-gray-500">
+                  Đang tải...
+                </div>
+              ) : (
+                provinces.map((province: Province) => (
                 <Link
                   key={province.id}
                   to={`/province/${province.slug}`}
@@ -188,7 +195,8 @@ const ProvinceDropdown = ({
                     {province.name}
                   </span>
                 </Link>
-              ))}
+              ))
+              )}
             </div>
           </div>,
           document.body

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
-import { provinces, type Province } from "@/data/provinces";
+import { useProvinces } from "@/contexts/ProvinceContext";
+import type { Province } from "@/global.types";
 
 interface MobileProvinceDropdownProps {
   onItemClick?: () => void;
@@ -10,6 +11,7 @@ interface MobileProvinceDropdownProps {
 const MobileProvinceDropdown = ({
   onItemClick,
 }: MobileProvinceDropdownProps) => {
+  const { provinces, loading } = useProvinces();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {
@@ -40,7 +42,12 @@ const MobileProvinceDropdown = ({
       {isOpen && (
         <div className="mt-3 pl-4 space-y-2 max-h-60 overflow-y-auto">
           <div className="grid grid-cols-2 gap-2">
-            {provinces.map((province: Province) => (
+            {loading ? (
+              <div className="col-span-2 text-center py-4 text-gray-500 text-sm">
+                Đang tải...
+              </div>
+            ) : (
+              provinces.map((province: Province) => (
               <Link
                 key={province.id}
                 to={`/province/${province.slug}`}
@@ -62,7 +69,8 @@ const MobileProvinceDropdown = ({
                   {province.name}
                 </span>
               </Link>
-            ))}
+            ))
+            )}
           </div>
         </div>
       )}

@@ -4,7 +4,7 @@ import queryClient from "./configs/queryClient";
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./hooks/useAuth";
 import Bookings from "./pages/Bookings";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";

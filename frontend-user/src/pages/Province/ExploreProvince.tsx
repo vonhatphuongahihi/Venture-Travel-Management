@@ -1,6 +1,6 @@
+import { provinces } from "@/data/provinces";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useProvinces } from "@/contexts/ProvinceContext";
 
 // Import assets
 import AttractionsSection from "@/components/province/AttractionsSection";
@@ -13,11 +13,12 @@ import { Attraction, Tour } from "@/global.types";
 
 const ExploreProvince = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { getProvinceBySlug, loading } = useProvinces();
   const [sortBy, setSortBy] = useState("Giá (từ thấp đến cao)");
   const [tours, setTours] = useState<Tour[]>(mockTours);
   const [attractions, setAttractions] = useState<Attraction[]>(mockAttractions);
-  const province = slug ? getProvinceBySlug(slug) : undefined;
+  const [province, setProvince] = useState(() =>
+    provinces.find((p) => p.slug === slug)
+  );
   const textRef = useRef(null);
   const [isClamped, setIsClamped] = useState(false);
 

@@ -18,11 +18,8 @@ class ApiClient {
     // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
-        // Add auth token if exists (check both localStorage and sessionStorage)
-        let token = localStorage.getItem('token');
-        if (!token) {
-          token = sessionStorage.getItem('token');
-        }
+        // Add auth token if exists
+        const token = localStorage.getItem('auth_token');
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -39,11 +36,8 @@ class ApiClient {
       (error) => {
         // Handle errors globally
         if (error.response?.status === 401) {
-          // Handle unauthorized - clear all token storage
-          localStorage.removeItem('token');
-          localStorage.removeItem('auth_token'); // Legacy key
-          localStorage.removeItem('remember');
-          sessionStorage.removeItem('token');
+          // Handle unauthorized
+          localStorage.removeItem('auth_token');
           window.location.href = '/login';
         }
         return Promise.reject(error);

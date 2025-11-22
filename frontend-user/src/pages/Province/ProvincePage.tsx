@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { useProvinces } from "@/contexts/ProvinceContext";
+import { provinces } from "@/data/provinces";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
@@ -23,8 +23,9 @@ enum ProvincePageTab {
 const ProvincePage = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const { getProvinceBySlug, loading } = useProvinces();
-  const province = slug ? getProvinceBySlug(slug) : undefined;
+  const [province, setProvince] = useState(() =>
+    provinces.find((p) => p.slug === slug)
+  );
   const textRef = useRef(null);
   const [isClamped, setIsClamped] = useState(false);
   const [currPage, setCurrPage] = useState<ProvincePageTab>(

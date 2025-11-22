@@ -1,6 +1,6 @@
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Menu, Plane, User } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -31,38 +31,42 @@ const Header = () => {
                 <nav className="hidden md:flex items-center space-x-16">
                     <Link
                         to="/tour"
-                        className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
-                            ? "text-primary font-semibold"
-                            : "hover:text-primary"
-                            }`}
+                        className={`text-sm font-medium transition-colors ${
+                            location.pathname === "/tour"
+                                ? "text-primary font-semibold"
+                                : "hover:text-primary"
+                        }`}
                     >
                         TOUR
                     </Link>
                     <ProvinceDropdown />
                     <Link
                         to="/map"
-                        className={`text-sm font-medium transition-colors ${location.pathname === "/map"
-                            ? "text-primary font-semibold"
-                            : "hover:text-primary"
-                            }`}
+                        className={`text-sm font-medium transition-colors ${
+                            location.pathname === "/map"
+                                ? "text-primary font-semibold"
+                                : "hover:text-primary"
+                        }`}
                     >
                         BẢN ĐỒ
                     </Link>
                     <Link
                         to="/explore-360"
-                        className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
-                            ? "text-primary font-semibold"
-                            : "hover:text-primary"
-                            }`}
+                        className={`text-sm font-medium transition-colors ${
+                            location.pathname === "/explore-360"
+                                ? "text-primary font-semibold"
+                                : "hover:text-primary"
+                        }`}
                     >
                         KHÁM PHÁ 360°
                     </Link>
                     <Link
                         to="/about"
-                        className={`text-sm font-medium transition-colors ${location.pathname === "/about"
-                            ? "text-primary font-semibold"
-                            : "hover:text-primary"
-                            }`}
+                        className={`text-sm font-medium transition-colors ${
+                            location.pathname === "/about"
+                                ? "text-primary font-semibold"
+                                : "hover:text-primary"
+                        }`}
                     >
                         VỀ CHÚNG TÔI
                     </Link>
@@ -125,10 +129,11 @@ const Header = () => {
                     <nav className="container py-4 space-y-5">
                         <Link
                             to="/tour"
-                            className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
-                                ? "text-primary font-semibold"
-                                : "hover:text-primary"
-                                }`}
+                            className={`block text-sm font-medium transition-colors ${
+                                location.pathname === "/tour"
+                                    ? "text-primary font-semibold"
+                                    : "hover:text-primary"
+                            }`}
                             onClick={() => setIsMenuOpen(false)}
                         >
                             TOUR

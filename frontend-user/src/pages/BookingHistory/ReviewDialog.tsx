@@ -227,7 +227,7 @@ const ReviewDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-        <DialogTitle className="text-xl font-bold">Đánh giá</DialogTitle>
+        <DialogTitle className="text-xl text-[#26B8ED] font-bold">Đánh giá</DialogTitle>
 
         <div className="mt-4 space-y-6">
           {/* Tour Review */}

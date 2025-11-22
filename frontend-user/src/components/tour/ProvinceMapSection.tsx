@@ -1,14 +1,47 @@
-import { Button } from "@/components/ui/button";
 import { Compass } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ProvinceAPI from "@/services/provinceAPI";
+
+interface Province {
+  id: string;
+  name: string;
+  region: string;
+}
 
 const ProvinceMapSection = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [loading, setLoading] = useState(true);
+  const mapInstanceRef = useRef<any>(null);
 
+  // Fetch provinces from API
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        setLoading(true);
+        const data = await ProvinceAPI.getProvinces();
+        setProvinces(data);
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
+
+  // Load Leaflet and initialize map
   useEffect(() => {
     const loadLeaflet = async () => {
+      // Check if Leaflet is already loaded
+      if ((window as any).L) {
+        initializeMap();
+        return;
+      }
+
       // Load Leaflet CSS
       const link = document.createElement('link');
       link.rel = 'stylesheet';
@@ -19,44 +52,32 @@ const ProvinceMapSection = () => {
       const script = document.createElement('script');
       script.src = 'https://unpkg.com/leaflet/dist/leaflet.js';
       script.onload = () => {
-        if (mapRef.current && (window as any).L) {
-          const map = (window as any).L.map(mapRef.current).setView([14.0583, 108.2772], 5);
-
-          (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(map);
-
-          // Add Vietnam marker
-          (window as any).L.marker([14.0583, 108.2772])
-            .addTo(map)
-            .bindPopup("Việt Nam")
-            .openPopup();
-
-          // Add province markers
-          const provinces = [
-            { name: "Hà Nội", coords: [21.0285, 105.8542] },
-            { name: "TP. Hồ Chí Minh", coords: [10.8231, 106.6297] },
-            { name: "Đà Nẵng", coords: [16.0544, 108.2022] },
-            { name: "Hạ Long", coords: [20.9101, 107.1839] },
-            { name: "Hội An", coords: [15.8801, 108.3380] },
-            { name: "Nha Trang", coords: [12.2388, 109.1967] },
-            { name: "Đà Lạt", coords: [11.9404, 108.4583] },
-            { name: "Phú Quốc", coords: [10.2899, 103.9840] }
-          ];
-
-          provinces.forEach(province => {
-            (window as any).L.marker(province.coords)
-              .addTo(map)
-              .bindPopup(province.name);
-          });
-        }
+        initializeMap();
       };
       document.head.appendChild(script);
     };
 
-    loadLeaflet();
-  }, []);
+    const initializeMap = () => {
+      if (mapRef.current && (window as any).L) {
+        // Clear existing map if any
+        if (mapInstanceRef.current) {
+          mapInstanceRef.current.remove();
+        }
+
+        const map = (window as any).L.map(mapRef.current).setView([14.0583, 108.2772], 5);
+        mapInstanceRef.current = map;
+
+        (window as any).L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+      }
+    };
+
+    if (!loading) {
+      loadLeaflet();
+    }
+  }, [loading]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -75,39 +96,31 @@ const ProvinceMapSection = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Group provinces by region
   const regions = [
     {
       id: "north",
       name: "Miền Bắc",
-      provinces: [
-        "Hà Nội",
-        "Hạ Long",
-        "Ninh Bình",
-        "Hà Giang",
-        "Mai Châu",
-        "Sapa"
-      ]
+      provinces: provinces
+        .filter(p => p.region === "Bắc Bộ")
+        .map(p => p.name)
+        .sort()
     },
     {
       id: "central",
       name: "Miền Trung",
-      provinces: [
-        "Đà Nẵng",
-        "Hội An",
-        "Nha Trang",
-        "Đà Lạt",
-        "Huế",
-        "Phong Nha"
-      ]
+      provinces: provinces
+        .filter(p => p.region === "Trung Bộ")
+        .map(p => p.name)
+        .sort()
     },
     {
       id: "south",
       name: "Miền Nam",
-      provinces: [
-        "Côn Đảo",
-        "Cần Thơ",
-        "Phú Quốc"
-      ]
+      provinces: provinces
+        .filter(p => p.region === "Nam Bộ")
+        .map(p => p.name)
+        .sort()
     }
   ];
 
@@ -129,50 +142,63 @@ const ProvinceMapSection = () => {
         </div>
 
         {/* Main Content */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          {/* Left Side - Map */}
-          <div>
-            <div className="text-sm font-medium text-muted-foreground mb-4">Vietnam Map</div>
-            <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-gray-200">
-              <div
-                ref={mapRef}
-                className="w-full h-96 rounded-lg"
-                style={{ minHeight: '400px' }}
-              />
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Đang tải dữ liệu...</p>
             </div>
           </div>
-
-          {/* Right Side - Content */}
-          <div className="space-y-8">
+        ) : (
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            {/* Left Side - Map */}
             <div>
-              <h3 className="text-2xl font-bold text-primary mb-4">
-                Khám phá 3 miền Việt Nam
-              </h3>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                Việt Nam mở ra như một bức tranh sống động trải dài khắp ba miền, mỗi miền sở hữu vẻ đẹp riêng biệt. Tất cả cùng dệt nên một câu chuyện tuyệt đẹp về thiên nhiên, văn hóa và những cuộc phiêu lưu.
-              </p>
+              <div className="text-sm font-medium text-muted-foreground mb-4">Vietnam Map</div>
+              <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-gray-200">
+                <div
+                  ref={mapRef}
+                  className="w-full h-96 rounded-lg"
+                  style={{ minHeight: '400px' }}
+                />
+              </div>
             </div>
 
-            {/* Regions List */}
-            <div className="space-y-6">
-              {regions.map((region) => (
-                <div key={region.id}>
-                  <h4 className="text-xl font-bold text-primary mb-3 relative">
-                    {region.name}
-                    <div className="absolute top-7 left-0 w-[60px] h-1 bg-primary mt-1"></div>
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {region.provinces.map((province, index) => (
-                      <div key={index} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors">
-                        {province}
+            {/* Right Side - Content */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-2xl font-bold text-primary mb-4">
+                  Khám phá 3 miền Việt Nam
+                </h3>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Việt Nam mở ra như một bức tranh sống động trải dài khắp ba miền, mỗi miền sở hữu vẻ đẹp riêng biệt. Tất cả cùng dệt nên một câu chuyện tuyệt đẹp về thiên nhiên, văn hóa và những cuộc phiêu lưu.
+                </p>
+              </div>
+
+              {/* Regions List */}
+              <div className="space-y-6">
+                {regions.map((region) => {
+                  if (region.provinces.length === 0) return null;
+
+                  return (
+                    <div key={region.id}>
+                      <h4 className="text-xl font-bold text-primary mb-3 relative">
+                        {region.name}
+                        <div className="absolute top-7 left-0 w-[60px] h-1 bg-primary mt-1"></div>
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {region.provinces.map((province, index) => (
+                          <div key={index} className="text-muted-foreground hover:text-primary cursor-pointer transition-colors">
+                            {province}
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

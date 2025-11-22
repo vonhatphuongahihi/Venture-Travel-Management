@@ -11,7 +11,6 @@ export class TourController {
             const {
                 page = '1',
                 limit = '10',
-                provinceId,
                 category,
                 isActive = 'true',
                 sortBy = 'createdAt',
@@ -27,10 +26,6 @@ export class TourController {
                 isActive: isActive === 'true',
             };
 
-            if (provinceId) {
-                where.provinceId = provinceId;
-            }
-
             if (category) {
                 where.categories = {
                     has: category,
@@ -42,13 +37,7 @@ export class TourController {
                 prisma.tour.findMany({
                     where,
                     include: {
-                        province: {
-                            select: {
-                                provinceId: true,
-                                name: true,
-                                region: true,
-                            },
-                        },
+
                         reviews: {
                             select: {
                                 rate: true,
@@ -106,8 +95,6 @@ export class TourController {
                     images: tour.images,
                     price: basePrice,
                     duration: tour.duration,
-                    location: tour.province.name,
-                    provinceId: tour.provinceId,
                     rating: Math.round(avgRating * 10) / 10,
                     reviewCount: tour.reviews.length,
                     category: tour.categories && tour.categories.length > 0 ? tour.categories[0] : 'Tour du lịch',
@@ -158,7 +145,6 @@ export class TourController {
             const tour = await prisma.tour.findUnique({
                 where: { tourId: id },
                 include: {
-                    province: true,
                     tourStops: {
                         include: {
                             attraction: {
@@ -216,8 +202,6 @@ export class TourController {
                 name: tour.name,
                 images: tour.images,
                 about: tour.about,
-                location: tour.province.name,
-                provinceId: tour.provinceId,
                 price: 0, // Will be calculated from ticket prices
                 rating: Math.round(avgRating * 10) / 10,
                 reviewCount: tour.reviews.length,
@@ -281,11 +265,6 @@ export class TourController {
                     images: review.images,
                     date: review.createdAt.toISOString(),
                 })),
-                province: {
-                    id: tour.province.provinceId,
-                    name: tour.province.name,
-                    region: tour.province.region,
-                },
                 pickupCoordinates: tour.pickup ? {
                     lat: tour.pickup.latitude,
                     lon: tour.pickup.longitude,

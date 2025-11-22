@@ -47,6 +47,7 @@ import TicketTypePicker from "@/components/detail/TicketTypePicker";
 import { tourService } from "@/services/tour.service";
 import { reviewService } from "@/services/review.service";
 import ReviewDialog from "@/pages/BookingHistory/ReviewDialog";
+import ShareDialog from "@/components/detail/ShareDialog";
 
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -268,7 +269,9 @@ const TourDetailPage = () => {
   };
 
   ///////////////////// Interaction /////////////////////
-  const handleShare = () => { };
+  const handleShare = () => {
+    setOpenShareDialog(true);
+  };
   const handleWriteReview = () => {
     setOpenReviewDialog(true);
   };
@@ -384,6 +387,7 @@ const TourDetailPage = () => {
   });
   const [puOpen, setPUOpen] = useState(false);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
+  const [openShareDialog, setOpenShareDialog] = useState(false);
 
   // Handle like/unlike review
   const handleLikeReview = async (reviewId: string) => {
@@ -841,6 +845,17 @@ const TourDetailPage = () => {
           }
         }}
       />
+
+      {/* Share Dialog */}
+      {tour && (
+        <ShareDialog
+          open={openShareDialog}
+          setOpen={setOpenShareDialog}
+          tourId={tour.id}
+          tourName={tour.title}
+          tourImage={tour.images?.[0]}
+        />
+      )}
     </div >
   );
 };

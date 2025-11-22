@@ -11,9 +11,28 @@ export class CloudinaryService {
         });
     }
 
-    // Upload image to Cloudinary
-    async uploadImage(fileBuffer: Buffer, fileName: string, folder: string = 'venture-travel/avatars'): Promise<UploadApiResponse> {
+    // Upload image to Cloudinary (generic method)
+    async uploadImage(
+        fileBuffer: Buffer,
+        fileName: string,
+        folder: string = 'venture-travel/avatars',
+        options?: {
+            width?: number;
+            height?: number;
+            crop?: 'fill' | 'fit' | 'scale' | 'limit';
+            quality?: string;
+            format?: string;
+        }
+    ): Promise<UploadApiResponse> {
         try {
+            const {
+                width = 400,
+                height = 400,
+                crop = 'fill',
+                quality = 'auto',
+                format = 'webp'
+            } = options || {};
+
             return new Promise((resolve, reject) => {
                 cloudinary.uploader.upload_stream(
                     {
@@ -21,9 +40,9 @@ export class CloudinaryService {
                         folder: folder,
                         public_id: fileName,
                         transformation: [
-                            { width: 400, height: 400, crop: 'fill' },
-                            { quality: 'auto' },
-                            { format: 'webp' }
+                            { width, height, crop },
+                            { quality },
+                            { format }
                         ]
                     },
                     (error, result) => {
@@ -38,6 +57,25 @@ export class CloudinaryService {
         } catch (error) {
             throw new Error(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+    }
+
+    // Upload review image to Cloudinary (specific method for reviews)
+    async uploadReviewImage(
+        fileBuffer: Buffer,
+        fileName: string
+    ): Promise<UploadApiResponse> {
+        return this.uploadImage(
+            fileBuffer,
+            fileName,
+            'venture-travel/reviews',
+            {
+                width: 1200,
+                height: 1200,
+                crop: 'limit', // Giữ tỷ lệ gốc
+                quality: 'auto',
+                format: 'webp'
+            }
+        );
     }
 
     // Delete image from Cloudinary

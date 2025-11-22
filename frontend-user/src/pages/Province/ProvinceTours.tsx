@@ -1,6 +1,6 @@
-import { provinces } from "@/data/provinces";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useProvinces } from "@/contexts/ProvinceContext";
 
 // Import assets
 import ProvinceToursSection from "@/components/province/ProvinceToursSection";
@@ -11,12 +11,11 @@ import { Attraction, Tour } from "@/global.types";
 
 const ProvinceTours = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { getProvinceBySlug } = useProvinces();
   const [sortBy, setSortBy] = useState<string>("price-asc");
   const [tours, setTours] = useState<Tour[]>(mockTours);
   const [attractions, setAttractions] = useState<Attraction[]>(mockAttractions);
-  const [province, setProvince] = useState(() =>
-    provinces.find((p) => p.slug === slug)
-  );
+  const province = slug ? getProvinceBySlug(slug) : undefined;
   const textRef = useRef(null);
   const [isClamped, setIsClamped] = useState(false);
 

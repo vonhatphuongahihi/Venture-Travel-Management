@@ -2,7 +2,7 @@ import AuthAPI from '@/services/authAPI';
 import GoogleAuthService from '@/services/googleAuthService';
 import UserAPI from '@/services/userAPI';
 import { RegisterRequest, User } from '@/types/api';
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react';
 
 export interface AuthContextType {
   user: User | null;
@@ -18,6 +18,15 @@ export interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Export useAuth hook
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
 interface AuthProviderProps {
   children: ReactNode;

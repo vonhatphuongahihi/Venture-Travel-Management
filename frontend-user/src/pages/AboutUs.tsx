@@ -21,10 +21,11 @@ const AboutUs = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const timer = setTimeout(() => {
       setIsPageLoaded(true);
     }, 100);
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); 
   }, []);
 
   const stats = [
@@ -85,6 +86,7 @@ const AboutUs = () => {
     },
   ];
 
+  // Cấu hình cho Desktop Carousel
   const membersPerSlide = 4;
   const totalSlides = Math.ceil(teamMembers.length / membersPerSlide);
 
@@ -94,12 +96,6 @@ const AboutUs = () => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
-  };
-
-  const getCurrentMembers = () => {
-    const start = currentSlide * membersPerSlide;
-    const end = start + membersPerSlide;
-    return teamMembers.slice(start, end);
   };
 
   const values = [
@@ -130,58 +126,58 @@ const AboutUs = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative h-[40vh] flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
+      <section className="relative min-h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden py-20 md:py-0">
         <img 
           src={landscapeSeaImg} 
           alt="Landscape Sea Background" 
           className="absolute inset-0 w-full h-full object-cover blur-sm"
         />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/"></div>
+        <div className="absolute inset-0 bg-black/40"></div>
         
-        <div className={`container text-right relative z-10 transition-all duration-1000 ${
+        <div className={`container relative z-10 transition-all duration-1000 px-4 ${
           isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-            Về <span className="text-gradient">VENTURE</span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 max-w-2xl ml-auto">
-            Chúng tôi là đối tác tin cậy trong mọi hành trình khám phá của bạn, 
-            mang đến những trải nghiệm du lịch đáng nhớ và ý nghĩa.
-          </p>
+          <div className="text-center md:text-right">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 text-white leading-tight">
+              Về <span className="text-gradient">VENTURE</span>
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl ml-auto mr-auto md:mr-0">
+              Chúng tôi là đối tác tin cậy trong mọi hành trình khám phá của bạn, 
+              mang đến những trải nghiệm du lịch đáng nhớ và ý nghĩa.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 bg-background">
-        <div className="container">
+      <section className="py-12 md:py-16 bg-background overflow-hidden">
+        <div className="container px-4 md:px-8">
           <div className={`transition-all duration-1000 delay-200 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-primary">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 lg:order-1">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
                   SỨ MỆNH CỦA CHÚNG TÔI
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
                   VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
                   chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
                   Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
                   mà còn là hành trình khám phá bản thân và kết nối với những con người, 
                   văn hóa mới lạ.
                 </p>
-                <p className="text-muted-foreground text-lg leading-relaxed">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
                   Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
                   những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
                 </p>
               </div>
-              <div className="relative flex justify-center">
-                <div className="relative w-[75%] transition-all duration-500 hover:scale-150 hover:rotate-3">
+              
+              <div className="relative flex justify-center order-1 lg:order-2">
+                <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:rotate-2">
                   <img 
                     src={fansipanImg} 
-                    className="shadow-xl w-full h-[280px] object-cover transition-all duration-500 hover:shadow-2xl"
-                    style={{ clipPath: 'polygon(50% 0%, 85% 35%, 70% 100%, 30% 100%, 15% 35%)' }}
+                    className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
               </div>
@@ -190,34 +186,33 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-16 bg-background">
-        <div className="container">
+      {/* Core Competency Section */}
+      <section className="py-12 md:py-16 bg-background overflow-hidden">
+        <div className="container px-4 md:px-8">
           <div className={`transition-all duration-1000 delay-200 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative flex justify-center">
-                <div className="relative w-[75%] transition-all duration-500 hover:scale-150 hover:-rotate-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="relative flex justify-center order-1">
+                <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:-rotate-2">
                   <img 
                     src={fieldImg} 
-                    className="shadow-xl w-full h-[280px] object-cover transition-all duration-500 hover:shadow-2xl"
-                    style={{ clipPath: 'polygon(50% 0%, 85% 35%, 70% 100%, 30% 100%, 15% 35%)' }}
+                    className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-primary">
+              <div className="order-2">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
                   NĂNG LỰC CỐT LÕI
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
                   VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
                   chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
                   Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
                   mà còn là hành trình khám phá bản thân và kết nối với những con người, 
                   văn hóa mới lạ.
                 </p>
-                <p className="text-muted-foreground text-lg leading-relaxed">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
                   Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
                   những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
                 </p>
@@ -227,36 +222,34 @@ const AboutUs = () => {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-16 bg-background">
-        <div className="container">
+      {/* Activities Section */}
+      <section className="py-12 md:py-16 bg-background overflow-hidden">
+        <div className="container px-4 md:px-8">
           <div className={`transition-all duration-1000 delay-200 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-primary">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 lg:order-1">
+                <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
                   CÁCH THỨC HOẠT ĐỘNG
                 </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-6">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
                   VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
                   chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
                   Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
                   mà còn là hành trình khám phá bản thân và kết nối với những con người, 
                   văn hóa mới lạ.
                 </p>
-                <p className="text-muted-foreground text-lg leading-relaxed">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
                   Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
                   những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
                 </p>
               </div>
-              <div className="relative flex justify-center">
-                <div className="relative w-[75%] transition-all duration-500 hover:scale-150 hover:rotate-2">
+              <div className="relative flex justify-center order-1 lg:order-2">
+                <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:rotate-2">
                   <img 
                     src={festivalImg} 
-                    className="shadow-xl w-full h-[280px] object-cover transition-all duration-500 hover:shadow-2xl"
-                    style={{ clipPath: 'polygon(50% 0%, 85% 35%, 70% 100%, 30% 100%, 15% 35%)' }}
+                    className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
               </div>
@@ -265,10 +258,9 @@ const AboutUs = () => {
         </div>
       </section>
 
-
       {/* Values Section */}
-      <section className="py-16 bg-background">
-        <div className="container">
+      <section className="py-12 md:py-16 bg-background">
+        <div className="container px-4 md:px-8">
           <div className={`transition-all duration-1000 delay-400 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
@@ -280,9 +272,9 @@ const AboutUs = () => {
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {values.map((value, index) => (
-                <div key={index} className="text-center p-6 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-300 hover:shadow-lg">
+                <div key={index} className="text-center p-6 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-300 hover:shadow-lg border border-transparent hover:border-primary/20">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
                     <value.icon className="h-8 w-8 text-primary" />
                   </div>
@@ -296,8 +288,8 @@ const AboutUs = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-10 bg-primary/5">
-        <div className="container">
+      <section className="py-12 md:py-16 bg-primary/5">
+        <div className="container px-4 md:px-8">
           <div className={`transition-all duration-1000 delay-500 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
@@ -306,9 +298,28 @@ const AboutUs = () => {
               <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
             </div>
             
-            {/* Carousel Container */}
-            <div className="relative">
-              {/* Team Members Grid */}
+            {/* --- MOBILE VIEW: Grid tĩnh (Không carousel) --- */}
+            <div className="block md:hidden">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {teamMembers.map((member, index) => (
+                  <div key={index} className="text-center p-3 bg-white/60 rounded-lg shadow-sm">
+                    <div className="w-20 h-20 mx-auto mb-2 relative">
+                      <img 
+                        src={member.image} 
+                        alt={member.name}
+                        className="w-full h-full rounded-full object-cover shadow-sm"
+                      />
+                    </div>
+                    <h3 className="text-sm font-semibold truncate">{member.name}</h3>
+                    <p className="text-primary text-xs font-medium">{member.position}</p>
+                    <p className="text-muted-foreground text-[10px]">{member.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* --- DESKTOP VIEW: Carousel như cũ --- */}
+            <div className="hidden md:block relative max-w-6xl mx-auto">
               <div className="overflow-hidden">
                 <div 
                   className="flex transition-transform duration-500 ease-in-out"
@@ -316,17 +327,19 @@ const AboutUs = () => {
                 >
                   {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                     <div key={slideIndex} className="w-full flex-shrink-0">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+                      <div className="grid grid-cols-4 gap-6 px-12">
                         {teamMembers
                           .slice(slideIndex * membersPerSlide, (slideIndex + 1) * membersPerSlide)
                           .map((member, index) => (
-                            <div key={index} className="text-center p-4 transition-all duration-300 transform hover:scale-110">
-                              <img 
-                                src={member.image} 
-                                alt={member.name}
-                                className="w-28 h-28 rounded-full mx-auto mb-3 object-cover transition-all duration-300"
-                              />
-                              <h3 className="text-lg font-semibold mb-2">{member.name}</h3>
+                            <div key={index} className="text-center p-4 bg-white/50 rounded-xl hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                              <div className="w-28 h-28 mx-auto mb-4 relative group">
+                                <img 
+                                  src={member.image} 
+                                  alt={member.name}
+                                  className="w-full h-full rounded-full object-cover transition-all duration-300 group-hover:scale-105 shadow-md"
+                                />
+                              </div>
+                              <h3 className="text-lg font-semibold mb-1 truncate">{member.name}</h3>
                               <p className="text-primary font-medium mb-1 text-sm">{member.position}</p>
                               <p className="text-muted-foreground text-sm">{member.description}</p>
                             </div>
@@ -340,7 +353,7 @@ const AboutUs = () => {
               {/* Navigation Buttons */}
               <button
                 onClick={prevSlide}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white/90 hover:bg-white text-primary p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-lg transition-all duration-300 z-10"
                 disabled={totalSlides <= 1}
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -348,21 +361,21 @@ const AboutUs = () => {
               
               <button
                 onClick={nextSlide}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white/90 hover:bg-white text-primary p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-lg transition-all duration-300 z-10"
                 disabled={totalSlides <= 1}
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
 
               {/* Dots Indicator */}
-              <div className="flex justify-center mt-6 space-x-2">
+              <div className="flex justify-center mt-8 space-x-2">
                 {Array.from({ length: totalSlides }).map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       currentSlide === index 
-                        ? 'bg-primary scale-125' 
+                        ? 'bg-primary scale-125 w-5' 
                         : 'bg-primary/30 hover:bg-primary/50'
                     }`}
                   />
@@ -374,8 +387,8 @@ const AboutUs = () => {
       </section>
 
       {/* Contact CTA Section */}
-      <section className="py-16 bg-background">
-        <div className="container">
+      <section className="py-12 md:py-16 bg-background">
+        <div className="container px-4 md:px-8">
           <div className={`text-center transition-all duration-1000 delay-600 ${
             isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
@@ -385,16 +398,16 @@ const AboutUs = () => {
             <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
               Hãy để chúng tôi đồng hành cùng bạn trong những hành trình khám phá tuyệt vời nhất.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link 
                 to="/" 
-                className="px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors text-center"
+                className="w-full sm:w-auto px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors text-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Khám phá Tour
               </Link>
               <Link 
                 to="/contact" 
-                className="px-8 py-3 border border-primary text-primary rounded-full hover:bg-primary/10 transition-colors text-center"
+                className="w-full sm:w-auto px-8 py-3 border border-primary text-primary rounded-full hover:bg-primary/10 transition-colors text-center"
               >
                 Liên hệ tư vấn
               </Link>

@@ -31,56 +31,64 @@ import TermOfUse from "./pages/TermOfUse";
 import TourDetail from "./pages/TourDetail";
 import VerifyEmail from "./pages/VerifyEmail";
 import FavoriteTour from "./pages/FavoriteTour";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BookingProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <ProvinceProvider>
-            <ToastProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<SplashScreen />} />
-                  <Route path="/tour" element={<Index />} />
-                  <Route path="/tour/:id" element={<TourDetail />} />
-                  <Route path="/book-tour" element={<BookTourNew />} />
-                  <Route path="/explore-360" element={<Explore360 />} />
-                  <Route path="/map" element={<Map />} />
-                  <Route path="/province/:slug" element={<ProvincePage />}>
-                    <Route index element={<ExploreProvince />} />
-                    <Route path="tours-activities" element={<ProvinceTours />} />
-                  </Route>
-                  <Route path="/attraction/:slug" element={<AttractionPage />} />
-                  <Route path="/about" element={<AboutUs />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/terms" element={<TermOfUse />} />
-                  <Route path="/policy" element={<PrivacyPolicy />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/verify-email" element={<VerifyEmail />} />
-                  <Route
-                    path="/auth/google/success"
-                    element={<GoogleAuthSuccess />}
-                  />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/booking-history" element={<BookingHistory />} />
-                  <Route path="/favorite-tours" element={<FavoriteTour />} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </ToastProvider>
-          </ProvinceProvider>
-        </AuthProvider>
-      </TooltipProvider>
-    </BookingProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const hideScrollButtonPaths = ["/login", "/register"];
+  const currentPath = window.location.pathname;
+  const showScrollButton = !hideScrollButtonPaths.includes(currentPath);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BookingProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <ProvinceProvider>
+              <ToastProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<SplashScreen />} />
+                    <Route path="/tour" element={<Index />} />
+                    <Route path="/tour/:id" element={<TourDetail />} />
+                    <Route path="/book-tour" element={<BookTourNew />} />
+                    <Route path="/explore-360" element={<Explore360 />} />
+                    <Route path="/map" element={<Map />} />
+                    <Route path="/province/:slug" element={<ProvincePage />}>
+                      <Route index element={<ExploreProvince />} />
+                      <Route path="tours-activities" element={<ProvinceTours />} />
+                    </Route>
+                    <Route path="/attraction/:slug" element={<AttractionPage />} />
+                    <Route path="/about" element={<AboutUs />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/terms" element={<TermOfUse />} />
+                    <Route path="/policy" element={<PrivacyPolicy />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/verify-email" element={<VerifyEmail />} />
+                    <Route
+                      path="/auth/google/success"
+                      element={<GoogleAuthSuccess />}
+                    />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/booking-history" element={<BookingHistory />} />
+                    <Route path="/favorite-tours" element={<FavoriteTour />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+                {showScrollButton && <ScrollToTopButton />}
+              </ToastProvider>
+            </ProvinceProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </BookingProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

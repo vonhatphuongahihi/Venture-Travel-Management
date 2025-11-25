@@ -16,7 +16,6 @@ const Header = () => {
         <header className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center justify-between">
                 {/* Logo */}
-
                 <div className="flex items-center space-x-2">
                     <div className="relative">
                         <Link to="/tour">
@@ -27,6 +26,7 @@ const Header = () => {
                         <Plane className="h-4 w-4 text-primary" />
                     </div>
                 </div>
+
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center space-x-16">
                     <Link
@@ -58,15 +58,6 @@ const Header = () => {
                         KHÁM PHÁ 360°
                     </Link>
                     <Link
-                        to="/about"
-                        className={`text-sm font-medium transition-colors ${location.pathname === "/about"
-                            ? "text-primary font-semibold"
-                            : "hover:text-primary"
-                            }`}
-                    >
-                        VỀ CHÚNG TÔI
-                    </Link>
-                    <Link
                         to="/contact"
                         className="text-sm font-medium hover:text-primary transition-colors"
                     >
@@ -80,7 +71,7 @@ const Header = () => {
                     </Link>
                 </nav>
 
-                {/* Login */}
+                {/* Login / Profile Button (Desktop) */}
                 <div className="flex items-center space-x-4">
                     {!isAuthenticated ? (
                         <Link to="/login">
@@ -157,14 +148,40 @@ const Header = () => {
                         >
                             LIÊN HỆ
                         </Link>
+
+                        {/* --- PHẦN ĐÃ CHỈNH SỬA --- */}
                         <div className="pt-3 border-t border-border">
-                            <Link to="/login">
-                                <Button variant="tour" size="sm" className="w-full">
-                                    <User className="h-4 w-4" />
-                                    Đăng nhập
-                                </Button>
-                            </Link>
+                            {!isAuthenticated ? (
+                                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                                    <Button variant="tour" size="sm" className="w-full">
+                                        <User className="h-4 w-4" />
+                                        Đăng nhập
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors"
+                                >
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
+                                        {user?.profilePhoto ? (
+                                            <img
+                                                src={user.profilePhoto}
+                                                alt={user.name || "Profile"}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <User className="h-4 w-4 text-primary" />
+                                        )}
+                                    </div>
+                                    <span className="text-sm font-semibold text-foreground">
+                                        {user?.name || "Tài khoản của tôi"}
+                                    </span>
+                                </Link>
+                            )}
                         </div>
+                        {/* -------------------------- */}
                     </nav>
                 </div>
             )}

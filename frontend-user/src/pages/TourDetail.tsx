@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import {
   PriceCategories,
@@ -16,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import {
   Bookmark,
   CalendarCog,
-  ChevronDown,
   Clock,
   Filter,
   Languages,
@@ -69,7 +67,6 @@ const TourDetailPage = () => {
     priceCategories: [] as any[],
   });
   const totalPrice = userTicket.priceCategories.reduce((sum: number, cat: any) => {
-    // Tìm giá tương ứng với loại vé hiện tại và category
     if (!userTicket.currentType) return sum;
     const priceObj = ticketPrices.find(
       (tp: any) =>
@@ -93,7 +90,6 @@ const TourDetailPage = () => {
       return;
     }
 
-    // If only refreshing reviews, skip loading state
     if (!refreshReviews) {
       setLoading(true);
     }
@@ -110,7 +106,6 @@ const TourDetailPage = () => {
         return;
       }
 
-      // Set tour data
       setTour({
         id: tourData.id,
         provinceId: tourData.provinceId,
@@ -144,13 +139,10 @@ const TourDetailPage = () => {
         createdBy: tourData.createdBy,
       } as TourDetail);
 
-      // Set tour stops
       if (tourData.tourStops && tourData.tourStops.length > 0) {
-        // Sort by stopOrder
         const sortedStops = [...tourData.tourStops].sort((a, b) => a.stopOrder - b.stopOrder);
         setTourStop(sortedStops);
 
-        // Create tour route from tour stops
         const routeGeom = sortedStops
           .map((stop: TourStop) => stop.attractionGeom)
           .filter((geom) => geom[0] !== 0 && geom[1] !== 0) as [number, number][];
@@ -165,11 +157,10 @@ const TourDetailPage = () => {
         }
       }
 
-      // Set reviews (always fetch fresh reviews)
       try {
         const reviewsData = await reviewService.getTourReviews(id, {
           page: 1,
-          limit: 50, // Get more reviews
+          limit: 50,
           sortBy: 'createdAt',
           order: 'desc',
         });
@@ -197,7 +188,6 @@ const TourDetailPage = () => {
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
-        // Fallback to reviews from tour data if available
         if (tourData.reviews) {
           setReviews(tourData.reviews);
           const avgRating = tourData.reviews.length > 0
@@ -207,7 +197,6 @@ const TourDetailPage = () => {
         }
       }
 
-      // Set ticket prices
       if (tourData.ticketPrices) {
         setTicketPrices(tourData.ticketPrices);
       }
@@ -234,7 +223,6 @@ const TourDetailPage = () => {
     }
   }, [id]);
 
-  // Function to refresh reviews (can be called after submitting a review)
   const refreshReviews = async () => {
     if (id) {
       try {
@@ -304,7 +292,6 @@ const TourDetailPage = () => {
           'success'
         );
 
-        // Update user context if favoriteTours is available
         if (user && updateUser && response.data.favoriteTours) {
           updateUser({ ...user, favoriteTours: response.data.favoriteTours });
         }
@@ -319,7 +306,6 @@ const TourDetailPage = () => {
     }
   };
 
-  // Check if tour is favorite when component mounts or user changes
   useEffect(() => {
     if (user && user.favoriteTours && id) {
       setIsFavorite(user.favoriteTours.includes(id));
@@ -346,7 +332,6 @@ const TourDetailPage = () => {
     { id: "itinerary", label: "Hành trình" },
     { id: "reviews", label: "Đánh giá" },
   ];
-  // Xử lý scroll - hiện navbar phụ
   const [showStickyNav, setShowStickyNav] = useState(false);
   useEffect(() => {
     const handleScroll = () => {
@@ -360,14 +345,12 @@ const TourDetailPage = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  // Smooth scroll đến section
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
-      // chiều cao navbar (ví dụ 80px)
       let navbarHeight = 64;
       if (showStickyNav) {
-        navbarHeight += 56; // chiều cao navbar phụ
+        navbarHeight += 56;
       }
 
       const y = el.getBoundingClientRect().top + window.scrollY - navbarHeight;
@@ -376,7 +359,6 @@ const TourDetailPage = () => {
       setSectionChosen(id);
     }
   };
-  // Chuyển sectionChosen khi scroll
   useEffect(() => {
     const sections = document.querySelectorAll("section");
 
@@ -384,7 +366,6 @@ const TourDetailPage = () => {
       let current = "";
       sections.forEach((section) => {
         const rect = section.getBoundingClientRect();
-        // kiểm tra nếu section đang hiển thị tối thiểu 1 phần trên màn hình
         if (rect.top <= 100 && rect.bottom > 100) {
           current = section.id;
         }
@@ -407,11 +388,8 @@ const TourDetailPage = () => {
       month: "long",
       day: "numeric",
     };
-    // Format theo ngôn ngữ tiếng Việt
     let formatted = date.toLocaleDateString("vi-VN", options);
-    // Mặc định `toLocaleDateString` ở vi-VN sẽ ra "thứ ba, 27 tháng 9, 2025"
     formatted = formatted.replace(/, (\d+)/, (match, p1) => `, ngày ${p1}`);
-    // Viết hoa chữ cái đầu
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   }
 
@@ -442,12 +420,9 @@ const TourDetailPage = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSavingFavorite, setIsSavingFavorite] = useState(false);
 
-  // Handle like/unlike review
   const handleLikeReview = async (reviewId: string) => {
     try {
       const result = await reviewService.likeTourReview(reviewId);
-
-      // Update review state
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review.reviewId === reviewId
@@ -457,7 +432,6 @@ const TourDetailPage = () => {
       );
     } catch (error) {
       console.error('Error liking review:', error);
-      // You can show a toast notification here
     }
   };
 
@@ -468,7 +442,7 @@ const TourDetailPage = () => {
     return (
       <div className="flex flex-col w-full items-center min-h-screen">
         <Header />
-        <div className="mt-24 px-[120px] w-full flex flex-col items-center justify-center h-96">
+        <div className="mt-24 px-4 md:px-8 w-full flex flex-col items-center justify-center h-96">
           <p className="text-red-500 text-xl mb-4">{error}</p>
           <Button onClick={() => navigate('/')}>Về trang chủ</Button>
         </div>
@@ -480,7 +454,7 @@ const TourDetailPage = () => {
     return (
       <div className="flex flex-col w-full items-center min-h-screen">
         <Header />
-        <div className="mt-24 px-[120px] w-full flex flex-col items-center justify-center h-96">
+        <div className="mt-24 px-4 md:px-8 w-full flex flex-col items-center justify-center h-96">
           <p className="text-gray-500 text-xl mb-4">Không tìm thấy tour</p>
           <Button onClick={() => navigate('/')}>Về trang chủ</Button>
         </div>
@@ -490,38 +464,39 @@ const TourDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center min-h-screen space-y-10">
+    <div className="flex flex-col w-full items-center min-h-screen space-y-6 md:space-y-10">
       <Header />
-      <div className="mt-24 px-[120px] w-full flex flex-col space-y-2">
+      {/* Container chính: Thay đổi px-[120px] thành responsive */}
+      <div className="mt-24 px-4 md:px-8 lg:px-[120px] w-full flex flex-col space-y-2 md:space-y-4">
         {/*Title*/}
-        <div className="flex text-black text-3xl font-semibold font-['Inter'] flex-wrap">
+        <div className="flex text-black text-2xl md:text-3xl font-semibold font-['Inter'] flex-wrap">
           {tour.title}
         </div>
         {/*Rating & Action*/}
-        <div className="flex justify-between w-[650px] font-['Inter'] mt-5 h-10 items-center">
+        <div className="flex flex-col md:flex-row justify-between w-full lg:max-w-[650px] font-['Inter'] mt-2 md:mt-5 h-auto md:h-10 items-start md:items-center gap-4 md:gap-0">
           <div className="flex items-center space-x-2">
             <RatingDisplay rating={rating} />
             <p className="text-black font-light font-['Inter']">
               ({reviews.length} đánh giá)
             </p>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
             <Button
-              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1"
+              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0"
               onClick={handleShare}
             >
               <Share2 size={16} />
               <p className="font-['Inter']">Chia sẻ</p>
             </Button>
             <Button
-              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1"
+              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0"
               onClick={handleWriteReview}
             >
               <PenLine size={16} />
               <p className="font-['Inter']">Đánh giá</p>
             </Button>
             <Button
-              className={`${isFavorite ? 'bg-[#26B8ED] text-white' : 'hover:bg-gray-200 bg-gray-100 text-primary'} flex items-center space-x-1`}
+              className={`${isFavorite ? 'bg-[#26B8ED] text-white' : 'hover:bg-gray-200 bg-gray-100 text-primary'} flex items-center space-x-1 shrink-0`}
               onClick={handleSave}
               disabled={isSavingFavorite || !user}
             >
@@ -532,42 +507,37 @@ const TourDetailPage = () => {
             </Button>
           </div>
         </div>
-        {/*Small Gallery*/}
-        <div className="flex w-full justify-between space-x-2">
+        
+        {/*Small Gallery: Responsive Grid*/}
+        <div className="flex flex-col md:flex-row w-full justify-between gap-2 md:space-x-2">
+          {/* Main Image */}
           <img
-            className="w-2/3 h-[500px] rounded-tl-2xl rounded-bl-2xl cursor-pointer"
+            className="w-full md:w-2/3 h-[300px] md:h-[500px] rounded-2xl md:rounded-l-2xl md:rounded-r-none object-cover cursor-pointer"
             alt={`${tour.title}1`}
-            src={
-              tour.images[0] ? tour.images[0] : "https://placehold.co/795x500"
-            }
+            src={tour.images[0] ? tour.images[0] : "https://placehold.co/795x500"}
             onClick={() => clickGallery(0)}
           />
-          <div className="flex w-1/3 flex-col justify-between space-y-2">
+          {/* Side Images */}
+          <div className="flex flex-row md:flex-col w-full md:w-1/3 justify-between gap-2 md:space-y-2">
             <img
-              className="w-full h-[245px] rounded-tr-2xl cursor-pointer"
+              className="w-1/2 md:w-full h-[150px] md:h-[245px] rounded-l-2xl md:rounded-bl-none md:rounded-tr-2xl object-cover cursor-pointer"
               alt={`${tour.title}2`}
-              src={
-                tour.images[1] ? tour.images[1] : "https://placehold.co/400x245"
-              }
+              src={tour.images[1] ? tour.images[1] : "https://placehold.co/400x245"}
               onClick={() => clickGallery(1)}
             />
             <div
-              className="relative h-full cursor-pointer"
+              className="relative w-1/2 md:w-full h-[150px] md:h-[245px] cursor-pointer"
               onClick={() => clickGallery(2)}
             >
               <img
-                className="w-full h-[245px] rounded-br-2xl"
+                className="w-full h-full rounded-r-2xl md:rounded-tr-none md:rounded-br-2xl object-cover"
                 alt={`${tour.title}3`}
-                src={
-                  tour.images[2]
-                    ? tour.images[2]
-                    : "https://placehold.co/400x245"
-                }
+                src={tour.images[2] ? tour.images[2] : "https://placehold.co/400x245"}
               />
               {/*Overlay*/}
               {tour.images.length > 3 && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-br-2xl">
-                  <span className="text-white text-4xl font-bold">
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-r-2xl md:rounded-tr-none md:rounded-br-2xl">
+                  <span className="text-white text-3xl md:text-4xl font-bold">
                     +{tour.images.length - 3}
                   </span>
                 </div>
@@ -575,26 +545,26 @@ const TourDetailPage = () => {
             </div>
           </div>
         </div>
+
         {/*Gallery Modal*/}
-        {
-          showGallery && (
-            <ImageGallery
-              target={targetGallery}
-              currentIndex={startImageIndex}
-              onClose={() => setShowGallery(false)}
-            />
-          )
-        }
+        {showGallery && (
+          <ImageGallery
+            target={targetGallery}
+            currentIndex={startImageIndex}
+            onClose={() => setShowGallery(false)}
+          />
+        )}
+
         {/*Overview & Details & Booking*/}
         <div className="relative">
-          {/* Sticky Secondary Navbar */}
+          {/* Sticky Secondary Navbar - Hidden on mobile, visible on md+ */}
           <div
-            className={`fixed top-0 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${showStickyNav
+            className={`hidden md:block fixed top-0 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${showStickyNav
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 -translate-y-100 pointer-events-none"
               }`}
           >
-            <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14">
               {/* Tabs */}
               <div className="flex gap-6 text-sm font-medium h-full">
                 {tabs.map((tab) => (
@@ -604,7 +574,7 @@ const TourDetailPage = () => {
                     className={`${sectionChosen === tab.id
                       ? "text-primary border-b-2 border-primary"
                       : "text-black"
-                      } w-[100px] h-full hover:bg-primary hover:text-white font-['Inter'] font-semibold`}
+                      } w-auto px-2 h-full hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
                   >
                     {tab.label}
                   </button>
@@ -613,14 +583,13 @@ const TourDetailPage = () => {
 
               {/* Price + button */}
               <div className="flex items-center gap-4">
-                <span className="font-semibold">Chỉ từ 3,000,000 ₫</span>
+                <span className="font-semibold hidden lg:inline">Chỉ từ 3,000,000 ₫</span>
                 <Button
                   className="bg-primary font-semibold border border-2 border-black text-white px-4 py-2 rounded-full hover:bg-primary/50"
                   onClick={() => {
                     const el = document.getElementById("booking");
                     if (el) {
-                      const y =
-                        el.getBoundingClientRect().top + window.scrollY - 20; // chừa cho navbar
+                      const y = el.getBoundingClientRect().top + window.scrollY - 80;
                       window.scrollTo({ top: y, behavior: "smooth" });
                     }
                   }}
@@ -631,11 +600,12 @@ const TourDetailPage = () => {
             </div>
           </div>
 
-          {/* Main Layout */}
-          <div className="max-w-7xl mx-auto px-4 py-2 grid grid-cols-1 md:grid-cols-3 gap-6 mb-40">
+          {/* Main Layout Grid */}
+          <div className="max-w-7xl mx-auto py-2 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10 md:mb-40">
             {/* Left content */}
-            <div className="col-span-2 flex flex-col">
-              <div className="flex gap-6 text-sm font-medium h-10">
+            <div className="col-span-1 lg:col-span-2 flex flex-col">
+              {/* Mobile Tabs Scrollable */}
+              <div className="flex gap-4 md:gap-6 text-sm font-medium h-10 overflow-x-auto scrollbar-hide w-full mb-4">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
@@ -643,24 +613,25 @@ const TourDetailPage = () => {
                     className={`${sectionChosen === tab.id
                       ? "text-primary border-b-2 border-primary"
                       : "text-black"
-                      } w-[100px] hover:bg-primary hover:text-white font-['Inter'] font-semibold`}
+                      } w-auto min-w-[80px] px-2 whitespace-nowrap hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
                   >
                     {tab.label}
                   </button>
                 ))}
               </div>
+              
               <section
                 id={"overview"}
-                className="rounded mt-6 px-6 font-['Inter']"
+                className="rounded mt-2 md:mt-6 px-2 md:px-6 font-['Inter']"
               >
                 <h2 className="text-xl font-bold mb-4">Về chuyến đi</h2>
-                <p className="justify-start text-black font-normal">
+                <p className="justify-start text-black font-normal leading-relaxed">
                   {tour.description}
                 </p>
                 <div className="w-full border-t border-primary my-5"></div>
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Smile className="w-5 h-5 text-gray-700" />
+                    <Smile className="w-5 h-5 text-gray-700 shrink-0" />
                     <span>
                       <strong>Độ tuổi: </strong>
                       {`${tour.age} tuổi`}
@@ -668,7 +639,7 @@ const TourDetailPage = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-gray-700" />
+                    <Users className="w-5 h-5 text-gray-700 shrink-0" />
                     <span>
                       <strong>Giới hạn nhóm:</strong> Tối đa {tour.maxGroup}{" "}
                       người/nhóm
@@ -676,14 +647,14 @@ const TourDetailPage = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-gray-700" />
+                    <Clock className="w-5 h-5 text-gray-700 shrink-0" />
                     <span>
                       <strong>Thời lượng:</strong> {tour.duration}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Languages className="w-5 h-5 text-gray-700" />
+                    <Languages className="w-5 h-5 text-gray-700 shrink-0" />
                     <span>
                       <strong>Hướng dẫn viên:</strong> {tour.languages}
                     </span>
@@ -691,7 +662,7 @@ const TourDetailPage = () => {
                 </div>
                 <div className="w-full border-t border-primary mt-5 mb-2"></div>
               </section>
-              <section id={"details"} className="rounded px-6 font-['Inter']">
+              <section id={"details"} className="rounded px-2 md:px-6 font-['Inter']">
                 <Highlights highlight={tour.highlight} />
                 <Inclusions inclusions={tour.inclusions} />
                 <Exclusions exclusions={tour.exclusions} />
@@ -709,16 +680,16 @@ const TourDetailPage = () => {
               </section>
             </div>
 
-            {/* Right sticky price card */}
-            <div id={"booking"} className="col-span-1 font-['Inter']">
-              <div className="sticky top-2 min-h-[360px] h-auto bg-white rounded-xl shadow-xl shadow-primary">
+            {/* Right sticky price card (Desktop) / Bottom flow (Mobile) */}
+            <div id={"booking"} className="col-span-1 font-['Inter'] mt-6 lg:mt-0">
+              <div className="lg:sticky lg:top-24 min-h-[360px] h-auto bg-white rounded-xl shadow-xl shadow-primary/20 border border-gray-100">
                 <div className="flex items-center font-semibold font-xl bg-primary w-full h-14 text-white rounded-t-xl p-5">
                   <p className="font-bold text-lg">
-                    Chọn ngày và số lượng hành khách
+                    Chọn ngày và số lượng
                   </p>
                 </div>
                 {/*Date and travellers*/}
-                <div className="py-5 px-4 w-full flex justify-between">
+                <div className="py-5 px-4 w-full flex flex-col sm:flex-row lg:flex-row justify-between gap-4">
                   <DateTourPicker
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
@@ -730,14 +701,16 @@ const TourDetailPage = () => {
                   />
                 </div>
                 <TicketTypePicker userTicket={userTicket} setUserTicket={setUserTicket} ticketPrices={ticketPrices} totalPrice={totalPrice} />
-                <div className="w-full flex justify-center">
-                  <Button className="flex justify-center space-x-2 w-80 text-white rounded-2xl hover:bg-primary/50 border border-2 border-gray-300">
+                <div className="w-full flex justify-center mt-4">
+                  <Button className="flex justify-center space-x-2 w-11/12 md:w-80 text-white rounded-2xl hover:bg-primary/90 border border-2 border-transparent transition shadow-lg">
                     <Ticket size={24} />
-                    <p className=" text-xl font-semibold ">Đặt chỗ ngay</p>
+                    <p className="text-lg md:text-xl font-semibold">Đặt chỗ ngay</p>
                   </Button>
                 </div>
-                <div className="w-[360px] ml-[20px] border-t border-primary my-5"></div>
-                <div></div>
+                <div className="w-full px-5">
+                   <div className="border-t border-primary my-5"></div>
+                </div>
+                
                 <div className="px-5 flex items-start text-xs gap-2 pb-5">
                   <CalendarCog className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p>
@@ -757,9 +730,10 @@ const TourDetailPage = () => {
             </div>
           </div>
         </div>
+
         {/*Itinerary*/}
         <div className="flex w-full justify-between space-x-2">
-          <section id={"itinerary"} className="h-full w-full rounded p-6">
+          <section id={"itinerary"} className="h-full w-full rounded p-2 md:p-6">
             <h2 className="text-2xl font-['Inter'] font-bold mb-4">
               Hành trình
             </h2>
@@ -770,15 +744,16 @@ const TourDetailPage = () => {
             />
           </section>
         </div>
+
         {/*Reviews*/}
         <div className="flex w-full justify-between space-x-2">
-          <section id={"reviews"} className="h-full w-full rounded p-6">
+          <section id={"reviews"} className="h-full w-full rounded p-2 md:p-6">
             <h2 className="text-2xl font-bold font-['Inter'] mb-4">Đánh giá</h2>
-            <div className="w-full flex justify-between items-start">
-              {/* Filter & Reviews */}
-              <div className="w-[800px] flex flex-col">
+            <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-8">
+              {/* Filter & Reviews List */}
+              <div className="w-full lg:flex-1 flex flex-col order-2 lg:order-1">
                 {/*Filter*/}
-                <div className="flex w-full justify-between items-center">
+                <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4 sm:gap-0">
                   <div className="flex text-lg font-semibold items-center space-x-2">
                     <Filter size={16} />
                     <p>Bộ lọc</p>
@@ -786,61 +761,61 @@ const TourDetailPage = () => {
                   <ReviewFilter value={filter} setValue={setFilter} options={options} />
                 </div>
                 {/* Reviews List */}
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-4 space-y-4">
                   {filteredReviews.map((review) => (
                     <li
                       key={review.reviewId}
-                      className="p-3 border-b border-primary rounded space-y-2"
+                      className="p-3 border-b border-primary/20 rounded space-y-3"
                     >
                       {/*General Review Info*/}
-                      <div className="w-full flex justify-between">
-                        <div className="flex-col space-y-2">
-                          <div className="flex items-center">
-                            <img
-                              src={review.userAvatar}
-                              className="w-10 h-10 rounded-full mr-3 cursor-pointer hover:border-2 border-primary"
-                              onClick={handleGoToUser}
-                            />
-                            <div className="flex-col space-y-2">
-                              <p
-                                className="font-semibold cursor-pointer hover:underline"
-                                onClick={handleGoToUser}
-                              >
-                                {review.userName}
-                              </p>
-                              <p className="italic text-sm text-gray-500">
-                                Đăng vào {formatDate(review.createdAt)}
-                              </p>
-                            </div>
-                          </div>
-                          <RatingDisplay rating={review.rate} />
-                        </div>
-                        <div
-                          className={`flex items-center h-10 space-x-2 cursor-pointer p-2 rounded-lg justify-end transition-colors ${review.liked
-                            ? 'text-white bg-primary'
-                            : 'text-primary hover:text-white hover:bg-primary'
-                            }`}
-                          onClick={() => handleLikeReview(review.reviewId)}
-                        >
-                          <ThumbsUp
-                            size={20}
-                            className={`mr-3 ${review.liked ? 'fill-white' : ''}`}
+                      <div className="w-full flex justify-between items-start">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                          <img
+                            src={review.userAvatar}
+                            className="w-10 h-10 rounded-full cursor-pointer hover:border-2 border-primary object-cover"
+                            onClick={handleGoToUser}
                           />
-                          {review.likesCount}
+                          <div className="flex-col">
+                            <p
+                              className="font-semibold cursor-pointer hover:underline text-sm md:text-base"
+                              onClick={handleGoToUser}
+                            >
+                              {review.userName}
+                            </p>
+                            <p className="italic text-xs md:text-sm text-gray-500">
+                              Đăng vào {formatDate(review.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                             <RatingDisplay rating={review.rate} />
+                             <div
+                              className={`flex items-center px-2 py-1 rounded-lg transition-colors cursor-pointer text-sm ${review.liked
+                                ? 'text-white bg-primary'
+                                : 'text-primary hover:bg-primary/10'
+                                }`}
+                              onClick={() => handleLikeReview(review.reviewId)}
+                            >
+                              <ThumbsUp
+                                size={14}
+                                className={`mr-1 ${review.liked ? 'fill-white' : ''}`}
+                              />
+                              {review.likesCount}
+                            </div>
                         </div>
                       </div>
 
-                      <p>{review.content}</p>
+                      <p className="text-sm md:text-base">{review.content}</p>
 
                       {/* Review Images */}
                       {review.images.length > 0 && (
-                        <div className="flex space-x-2 overflow-x-auto">
+                        <div className="flex space-x-2 overflow-x-auto pb-2">
                           {review.images.map((img, idx) => (
                             <img
                               key={idx}
                               src={img}
                               alt={`Review ${review.reviewId} Image ${idx + 1}`}
-                              className="w-32 h-32 object-cover rounded cursor-pointer"
+                              className="w-24 h-24 md:w-32 md:h-32 object-cover rounded cursor-pointer shrink-0"
                               onClick={() => {
                                 setStartImageIndex(idx);
                                 setTargetGallery(review.images);
@@ -854,25 +829,26 @@ const TourDetailPage = () => {
                   ))}
                 </ul>
               </div>
-              {/* Rating Summary */}
-              <div className="flex flex-col items-center space-y-5 w-[350px] h-[250px] outline outline-1 outline-primary rounded-xl bg-background p-6">
+
+              {/* Rating Summary - Moves to top on mobile via order-1, right on desktop via order-2 */}
+              <div className="w-full lg:w-[350px] order-1 lg:order-2 flex flex-col items-center space-y-5 h-auto lg:h-[250px] outline outline-1 outline-primary/30 rounded-xl bg-background p-6">
                 <div className="flex items-center justify-center space-x-2">
                   <RatingDisplay rating={rating} />
                   <p className="text-black font-light font-['Inter']">
                     ({reviews.length} đánh giá)
                   </p>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 w-full max-w-[250px]">
                   {ratingCounts.map(({ star, count }) => (
-                    <div key={star} className="flex items-center">
-                      {/* Cột sao (cố định chiều rộng để thẳng hàng) */}
-                      <div className="flex text-primary justify-end w-28 mr-2">
+                    <div key={star} className="flex items-center justify-between">
+                      {/* Cột sao */}
+                      <div className="flex text-primary">
                         {Array.from({ length: star }).map((_, i) => (
-                          <Star key={i} className="fill-primary text-primary" />
+                          <Star key={i} size={16} className="fill-primary text-primary" />
                         ))}
                       </div>
                       {/* Cột số */}
-                      <span className="font-bold">{count}</span>
+                      <span className="font-bold text-sm">{count}</span>
                     </div>
                   ))}
                 </div>
@@ -885,7 +861,7 @@ const TourDetailPage = () => {
         <Footer />
       </div>
 
-      {/* Review Dialog */}
+      {/* Dialogs */}
       <ReviewDialog
         open={openReviewDialog}
         setOpen={setOpenReviewDialog}
@@ -895,14 +871,10 @@ const TourDetailPage = () => {
         tourDescription={tour?.description}
         attractionIds={tourStop.map((stop) => stop.attractionId).filter(Boolean)}
         onSuccess={() => {
-          // Refresh reviews after successful submission
-          if (id) {
-            refreshReviews();
-          }
+          if (id) refreshReviews();
         }}
       />
 
-      {/* Share Dialog */}
       {tour && (
         <ShareDialog
           open={openShareDialog}

@@ -53,7 +53,7 @@ import { useToast } from "@/contexts/ToastContext";
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, token, updateUser } = useAuth();
+  const { user, token } = useAuth();
   const { showToast } = useToast();
   ///////////////////// Fetch /////////////////////
   const [tour, setTour] = useState<TourDetail | null>(null);
@@ -291,10 +291,6 @@ const TourDetailPage = () => {
             : 'Đã xóa khỏi danh sách yêu thích',
           'success'
         );
-
-        if (user && updateUser && response.data.favoriteTours) {
-          updateUser({ ...user, favoriteTours: response.data.favoriteTours });
-        }
       } else {
         showToast(response.message || 'Thất bại khi lưu tour', 'error');
       }
@@ -306,13 +302,39 @@ const TourDetailPage = () => {
     }
   };
 
+  // Check favorite status on mount or when tour/token changes
   useEffect(() => {
-    if (user && user.favoriteTours && id) {
-      setIsFavorite(user.favoriteTours.includes(id));
-    } else {
-      setIsFavorite(false);
-    }
-  }, [user, id]);
+    let isMounted = true;
+
+    const fetchFavoriteStatus = async () => {
+      if (!token || !id) {
+        if (isMounted) {
+          setIsFavorite(false);
+        }
+        return;
+      }
+
+      try {
+        const response = await UserAPI.getFavoriteTours(token);
+        if (response.success && response.data && isMounted) {
+          const isFav = response.data.some(
+            (favoriteTour: any) =>
+              favoriteTour.tourId === id ||
+              favoriteTour.id === id
+          );
+          setIsFavorite(isFav);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    fetchFavoriteStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, id]);
 
   ///////////////////// Gallery /////////////////////
   const [showGallery, setShowGallery] = useState(false);
@@ -502,12 +524,14 @@ const TourDetailPage = () => {
             >
               <Bookmark size={16} className={isFavorite ? 'fill-white' : ''} />
               <p className="font-['Inter']">
-                {isSavingFavorite ? 'Đang lưu...' : isFavorite ? 'Đã lưu' : 'Lưu'}
+                {isSavingFavorite
+                  ? isFavorite ? 'Đang bỏ lưu...' : 'Đang lưu...'
+                  : isFavorite ? 'Đã lưu' : 'Lưu'}
               </p>
             </Button>
           </div>
         </div>
-        
+
         {/*Small Gallery: Responsive Grid*/}
         <div className="flex flex-col md:flex-row w-full justify-between gap-2 md:space-x-2">
           {/* Main Image */}
@@ -619,7 +643,7 @@ const TourDetailPage = () => {
                   </button>
                 ))}
               </div>
-              
+
               <section
                 id={"overview"}
                 className="rounded mt-2 md:mt-6 px-2 md:px-6 font-['Inter']"
@@ -708,9 +732,9 @@ const TourDetailPage = () => {
                   </Button>
                 </div>
                 <div className="w-full px-5">
-                   <div className="border-t border-primary my-5"></div>
+                  <div className="border-t border-primary my-5"></div>
                 </div>
-                
+
                 <div className="px-5 flex items-start text-xs gap-2 pb-5">
                   <CalendarCog className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p>
@@ -788,20 +812,20 @@ const TourDetailPage = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                             <RatingDisplay rating={review.rate} />
-                             <div
-                              className={`flex items-center px-2 py-1 rounded-lg transition-colors cursor-pointer text-sm ${review.liked
-                                ? 'text-white bg-primary'
-                                : 'text-primary hover:bg-primary/10'
-                                }`}
-                              onClick={() => handleLikeReview(review.reviewId)}
-                            >
-                              <ThumbsUp
-                                size={14}
-                                className={`mr-1 ${review.liked ? 'fill-white' : ''}`}
-                              />
-                              {review.likesCount}
-                            </div>
+                          <RatingDisplay rating={review.rate} />
+                          <div
+                            className={`flex items-center px-2 py-1 rounded-lg transition-colors cursor-pointer text-sm ${review.liked
+                              ? 'text-white bg-primary'
+                              : 'text-primary hover:bg-primary/10'
+                              }`}
+                            onClick={() => handleLikeReview(review.reviewId)}
+                          >
+                            <ThumbsUp
+                              size={14}
+                              className={`mr-1 ${review.liked ? 'fill-white' : ''}`}
+                            />
+                            {review.likesCount}
+                          </div>
                         </div>
                       </div>
 

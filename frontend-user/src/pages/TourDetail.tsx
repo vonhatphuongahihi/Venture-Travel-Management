@@ -55,7 +55,7 @@ import { useToast } from "@/contexts/ToastContext";
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, token, updateUser } = useAuth();
+  const { user, token } = useAuth();
   const { showToast } = useToast();
   ///////////////////// Fetch /////////////////////
   const [tour, setTour] = useState<TourDetail | null>(null);
@@ -304,10 +304,6 @@ const TourDetailPage = () => {
           'success'
         );
 
-        // Update user context if favoriteTours is available
-        if (user && updateUser && response.data.favoriteTours) {
-          updateUser({ ...user, favoriteTours: response.data.favoriteTours });
-        }
       } else {
         showToast(response.message || 'Thất bại khi lưu tour', 'error');
       }
@@ -319,14 +315,39 @@ const TourDetailPage = () => {
     }
   };
 
-  // Check if tour is favorite when component mounts or user changes
+  // Check favorite status on mount or when tour/token changes
   useEffect(() => {
-    if (user && user.favoriteTours && id) {
-      setIsFavorite(user.favoriteTours.includes(id));
-    } else {
-      setIsFavorite(false);
-    }
-  }, [user, id]);
+    let isMounted = true;
+
+    const fetchFavoriteStatus = async () => {
+      if (!token || !id) {
+        if (isMounted) {
+          setIsFavorite(false);
+        }
+        return;
+      }
+
+      try {
+        const response = await UserAPI.getFavoriteTours(token);
+        if (response.success && response.data && isMounted) {
+          const isFav = response.data.some(
+            (favoriteTour: any) =>
+              favoriteTour.tourId === id ||
+              favoriteTour.id === id
+          );
+          setIsFavorite(isFav);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    fetchFavoriteStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, id]);
 
   ///////////////////// Gallery /////////////////////
   const [showGallery, setShowGallery] = useState(false);
@@ -527,7 +548,9 @@ const TourDetailPage = () => {
             >
               <Bookmark size={16} className={isFavorite ? 'fill-white' : ''} />
               <p className="font-['Inter']">
-                {isSavingFavorite ? 'Đang lưu...' : isFavorite ? 'Đã lưu' : 'Lưu'}
+                {isSavingFavorite
+                  ? isFavorite ? 'Đang bỏ lưu...' : 'Đang lưu...'
+                  : isFavorite ? 'Đã lưu' : 'Lưu'}
               </p>
             </Button>
           </div>

@@ -203,7 +203,6 @@ export class UserService {
           lastLogin: true,
           createdAt: true,
           updatedAt: true,
-          favoriteTours: true,
         },
       });
 
@@ -232,45 +231,40 @@ export class UserService {
         return ResponseUtils.error("Tour không tồn tại");
       }
 
-      // Get current user with favorite tours
-      const user = await prisma.user.findUnique({
-        where: { userId: userId },
-        select: { favoriteTours: true },
-      });
-
-      if (!user) {
-        return ResponseUtils.error("Người dùng không tồn tại");
-      }
-
-      // Toggle favorite tour
-      const currentFavorites = user.favoriteTours || [];
-      const isFavorite = currentFavorites.includes(tourId);
-
-      let newFavorites: string[];
-      if (isFavorite) {
-        // Remove from favorites
-        newFavorites = currentFavorites.filter((id) => id !== tourId);
-      } else {
-        // Add to favorites
-        newFavorites = [...currentFavorites, tourId];
-      }
-
-      // Update user
-      const updatedUser = await prisma.user.update({
-        where: { userId: userId },
-        data: { favoriteTours: newFavorites },
-        select: {
-          favoriteTours: true,
+      // Check if already in favorites
+      const existingFavorite = await prisma.favoriteTour.findUnique({
+        where: {
+          userId_tourId: {
+            userId: userId,
+            tourId: tourId,
+          },
         },
       });
 
-      return ResponseUtils.success(
-        isFavorite ? "Đã xóa khỏi danh sách yêu thích" : "Đã thêm vào danh sách yêu thích",
-        {
-          favoriteTours: updatedUser.favoriteTours,
-          isFavorite: !isFavorite,
-        }
-      );
+      if (existingFavorite) {
+        // Remove from favorites
+        await prisma.favoriteTour.delete({
+          where: {
+            favoriteId: existingFavorite.favoriteId,
+          },
+        });
+
+        return ResponseUtils.success("Đã xóa khỏi danh sách yêu thích", {
+          isFavorite: false,
+        });
+      } else {
+        // Add to favorites
+        await prisma.favoriteTour.create({
+          data: {
+            userId: userId,
+            tourId: tourId,
+          },
+        });
+
+        return ResponseUtils.success("Đã thêm vào danh sách yêu thích", {
+          isFavorite: true,
+        });
+      }
     } catch (error) {
       return ResponseUtils.error(
         "Thất bại khi cập nhật tour yêu thích",
@@ -282,42 +276,34 @@ export class UserService {
   // Get favorite tours with details
   static async getFavoriteTours(userId: string) {
     try {
-      const user = await prisma.user.findUnique({
+      // Get user's favorite tours from junction table
+      const favoriteTours = await prisma.favoriteTour.findMany({
         where: { userId: userId },
-        select: { favoriteTours: true },
-      });
-
-      if (!user) {
-        return ResponseUtils.error("Người dùng không tồn tại");
-      }
-
-      const favoriteTourIds = user.favoriteTours || [];
-
-      if (favoriteTourIds.length === 0) {
-        return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", []);
-      }
-
-      // Get tour details
-      const favoriteTours = await prisma.tour.findMany({
-        where: {
-          tourId: { in: favoriteTourIds },
-          isActive: true,
-        },
-        select: {
-          tourId: true,
-          name: true,
-          images: true,
-          about: true,
-          duration: true,
-          categories: true,
-          createdAt: true,
+        include: {
+          tour: {
+            select: {
+              tourId: true,
+              name: true,
+              images: true,
+              about: true,
+              duration: true,
+              categories: true,
+              createdAt: true,
+              isActive: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',
         },
       });
 
-      return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", favoriteTours);
+      // Filter only active tours and map to tour data
+      const activeTours = favoriteTours
+        .filter(fav => fav.tour.isActive)
+        .map(fav => fav.tour);
+
+      return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", activeTours);
     } catch (error) {
       return ResponseUtils.error(
         "Lấy danh sách tour yêu thích thất bại",

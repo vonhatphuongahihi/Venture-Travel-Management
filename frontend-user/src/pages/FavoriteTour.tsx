@@ -117,36 +117,58 @@ const FavoriteTourPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 flex flex-col">
             <Header />
 
-            <main className="flex-1 container mx-auto px-4 py-8 md:py-12">
+            <main className="flex-1 container mx-auto px-4 py-10 md:py-14">
                 {/* Header Section */}
-                <div className="mb-8 md:mb-12">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Heart className="w-8 h-8 text-primary fill-primary" />
-                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                            Tour Yêu Thích
-                        </h1>
+                <div className="mb-10 md:mb-14">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                                Tour Yêu Thích
+                            </h1>
+                            <p className="text-gray-600 text-lg max-w-3xl">
+                                Nơi lưu giữ những chuyến đi bạn đã đánh dấu. Quay lại bất cứ lúc nào để đặt tour chỉ với một cú nhấp.
+                            </p>
+                        </div>
+                        <div className="flex flex-col gap-3 bg-white rounded-2xl shadow-xl shadow-primary/10 px-6 py-4 border border-primary/10 max-w-xs">
+                            <span className="text-xs uppercase tracking-widest text-gray-400">Đang lưu</span>
+                            <div className="text-3xl font-bold text-primary">{favoriteTours.length}</div>
+                            <p className="text-sm text-gray-500">tour bạn yêu thích</p>
+                            <Button
+                                className="w-full bg-primary hover:bg-primary/90 text-white"
+                                onClick={() => navigate('/tour')}
+                            >
+                                Khám phá tour mới
+                            </Button>
+                        </div>
                     </div>
-                    <p className="text-gray-600 text-lg">
-                        Danh sách các tour bạn đã lưu để xem lại sau
-                    </p>
                 </div>
 
                 {/* Loading State */}
                 {loading && (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-                        <p className="text-gray-600">Đang tải danh sách tour yêu thích...</p>
+                    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        {[...Array(6)].map((_, index) => (
+                            <div key={index} className="animate-pulse rounded-2xl bg-white/80 p-6 border border-slate-100 shadow">
+                                <div className="h-40 bg-slate-200 rounded-xl mb-4" />
+                                <div className="h-4 bg-slate-200 rounded w-3/4 mb-2" />
+                                <div className="h-4 bg-slate-200 rounded w-1/2 mb-4" />
+                                <div className="space-y-2">
+                                    <div className="h-3 bg-slate-100 rounded" />
+                                    <div className="h-3 bg-slate-100 rounded w-2/3" />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
                 {/* Error State */}
                 {error && !loading && (
-                    <div className="flex flex-col items-center justify-center py-20">
+                    <div className="max-w-xl mx-auto bg-white border border-red-100 rounded-3xl p-10 text-center shadow-lg">
+                        <Heart className="w-12 h-12 text-red-400 mb-4 mx-auto" />
                         <p className="text-red-500 text-lg mb-4">{error}</p>
-                        <Button onClick={fetchFavoriteTours} variant="outline">
+                        <Button onClick={fetchFavoriteTours} className="bg-primary text-white">
                             Thử lại
                         </Button>
                     </div>
@@ -154,19 +176,21 @@ const FavoriteTourPage = () => {
 
                 {/* Empty State */}
                 {!loading && !error && favoriteTours.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <Heart className="w-24 h-24 text-gray-300 mb-6" />
-                        <h2 className="text-2xl font-bold text-gray-700 mb-2">
-                            Chưa có tour yêu thích nào
+                    <div className="max-w-3xl mx-auto text-center bg-white/90 backdrop-blur rounded-[32px] border border-slate-100 py-16 px-8 shadow-2xl shadow-primary/10">
+                        <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                            <Heart className="w-10 h-10 text-primary fill-primary/30" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-gray-800 mb-3">
+                            Bạn chưa lưu tour nào
                         </h2>
-                        <p className="text-gray-500 mb-6 max-w-md">
-                            Hãy khám phá các tour và lưu những tour bạn quan tâm để xem lại sau nhé!
+                        <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                            Hãy thêm tour yêu thích để tạo nên bộ sưu tập hành trình của riêng bạn. Lưu lại để không bỏ lỡ các ưu đãi đặc biệt!
                         </p>
                         <Button
                             onClick={() => navigate('/tour')}
-                            className="bg-primary hover:bg-primary/90 text-white"
+                            className="bg-primary hover:bg-primary/90 text-white px-8"
                         >
-                            Khám phá tour
+                            Bắt đầu khám phá
                         </Button>
                     </div>
                 )}
@@ -174,10 +198,13 @@ const FavoriteTourPage = () => {
                 {/* Tours Grid */}
                 {!loading && !error && favoriteTours.length > 0 && (
                     <>
-                        <div className="mb-6 flex items-center justify-between">
-                            <p className="text-gray-600">
-                                Bạn có <span className="font-semibold text-primary">{favoriteTours.length}</span> tour yêu thích
+                        <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                            <p className="text-gray-600 text-lg">
+                                Bạn đang lưu <span className="font-semibold text-primary">{favoriteTours.length}</span> tour yêu thích
                             </p>
+                            <span className="text-sm text-gray-500">
+                                Các tour mới nhất sẽ hiển thị trước
+                            </span>
                         </div>
 
                         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -212,17 +239,19 @@ const FavoriteTourPage = () => {
                                             availableSpots={tour.maxGroup || 20}
                                         />
                                         {/* Remove Favorite Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                handleRemoveFavorite(tour.id);
-                                            }}
-                                            className="absolute top-4 right-4 z-10 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-50 hover:scale-110 transition-all duration-200"
-                                            title="Xóa khỏi danh sách yêu thích"
-                                        >
-                                            <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-                                        </button>
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleRemoveFavorite(tour.id);
+                                                }}
+                                                className="p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-50 hover:scale-110 transition-all duration-200 border border-white"
+                                                title="Xóa khỏi danh sách yêu thích"
+                                            >
+                                                <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })}

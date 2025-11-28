@@ -113,7 +113,7 @@ export default function FilterDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-b from-white to-slate-50">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-[#26B8ED]">
             Lọc tour
@@ -130,8 +130,11 @@ export default function FilterDialog({
 
         <div className="space-y-6 py-4">
           {/* Price Range */}
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">Khoảng giá (VNĐ)</Label>
+          <div className="space-y-3 rounded-2xl border border-dashed border-primary/30 bg-white/80 p-5 shadow-sm">
+            <Label className="text-base font-semibold flex items-center gap-2">
+              <span className="inline-flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+              Khoảng giá (VNĐ)
+            </Label>
             <div className="space-y-4">
               <Slider
                 value={priceRange}
@@ -185,7 +188,7 @@ export default function FilterDialog({
           </div>
 
           {/* Duration */}
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold">Thời gian tour</Label>
             <div className="grid grid-cols-2 gap-2">
               {DURATION_OPTIONS.map((option) => (
@@ -214,7 +217,7 @@ export default function FilterDialog({
           </div>
 
           {/* Age Range */}
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold">Độ tuổi phù hợp</Label>
             <div className="grid grid-cols-2 gap-2">
               {AGE_RANGE_OPTIONS.map((option) => (
@@ -241,7 +244,7 @@ export default function FilterDialog({
           </div>
 
           {/* Group Size */}
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold">Số người</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -290,7 +293,7 @@ export default function FilterDialog({
           </div>
 
           {/* Languages */}
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold">Ngôn ngữ</Label>
             <div className="grid grid-cols-2 gap-2">
               {LANGUAGE_OPTIONS.map((language) => (
@@ -314,7 +317,7 @@ export default function FilterDialog({
           </div>
 
           {/* Start Date */}
-          <div className="space-y-3">
+          <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold">Ngày khởi hành</Label>
             <div className="relative">
               <Button

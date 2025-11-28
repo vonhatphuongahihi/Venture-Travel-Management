@@ -98,7 +98,6 @@ model Tour {
   highlights            String[]
   inclusions            String[]
   exclusions            String[]
-  bookings              bookings[]
   favoriteTours         FavoriteTour[]
   ticketTypes           TicketType[]
   reviews               TourReview[]
@@ -131,6 +130,7 @@ model TicketType {
   notes        String?
   quantity     Int
   createdAt    DateTime      @default(now()) @map("created_at")
+  bookings     bookings[]
   ticketPrices TicketPrice[]
   tour         Tour          @relation(fields: [tourId], references: [tourId])
 
@@ -148,16 +148,17 @@ model PriceCategory {
 }
 
 model TicketPrice {
-  ticketPriceId String        @id @default(uuid()) @map("ticket_price_id")
-  ticketTypeId  String        @map("ticket_type_id")
-  categoryId    String        @map("category_id")
-  notes         String?
-  price         Float
-  quantity      Int
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  priceCategory PriceCategory @relation(fields: [categoryId], references: [categoryId])
-  ticketType    TicketType    @relation(fields: [ticketTypeId], references: [ticketTypeId])
+  ticketPriceId   String            @id @default(uuid()) @map("ticket_price_id")
+  ticketTypeId    String            @map("ticket_type_id")
+  categoryId      String            @map("category_id")
+  notes           String?
+  price           Float
+  quantity        Int
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  booking_details booking_details[]
+  priceCategory   PriceCategory     @relation(fields: [categoryId], references: [categoryId])
+  ticketType      TicketType        @relation(fields: [ticketTypeId], references: [ticketTypeId])
 
   @@map("ticket_prices")
 }
@@ -198,10 +199,11 @@ model Arc {
 }
 
 model ArcPoint {
-  arcId   String @map("arc_id")
-  pointId String @map("point_id")
-  arc     Arc    @relation(fields: [arcId], references: [arcId])
-  point   Point  @relation(fields: [pointId], references: [pointId])
+  arcId    String @map("arc_id")
+  pointId  String @map("point_id")
+  sequence Int?
+  arc      Arc    @relation(fields: [arcId], references: [arcId])
+  point    Point  @relation(fields: [pointId], references: [pointId])
 
   @@id([arcId, pointId])
   @@map("arc_points")
@@ -218,6 +220,7 @@ model Polygon {
 model PolygonPoint {
   point_id   String
   polygon_id String
+  sequence   Int?
   points     Point   @relation(fields: [point_id], references: [pointId])
   polygons   Polygon @relation(fields: [polygon_id], references: [polygonId])
 
@@ -290,22 +293,34 @@ model FavoriteAttraction {
 }
 
 model bookings {
-  booking_id     String    @id @default(dbgenerated("(gen_random_uuid())::text"))
-  user_id        String
-  tour_id        String
-  booked_at      DateTime? @default(now()) @db.Timestamptz(6)
-  start_at       DateTime  @db.Timestamptz(6)
-  status         String?   @default("pending") @db.VarChar(20)
-  payment_status String?   @default("unpaid") @db.VarChar(20)
-  quantity       Int
-  note           String?
-  created_at     DateTime? @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime? @default(now()) @db.Timestamptz(6)
-  tours          Tour      @relation(fields: [tour_id], references: [tourId], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_tour")
-  users          User      @relation(fields: [user_id], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_user")
+  booking_id       String            @id
+  user_id          String
+  ticket_type_id   String
+  pickup_address   String
+  departure_date   DateTime          @db.Timestamp(6)
+  name             String
+  phone            String
+  email            String
+  status           String
+  payment_type     String
+  total_price      Float
+  special_requests String?
+  created_at       DateTime          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime          @db.Timestamp(6)
+  booking_details  booking_details[]
+  ticket_types     TicketType        @relation(fields: [ticket_type_id], references: [ticketTypeId])
+  users            User              @relation(fields: [user_id], references: [userId], map: "fk_booking_user")
+}
 
-  @@index([tour_id], map: "idx_booking_tour")
-  @@index([user_id], map: "idx_booking_user")
+model booking_details {
+  booking_detail_id String      @id
+  booking_id        String
+  ticket_price_id   String
+  quantity          Int
+  total_price       Float
+  created_at        DateTime    @default(now()) @db.Timestamp(6)
+  bookings          bookings    @relation(fields: [booking_id], references: [booking_id])
+  ticket_prices     TicketPrice @relation(fields: [ticket_price_id], references: [ticketPriceId])
 }
 
 enum Role {

@@ -32,14 +32,14 @@ export default function PickUp({
               <MapPin className="w-6 h-6 text-primary" />
               <div className="flex-col space-y-1">
                 <p className="font-semibold">Vị trí</p>
-                <p className="text-gray-500 max-w-3xl">{pickUpPoint}</p>
+                <p className="text-gray-500 max-w-3xl text-justify">{pickUpPoint}</p>
               </div>
             </div>
             <div className="flex space-x-2">
               <List className="w-6 h-6 text-primary" />
               <div className="flex-col space-y-1">
                 <p className="font-semibold">Chi tiết đón</p>
-                <p className="text-gray-500 max-w-3xl">{pickUpDetails}</p>
+                <p className="text-gray-500 max-w-3xl text-justify">{pickUpDetails}</p>
               </div>
             </div>
             <p className="font-bold">Kết thúc: </p>
@@ -47,7 +47,7 @@ export default function PickUp({
               <MapPin className="w-6 h-6 text-primary" />
               <div className="flex-col space-y-1">
                 <p className="font-semibold">Vị trí</p>
-                <p className="text-gray-500 max-w-3xl">{endPoint}</p>
+                <p className="text-gray-500 max-w-3xl text-justify">{endPoint}</p>
               </div>
             </div>
           </AccordionContent>

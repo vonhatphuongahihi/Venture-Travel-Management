@@ -54,7 +54,7 @@ const TourCard = ({
   };
 
   return (
-    <div className="tour-card group cursor-pointer" onClick={()=>{navigate(`/tour/${id}`)}}>
+    <div className="tour-card group cursor-pointer" onClick={() => { navigate(`/tour/${id}`) }}>
       {/* Image */}
       <div className="relative overflow-hidden">
         <img
@@ -122,12 +122,8 @@ const TourCard = ({
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-border flex gap-2">
-          <Button variant="tour" size="sm" className="flex-1 hover:bg-[#b2e8ff] hover:text-[#fafcff]"
-          onClick={()=>{navigate(`/tour/${id}`)}}>
+          <Button variant="default" size="sm" className="flex-1" onClick={() => { navigate(`/tour/${id}`) }}>
             Xem chi tiết
-          </Button>
-          <Button variant="default" size="sm" className="flex-1">
-            Đặt ngay
           </Button>
         </div>
       </div>

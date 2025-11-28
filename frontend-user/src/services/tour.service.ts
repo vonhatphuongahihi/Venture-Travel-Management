@@ -265,4 +265,26 @@ export const tourService = {
       return [];
     }
   },
+
+  // Get all categories
+  async getCategories(): Promise<string[]> {
+    try {
+      const response = await apiClient.get<{
+        success: boolean;
+        message: string;
+        data: {
+          categories: string[];
+        };
+      }>(API_ENDPOINTS.tours.categories);
+
+      if (response.success && response.data) {
+        return response.data.categories || [];
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+  },
 };

@@ -4,13 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { Filter, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { tourService, Tour } from "@/services/tour.service";
+import FilterDialog, { FilterOptions } from "./FilterDialog";
 
 const ToursSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isVisible, setIsVisible] = useState(false);
   const [tours, setTours] = useState<Tour[]>([]);
+  const [allTours, setAllTours] = useState<Tour[]>([]); // Store all tours for counting
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<FilterOptions>({});
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -30,7 +35,39 @@ const ToursSection = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Fetch tours from API
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesList = await tourService.getCategories();
+        setCategories(categoriesList);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch all tours once for counting (without limit)
+  useEffect(() => {
+    const fetchAllTours = async () => {
+      try {
+        const params: any = {
+          limit: 1000,
+          isActive: 'true',
+        };
+        const result = await tourService.getAllTours(params);
+        setAllTours(result.tours);
+      } catch (err) {
+        console.error('Error fetching all tours:', err);
+      }
+    };
+
+    fetchAllTours();
+  }, []);
+
+  // Fetch tours from API with filter
   useEffect(() => {
     const fetchTours = async () => {
       try {
@@ -43,17 +80,54 @@ const ToursSection = () => {
 
         // Apply category filter if not "all"
         if (activeFilter !== 'all') {
-          const categoryMap: { [key: string]: string } = {
-            "beach": "Biển đảo",
-            "cultural": "Văn hóa",
-            "mountain": "Núi rừng",
-            "city": "Thành phố"
-          };
-          params.category = categoryMap[activeFilter] || activeFilter;
+          params.category = activeFilter;
+        }
+
+        // Apply additional filters
+        if (appliedFilters.minPrice !== undefined) {
+          params.minPrice = appliedFilters.minPrice;
+        }
+        if (appliedFilters.maxPrice !== undefined) {
+          params.maxPrice = appliedFilters.maxPrice;
+        }
+        if (appliedFilters.duration) {
+          params.duration = appliedFilters.duration;
+        }
+        if (appliedFilters.ageRange) {
+          params.ageRange = appliedFilters.ageRange;
+        }
+        if (appliedFilters.minGroupSize !== undefined) {
+          params.minGroupSize = appliedFilters.minGroupSize;
+        }
+        if (appliedFilters.maxGroupSize !== undefined) {
+          params.maxGroupSize = appliedFilters.maxGroupSize;
+        }
+        if (appliedFilters.languages && appliedFilters.languages.length > 0) {
+          params.languages = appliedFilters.languages;
+        }
+        if (appliedFilters.startDate) {
+          params.startDate = appliedFilters.startDate.toISOString().split('T')[0];
         }
 
         const result = await tourService.getAllTours(params);
-        setTours(result.tours);
+
+        // Apply client-side filtering for filters not supported by API
+        let filteredTours = result.tours;
+
+        if (appliedFilters.minPrice !== undefined || appliedFilters.maxPrice !== undefined) {
+          filteredTours = filteredTours.filter((tour) => {
+            const price = tour.price || 0;
+            if (appliedFilters.minPrice !== undefined && price < appliedFilters.minPrice) {
+              return false;
+            }
+            if (appliedFilters.maxPrice !== undefined && price > appliedFilters.maxPrice) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        setTours(filteredTours);
       } catch (err) {
         console.error('Error fetching tours:', err);
         setError('Không thể tải danh sách tour');
@@ -64,28 +138,28 @@ const ToursSection = () => {
     };
 
     fetchTours();
-  }, [activeFilter]);
+  }, [activeFilter, appliedFilters]);
 
+  // Build filters from categories - use allTours for accurate counting
   const filters = [
-    { id: "all", label: "Tất cả", count: tours.length },
-    { id: "beach", label: "Biển đảo", count: tours.filter(t => t.category?.includes("Biển đảo")).length },
-    { id: "cultural", label: "Văn hóa", count: tours.filter(t => t.category?.includes("Văn hóa")).length },
-    { id: "mountain", label: "Núi rừng", count: tours.filter(t => t.category?.includes("Núi rừng")).length },
-    { id: "city", label: "Thành phố", count: tours.filter(t => t.category?.includes("Thành phố")).length },
+    { id: "all", label: "Tất cả", count: allTours.length },
+    ...categories.map((category) => ({
+      id: category,
+      label: category,
+      count: allTours.filter((t) => {
+        const tourCategories = (t as any).categories || [];
+        return t.category === category || tourCategories.includes(category);
+      }).length,
+    })),
   ];
 
-  // Count tours by category
+  // Count tours by category - use allTours for accurate counting
   const getTourCount = (filterId: string) => {
-    if (filterId === "all") return tours.length;
-
-    const categoryMap: { [key: string]: string } = {
-      "beach": "Biển đảo",
-      "cultural": "Văn hóa",
-      "mountain": "Núi rừng",
-      "city": "Thành phố"
-    };
-
-    return tours.filter(tour => tour.category === categoryMap[filterId]).length;
+    if (filterId === "all") return allTours.length;
+    return allTours.filter((tour) => {
+      const tourCategories = (tour as any).categories || [];
+      return tour.category === filterId || tourCategories.includes(filterId);
+    }).length;
   };
 
   const filteredTours = tours;
@@ -137,9 +211,25 @@ const ToursSection = () => {
 
           {/* View Controls */}
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterDialogOpen(true)}
+              className="relative"
+            >
               <Filter className="h-4 w-4 mr-2" />
               Lọc thêm
+              {Object.keys(appliedFilters).length > 0 && (
+                <span className="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full">
+                  {Object.keys(appliedFilters).filter(
+                    (key) =>
+                      appliedFilters[key as keyof FilterOptions] !== undefined &&
+                      (Array.isArray(appliedFilters[key as keyof FilterOptions])
+                        ? (appliedFilters[key as keyof FilterOptions] as any[]).length > 0
+                        : true)
+                  ).length}
+                </span>
+              )}
             </Button>
           </div>
         </div>
@@ -187,6 +277,19 @@ const ToursSection = () => {
           </Button>
         </div>
       </div>
+
+      {/* Filter Dialog */}
+      <FilterDialog
+        open={filterDialogOpen}
+        onOpenChange={setFilterDialogOpen}
+        onApply={(filters) => {
+          setAppliedFilters(filters);
+        }}
+        onReset={() => {
+          setAppliedFilters({});
+        }}
+        initialFilters={appliedFilters}
+      />
     </section>
   );
 };

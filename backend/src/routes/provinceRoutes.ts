@@ -11,3 +11,4 @@ router.get('/:slug', ProvinceController.getProvinceBySlug);
 
 export default router;
 
+

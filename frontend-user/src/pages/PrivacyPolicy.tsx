@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 function PrivacyPolicy() {
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   useEffect(() => {
+    window.scrollTo(0, 0);
     const timer = setTimeout(() => {
       setIsPageLoaded(true);
     }, 100);

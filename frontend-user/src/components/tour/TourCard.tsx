@@ -54,14 +54,18 @@ const TourCard = ({
   };
 
   return (
-    <div className="tour-card group cursor-pointer" onClick={() => { navigate(`/tour/${id}`) }}>
+    <div
+      className="tour-card group cursor-pointer rounded-2xl border border-transparent bg-white shadow-xl shadow-primary/5 hover:-translate-y-2 transition-all duration-300"
+      onClick={() => { navigate(`/tour/${id}`) }}
+    >
       {/* Image */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-2xl rounded-b-none">
         <img
           src={image}
           alt={title}
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-700"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute top-3 left-3">
           <Badge className={`tour-badge ${getStatusColor(status)}`}>
             {getStatusText(status)}
@@ -78,8 +82,8 @@ const TourCard = ({
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
-        <h3 className="text-lg font-semibold line-clamp-2 group-hover:text-primary transition-colors">
+      <div className="p-6 space-y-4">
+        <h3 className="text-xl font-semibold line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
 

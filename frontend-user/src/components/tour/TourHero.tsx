@@ -12,18 +12,19 @@ export const TourHero = ({
   children 
 }: TourHeroProps) => {
   return (
-    <div className="relative h-[763px] w-full">
+    <div className="relative h-[520px] w-full overflow-hidden">
       <img
         src={backgroundImage}
         alt="Hero background"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover scale-105"
       />
-      <div className="absolute inset-0 bg-black/13" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(84,198,238,0.35),_transparent_60%)]" />
       
       {children}
 
-      <div className="absolute bottom-[290px] left-1/2 transform -translate-x-1/2 text-center w-full px-4">
-        <h1 className="text-[42px] font-[400] text-[#54C6EE] leading-[35px] max-w-[910px] mx-auto">
+      <div className="absolute bottom-[180px] left-1/2 transform -translate-x-1/2 text-center w-full px-4">
+        <h1 className="text-[46px] md:text-[54px] font-semibold text-white leading-tight max-w-[910px] mx-auto drop-shadow-2xl">
           {title}
         </h1>
       </div>

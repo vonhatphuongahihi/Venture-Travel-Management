@@ -215,7 +215,7 @@ const ToursSection = () => {
               variant="outline"
               size="sm"
               onClick={() => setFilterDialogOpen(true)}
-              className="relative"
+              className="relative border-primary/30 hover:bg-primary/10"
             >
               <Filter className="h-4 w-4 mr-2" />
               Lọc thêm

@@ -9,7 +9,7 @@ export default function TravellerChoose({
 }) {
   const [priceCategories, setPriceCategories] = useState([]);
   useEffect(() => {
-    if(userTicket?.priceCategories && userTicket?.priceCategories.length > 0){
+    if (userTicket?.priceCategories && userTicket?.priceCategories.length > 0) {
       setPriceCategories(userTicket?.priceCategories);
       return;
     }
@@ -29,11 +29,13 @@ export default function TravellerChoose({
         createdAt: new Date("2025-09-01T10:00:00"),
       },
     ];
-    setPriceCategories(samplePriceCategories?.map((pc)=>{return {
-      ... pc,
-      quantity: 1,
-    }}));
-  },[]);
+    setPriceCategories(samplePriceCategories?.map((pc) => {
+      return {
+        ...pc,
+        quantity: 1,
+      }
+    }));
+  }, []);
   const addOne = (t) => {
     setPriceCategories((prev) =>
       prev.map((pc) =>
@@ -77,7 +79,13 @@ export default function TravellerChoose({
               </span>
               <button
                 className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400"
-                disabled={priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity === ticketPrices.find((tp)=>tp.categoryId===t.categoryId && tp.ticketTypeId===userTicket.currentType.ticketTypeId).quantity} 
+                disabled={
+                  priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity ===
+                  ticketPrices.find((tp) =>
+                    tp.categoryId === t.categoryId &&
+                    tp.ticketTypeId === userTicket.currentType?.ticketTypeId
+                  )?.quantity
+                }
                 onClick={() => addOne(t)}
               >
                 +
@@ -88,7 +96,7 @@ export default function TravellerChoose({
       })}
       <Button
         className="w-full bg-primary rounded-lg text-white hover:bg-[#0891B2] mt-5"
-        onClick={()=>onConfirm(priceCategories)}
+        onClick={() => onConfirm(priceCategories)}
       >
         Xác nhận
       </Button>

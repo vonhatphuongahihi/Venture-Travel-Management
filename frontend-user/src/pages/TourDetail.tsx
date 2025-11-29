@@ -56,7 +56,7 @@ const TourDetailPage = () => {
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
   const { showToast } = useToast();
-  const [requireDialogOpen, setRequireDialogOpen] = useState(false)
+  const [requireDialogOpen, setRequireDialogOpen] = useState(false);
   ///////////////////// Fetch /////////////////////
   const [tour, setTour] = useState<TourDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -461,15 +461,15 @@ const TourDetailPage = () => {
   };
 
   const handleGoToUser = () => { };
-  const isValidTickets = (tickets : {
-    currentType: TicketType | null,
-    priceCategories: any[],
-  }) =>{
+  const isValidTickets = (tickets: {
+    currentType: TicketType | null;
+    priceCategories: any[];
+  }) => {
     if (!tickets || !Array.isArray(tickets.priceCategories)) {
       return false;
     }
     return tickets?.priceCategories.some(item => item.quantity >= 1);
-  }
+  };
 
   if (loading) return <Loading />;
   if (error) {
@@ -530,11 +530,10 @@ const TourDetailPage = () => {
               <p className="font-['Inter']">Đánh giá</p>
             </Button>
             <Button
-              className={`${
-                isFavorite
-                  ? "bg-[#26B8ED] text-white"
-                  : "hover:bg-gray-200 bg-gray-100 text-primary"
-              } flex items-center space-x-1 shrink-0`}
+              className={`${isFavorite
+                ? "bg-[#26B8ED] text-white"
+                : "hover:bg-gray-200 bg-gray-100 text-primary"
+                } flex items-center space-x-1 shrink-0`}
               onClick={handleSave}
               disabled={isSavingFavorite || !user}
             >
@@ -545,8 +544,8 @@ const TourDetailPage = () => {
                     ? "Đang bỏ lưu..."
                     : "Đang lưu..."
                   : isFavorite
-                  ? "Đã lưu"
-                  : "Lưu"}
+                    ? "Đã lưu"
+                    : "Lưu"}
               </p>
             </Button>
           </div>
@@ -611,11 +610,10 @@ const TourDetailPage = () => {
         <div className="relative">
           {/* Sticky Secondary Navbar - Hidden on mobile, visible on md+ */}
           <div
-            className={`hidden md:block fixed top-0 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${
-              showStickyNav
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 -translate-y-100 pointer-events-none"
-            }`}
+            className={`hidden md:block fixed top-0 left-0 w-full bg-white shadow z-10 transition-all duration-300 ease-out ${showStickyNav
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-100 pointer-events-none"
+              }`}
           >
             <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14">
               {/* Tabs */}
@@ -624,11 +622,10 @@ const TourDetailPage = () => {
                   <button
                     key={tab.id}
                     onClick={() => scrollToSection(tab.id)}
-                    className={`${
-                      sectionChosen === tab.id
-                        ? "text-primary border-b-2 border-primary"
-                        : "text-black"
-                    } w-auto px-2 h-full hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
+                    className={`${sectionChosen === tab.id
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-black"
+                      } w-auto px-2 h-full hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
                   >
                     {tab.label}
                   </button>
@@ -641,7 +638,7 @@ const TourDetailPage = () => {
                   Chỉ từ 3,000,000 ₫
                 </span>
                 <Button
-                  className="bg-primary font-semibold border border-2 border-black text-white px-4 py-2 rounded-full hover:bg-primary/50"
+                  className="bg-primary font-semibold border-2 border-black text-white px-4 py-2 rounded-full hover:bg-primary/50"
                   onClick={() => {
                     const el = document.getElementById("booking");
                     if (el) {
@@ -667,11 +664,10 @@ const TourDetailPage = () => {
                   <button
                     key={tab.id}
                     onClick={() => scrollToSection(tab.id)}
-                    className={`${
-                      sectionChosen === tab.id
-                        ? "text-primary border-b-2 border-primary"
-                        : "text-black"
-                    } w-auto min-w-[80px] px-2 whitespace-nowrap hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
+                    className={`${sectionChosen === tab.id
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-black"
+                      } w-auto min-w-[80px] px-2 whitespace-nowrap hover:bg-primary hover:text-white font-['Inter'] font-semibold transition-colors`}
                   >
                     {tab.label}
                   </button>
@@ -796,37 +792,37 @@ const TourDetailPage = () => {
                   </div>
                 )}
                 <div className="w-full flex justify-center mt-6 px-4">
-                  {isAuthenticated ? 
-                  <Button
-                    onClick={() => {
-                      if (!isValidTickets(userTicket)) {
-                        showToast("Vui lòng chọn số lượng hành khách", "error");
-                        return;
-                      }
-                      // Đã chọn vé + đăng nhập -> đi
-                      window.scrollTo(0, 0);
-                      navigate("/book-tour", {
-                        state: {
-                          tour,
-                          ticketPrices,
-                          userTicket,
-                          selectedDate,
-                          totalPrice
-                        },
-                      });
-                    }}
-                    className="flex justify-center items-center space-x-2 w-full text-white rounded-xl hover:bg-primary/90 border-2 border-transparent transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] bg-gradient-to-r from-primary to-primary/90 py-6"
-                  >
-                    <Ticket size={24} />
-                    <p className="text-lg md:text-xl font-semibold">
-                      Đặt chỗ ngay
-                    </p>
-                  </Button>:
-                  <RequireSignIn
-                    redirectLink ={`/tour/${tour.id}`}
-                    open={requireDialogOpen}
-                    setOpen={setRequireDialogOpen}
-                  />}
+                  {isAuthenticated ?
+                    <Button
+                      onClick={() => {
+                        if (!isValidTickets(userTicket)) {
+                          showToast("Vui lòng chọn số lượng hành khách", "error");
+                          return;
+                        }
+                        // Đã chọn vé + đăng nhập -> đi
+                        window.scrollTo(0, 0);
+                        navigate("/book-tour", {
+                          state: {
+                            tour,
+                            ticketPrices,
+                            userTicket,
+                            selectedDate,
+                            totalPrice
+                          },
+                        });
+                      }}
+                      className="flex justify-center items-center space-x-2 w-full text-white rounded-xl hover:bg-primary/90 border-2 border-transparent transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] bg-gradient-to-r from-primary to-primary/90 py-6"
+                    >
+                      <Ticket size={24} />
+                      <p className="text-lg md:text-xl font-semibold">
+                        Đặt chỗ ngay
+                      </p>
+                    </Button> :
+                    <RequireSignIn
+                      redirectLink={`/tour/${tour.id}`}
+                      open={requireDialogOpen}
+                      setOpen={setRequireDialogOpen}
+                    />}
                 </div>
                 <div className="w-full px-5 mt-6">
                   <div className="border-t border-gray-200"></div>
@@ -924,18 +920,16 @@ const TourDetailPage = () => {
                         <div className="flex flex-col items-end gap-1">
                           <RatingDisplay rating={review.rate} />
                           <div
-                            className={`flex items-center px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer text-sm font-medium ${
-                              review.liked
-                                ? "text-white bg-primary shadow-md"
-                                : "text-primary hover:bg-primary/10 hover:shadow-sm"
-                            }`}
+                            className={`flex items-center px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer text-sm font-medium ${review.liked
+                              ? "text-white bg-primary shadow-md"
+                              : "text-primary hover:bg-primary/10 hover:shadow-sm"
+                              }`}
                             onClick={() => handleLikeReview(review.reviewId)}
                           >
                             <ThumbsUp
                               size={14}
-                              className={`mr-1.5 ${
-                                review.liked ? "fill-white" : ""
-                              }`}
+                              className={`mr-1.5 ${review.liked ? "fill-white" : ""
+                                }`}
                             />
                             {review.likesCount}
                           </div>

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar, DollarSign, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/contexts/ToastContext";
+import PickupAddressSelector from "@/components/booking/PickupAddressSelector";
 
 export default function BookTourNew() {
   const { state } = useLocation();
@@ -41,7 +42,7 @@ export default function BookTourNew() {
     }
     const booking = {
       user_id: user.userId,
-      ticket_type_id: userTicket.currentType.ticket_type_id,
+      ticket_type_id: userTicket.currentType.ticketTypeId,
       pickup_address: pickUpPoint,
       departure_date: selectedDate,
       name: fullname,
@@ -96,17 +97,26 @@ export default function BookTourNew() {
                   className="mt-2"
                 />
               </Label>
-              <Label>
-                Chọn điểm đón <span className="text-red-500">*</span>
-                <Input
-                  required
-                  type="text"
-                  placeholder="Chọn điểm đón"
+              {tour?.pickUpAreaGeom && tour.pickUpAreaGeom.length > 0 ? (
+                <PickupAddressSelector
+                  pickupAreaGeom={tour.pickUpAreaGeom}
+                  pickupPointGeom={tour.pickUpPointGeom || [0, 0]}
                   value={pickUpPoint}
-                  onChange={(e) => setPickup(e.target.value)}
-                  className="mt-2"
+                  onChange={setPickup}
                 />
-              </Label>
+              ) : (
+                <Label>
+                  Chọn điểm đón <span className="text-red-500">*</span>
+                  <Input
+                    required
+                    type="text"
+                    placeholder="Nhập địa chỉ đón khách"
+                    value={pickUpPoint}
+                    onChange={(e) => setPickup(e.target.value)}
+                    className="mt-2"
+                  />
+                </Label>
+              )}
               <Label>
                 Ghi chú
                 <Textarea

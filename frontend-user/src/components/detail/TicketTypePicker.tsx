@@ -14,25 +14,14 @@ function TicketTypePicker({
     // Lấy các ticketTypes từ ticketTypeId trong ticketPrices (mảng types)
     const sampleTicketTypes: TicketType[] = [
       {
-        ticketTypeId: "tt_001",
-        tourId: "tour_12345", // FK -> tours.tour_id
-        name: "Vé VIP 2N1D",
-        notes: "Khách sạn 5 sao, cabin ban công riêng",
-        quantity: 50,
-        price: 9000000,
+        ticketTypeId: "ab2c9dd9-2638-455f-ad39-622b88681bb8",
+        tourId: "05520fbe-21f9-4e04-9dc1-4ccf19b8614d", // FK -> tours.tour_id
+        name: "Vé thường",
+        notes: "Đã bao gồm đón khách",
+        quantity: 20,
         isActive: true,
         createdAt: new Date("2025-09-01T10:00:00"), // ISO timestamp}
-      },
-      {
-        ticketTypeId: "tt_002",
-        tourId: "tour_12345", // FK -> tours.tour_id
-        name: "Vé Thường 2N1D",
-        notes: "Trọn gói 2 ngày 1 đêm",
-        quantity: 50,
-        price: 6500000,
-        isActive: true,
-        createdAt: new Date("2025-09-01T10:00:00"), // ISO timestamp}
-      },
+      }
     ];
     setTicketTypes(sampleTicketTypes);
     setCurrentTicketTypes(sampleTicketTypes[0]);
@@ -97,9 +86,6 @@ function TicketTypePicker({
           </div>
         );
       })}
-      <div className="flex justify-between font-semibold text-lg my-4">
-        <span>Tổng giá tiền: {totalPrice.toLocaleString("vi-VN")}₫</span>
-      </div>
     </div>
   );
 }

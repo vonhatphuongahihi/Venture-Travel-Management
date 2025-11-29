@@ -17,15 +17,15 @@ export default function TravellerChoose({
     // Lấy các priceCategory từ categoryId trong ticketPrices (mảng categories)
     const samplePriceCategories: PriceCategories[] = [
       {
-        categoryId: "pc_001",
+        categoryId: "7537ef0a-c7fb-4a05-ab33-f4b2ab4033cf",
         name: "Người lớn",
-        description: "Từ 12 tuổi trở lên",
+        description: "Trên 140cm",
         createdAt: new Date("2025-09-01T10:00:00"),
       },
       {
-        categoryId: "pc_002",
+        categoryId: "ef0e08ba-f086-45b9-8976-203dddbcd9ae",
         name: "Trẻ em",
-        description: "Từ 5 đến dưới 12 tuổi",
+        description: "Dưới 140cm",
         createdAt: new Date("2025-09-01T10:00:00"),
       },
     ];
@@ -52,10 +52,10 @@ export default function TravellerChoose({
       )
     );
   };
+
   return (
     <div
       className="w-[400px] bg-white rounded-lg outline outline-1 outline-primary p-5"
-      onClick={() => {}}
     >
       {priceCategories?.map((t, i) => {
         return (
@@ -77,7 +77,7 @@ export default function TravellerChoose({
               </span>
               <button
                 className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400"
-                disabled={priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity === 15} // Giới hạn tối đa 15 người 1 lần :)
+                disabled={priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity === ticketPrices.find((tp)=>tp.categoryId===t.categoryId && tp.ticketTypeId===userTicket.currentType.ticketTypeId).quantity} 
                 onClick={() => addOne(t)}
               >
                 +

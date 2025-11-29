@@ -82,7 +82,6 @@ export interface TicketType { // Thường, Cao cấp, ...
   name: string;
   notes?: string;
   quantity: number;
-  price: number;
   isActive: boolean;
   createdAt: Date; // ISO timestamp
 }
@@ -101,7 +100,6 @@ export interface TicketPrices{
   notes?: string;
   price: number;
   quantity: number;
-  isActive: boolean;
   createdAt: Date;
   updatedAt?: Date;
 }

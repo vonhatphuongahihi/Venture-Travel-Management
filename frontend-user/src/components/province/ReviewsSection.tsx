@@ -11,12 +11,15 @@ import {
 import { mockReviews } from "@/data/reviews";
 import ReviewCard from "./ReviewCard";
 
+import { useProvinceReviews } from "@/hooks/useProvince";
+
 interface ReviewsSectionProps {
   province: Province;
 }
 
 const ReviewsSection = ({ province }: ReviewsSectionProps) => {
-  const [reviews, setReviews] = React.useState<Review[]>(mockReviews);
+  const { data: reviewsData } = useProvinceReviews(province.id);
+  const reviews = reviewsData?.data || [];
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -45,10 +48,10 @@ const ReviewsSection = ({ province }: ReviewsSectionProps) => {
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-6">
-        Đánh giá về các hoạt động ở {province.name}
+        Đánh giá về các tour ở {province.name}
       </h2>
 
-      <Carousel
+      {reviews.length > 0 ? <Carousel
         opts={{
           align: "start",
         }}
@@ -64,7 +67,7 @@ const ReviewsSection = ({ province }: ReviewsSectionProps) => {
         </CarouselContent>
         {canScrollPrev && <CarouselPrevious />}
         {canScrollNext && <CarouselNext />}
-      </Carousel>
+      </Carousel> : <p>Không có đánh giá nào</p>}
     </section>
   );
 };

@@ -126,6 +126,7 @@ const TourDetailPage = () => {
         pickUpPoint: tourData.pickUpPoint,
         pickUpDetails: tourData.pickUpDetails,
         pickUpPointGeom: tourData.pickUpPointGeom,
+        pickUpAreaGeom: tourData.pickUpAreaGeom || [],
         endPoint: tourData.endPoint || '',
         endPointGeom: tourData.endPointGeom,
         additionalInfo: tourData.additionalInfo || '',
@@ -742,6 +743,8 @@ const TourDetailPage = () => {
                   id={"pickUp"}
                   pickUpPoint={tour.pickUpPoint}
                   pickUpDetails={tour.pickUpDetails}
+                  pickUpPointGeom={tour.pickUpPointGeom}
+                  pickUpAreaGeom={tour.pickUpAreaGeom}
                   endPoint={tour.endPoint}
                   open={puOpen}
                   setOpen={setPUOpen}

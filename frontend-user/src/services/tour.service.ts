@@ -194,6 +194,9 @@ export const tourService = {
           pickUpPointGeom: tour.pickupCoordinates ?
             [tour.pickupCoordinates.lon || 0, tour.pickupCoordinates.lat || 0] :
             [0, 0],
+          pickUpAreaGeom: tour.pickupAreaCoordinates ?
+            tour.pickupAreaCoordinates.map((coord: any) => [coord.lon, coord.lat] as [number, number]) :
+            [],
           endPoint: tour.endPoint || '',
           endPointGeom: tour.endCoordinates ?
             [tour.endCoordinates.lon || 0, tour.endCoordinates.lat || 0] :

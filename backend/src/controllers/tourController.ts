@@ -183,6 +183,15 @@ export class TourController {
                     },
                     pickup: true,
                     end: true,
+                    pickupArea: {
+                        include: {
+                            polygon_points: {
+                                include: {
+                                    points: true,
+                                },
+                            },
+                        },
+                    },
                 },
             });
 
@@ -273,6 +282,14 @@ export class TourController {
                     lat: tour.end.latitude,
                     lon: tour.end.longitude,
                 } : null,
+                pickupAreaCoordinates: tour.pickupArea?.polygon_points
+                    ? tour.pickupArea.polygon_points
+                        .sort((a: any, b: any) => (a.sequence || 0) - (b.sequence || 0))
+                        .map((pp: any) => ({
+                            lat: pp.points.latitude,
+                            lon: pp.points.longitude,
+                        }))
+                    : null,
             };
 
             res.status(200).json(

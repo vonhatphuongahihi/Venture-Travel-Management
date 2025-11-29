@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useProvinces } from "@/contexts/ProvinceContext";
+import { useOutletContext } from "react-router-dom";
 
 // Import assets
 import AttractionsSection from "@/components/province/AttractionsSection";
@@ -8,17 +7,23 @@ import ReviewsSection from "@/components/province/ReviewsSection";
 import TourSliderSection from "@/components/province/TourSliderSection";
 import WeatherSection from "@/components/province/WeatherSection";
 import { mockAttractions } from "@/data/attractions";
-import { mockTours } from "@/data/tours";
-import { Attraction, Tour } from "@/global.types";
+import { Attraction, Province, Tour } from "@/global.types";
+
+import { useProvinceAttractions, useProvinceTours } from "@/hooks/useProvince";
+
+interface ExploreProvinceContext {
+  province: Province;
+}
 
 const ExploreProvince = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const { getProvinceBySlug, loading } = useProvinces();
-  const [sortBy, setSortBy] = useState("Giá (từ thấp đến cao)");
-  const [tours, setTours] = useState<Tour[]>(mockTours);
-  const [attractions, setAttractions] = useState<Attraction[]>(mockAttractions);
-  const province = slug ? getProvinceBySlug(slug) : undefined;
-  const textRef = useRef(null);
+  const { province } = useOutletContext<ExploreProvinceContext>();
+  
+  const { data: toursData } = useProvinceTours(province?.id || "", 1, 10);
+  const tours = toursData?.data || [];
+
+  const { data: attractionsData } = useProvinceAttractions(province?.id || "");
+  const attractions = attractionsData || [];
+  const textRef = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
 
   useEffect(() => {
@@ -29,6 +34,9 @@ const ExploreProvince = () => {
       setIsClamped(isOverflowing);
     }
   }, []);
+
+  if (!province) return null;
+
 
   return (
     <div className="container mx-auto max-w-7xl space-y-8 mb-8">

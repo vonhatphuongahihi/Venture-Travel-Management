@@ -3,6 +3,7 @@ import { Card, CardContent } from "../ui/card";
 import { Review } from "@/global.types";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const ReviewCard = ({
   review,
@@ -11,9 +12,11 @@ const ReviewCard = ({
   review: Review;
   isFromProvincePage?: boolean;
 }) => {
+  const navigate = useNavigate();
+
   return (
-    <Card className="group overflow-hidden min-w-[200px] rounded-2xl transition-all hover:-translate-y-1 cursor-pointer h-full">
-      <div className="h-full flex flex-col justify-between gap-2">
+    <Card className="group overflow-hidden min-w-[200px] rounded-2xl transition-all hover:-translate-y-1 cursor-pointer h-full" onClick={() => navigate(`/tour/${review.tour.id}`)}>
+      <div className="h-full flex flex-col justify-between gap-3">
         <div className="flex justify-between items-center pt-4 px-4">
           <div className="flex items-center gap-2">
             <Avatar>
@@ -38,7 +41,7 @@ const ReviewCard = ({
           </div>
         </div>
 
-        <div className="px-4">
+        <div className="px-4 h-20">
           <p className="line-clamp-4 text-sm">{review.content}</p>
         </div>
 

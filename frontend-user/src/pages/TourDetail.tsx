@@ -124,6 +124,7 @@ const TourDetailPage = () => {
         pickUpPoint: tourData.pickUpPoint,
         pickUpDetails: tourData.pickUpDetails,
         pickUpPointGeom: tourData.pickUpPointGeom,
+        pickUpAreaGeom: tourData.pickUpAreaGeom || [],
         endPoint: tourData.endPoint || '',
         endPointGeom: tourData.endPointGeom,
         additionalInfo: tourData.additionalInfo || '',
@@ -702,6 +703,8 @@ const TourDetailPage = () => {
                   id={"pickUp"}
                   pickUpPoint={tour.pickUpPoint}
                   pickUpDetails={tour.pickUpDetails}
+                  pickUpPointGeom={tour.pickUpPointGeom}
+                  pickUpAreaGeom={tour.pickUpAreaGeom}
                   endPoint={tour.endPoint}
                   open={puOpen}
                   setOpen={setPUOpen}
@@ -775,7 +778,7 @@ const TourDetailPage = () => {
 
         {/*Itinerary*/}
         <div className="flex w-full justify-between space-x-2">
-          <section id={"itinerary"} className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100 mt-6">
+          <section id={"itinerary"} className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100">
             <h2 className="text-2xl font-['Inter'] font-bold mb-6 text-gray-900">
               Hành trình
             </h2>

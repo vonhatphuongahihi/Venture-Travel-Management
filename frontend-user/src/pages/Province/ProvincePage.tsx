@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { useProvinces } from "@/contexts/ProvinceContext";
+import { useProvince, useProvinceTours } from "@/hooks/useProvince";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 
@@ -23,9 +23,10 @@ enum ProvincePageTab {
 const ProvincePage = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
-  const { getProvinceBySlug, loading } = useProvinces();
-  const province = slug ? getProvinceBySlug(slug) : undefined;
-  const textRef = useRef(null);
+
+  const { data: province, isLoading } = useProvince(slug.toUpperCase() || "");
+
+  const textRef = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
   const [currPage, setCurrPage] = useState<ProvincePageTab>(
     ProvincePageTab.EXPLORE
@@ -38,7 +39,7 @@ const ProvincePage = () => {
         textRef.current.scrollHeight > textRef.current.clientHeight;
       setIsClamped(isOverflowing);
     }
-  }, []);
+  }, [province]);
 
   useEffect(() => {
     const parts = location.pathname.split("/");
@@ -49,6 +50,15 @@ const ProvincePage = () => {
       setCurrPage(ProvincePageTab.EXPLORE);
     }
   }, [location]);
+
+  // If loading, show loading state (optional)
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   // If province not found, show default or redirect
   if (!province) {
@@ -73,11 +83,11 @@ const ProvincePage = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative !h-64 md:h-96">
+      <div className="relative h-64 md:h-72">
         <img
-          src={heroImage}
+          src={province.image || heroImage}
           alt={province.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
@@ -139,7 +149,7 @@ const ProvincePage = () => {
               )}
             >
               <Link to={`/province/${province.slug}/tours-activities`}>
-                <h2 className="text-base py-3 px-1">Tour & Hoạt động</h2>
+                <h2 className="text-base py-3 px-1">Những Tour hấp dẫn</h2>
               </Link>
             </div>
           </div>
@@ -147,7 +157,7 @@ const ProvincePage = () => {
       </section>
 
       {/* Main Content */}
-      <Outlet />
+      <Outlet context={{ province }} />
 
       {/* Footer */}
       <Footer />

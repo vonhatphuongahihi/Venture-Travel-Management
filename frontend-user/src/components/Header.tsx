@@ -63,12 +63,6 @@ const Header = () => {
                     >
                         LIÊN HỆ
                     </Link>
-                    <Link
-                        to="/book-tour"
-                        className="text-sm font-medium hover:text-primary transition-colors"
-                    >
-                        ĐĂNG KÝ TOUR
-                    </Link>
                 </nav>
 
                 {/* Login / Profile Button (Desktop) */}

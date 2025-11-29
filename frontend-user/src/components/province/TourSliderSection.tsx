@@ -46,7 +46,7 @@ const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
     <section className="pt-5">
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-semibold ">
-          Hoạt động vui chơi hấp dẫn ở {province.name}
+          Tour hấp dẫn ở {province.name}
         </h2>
 
         <Link
@@ -57,7 +57,7 @@ const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
         </Link>
       </div>
 
-      <Carousel
+      {tours.length > 0 ? <Carousel
         opts={{
           align: "start",
         }}
@@ -75,7 +75,7 @@ const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
         </CarouselContent>
         {canScrollPrev && <CarouselPrevious />}
         {canScrollNext && <CarouselNext />}
-      </Carousel>
+      </Carousel> : <p>Không có tour nào</p>}
     </section>
   );
 };

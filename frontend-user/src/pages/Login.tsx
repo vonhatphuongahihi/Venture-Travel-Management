@@ -1,11 +1,12 @@
 import React from "react";
 import logo from "@/assets/logo.png";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 
 const Login = () => {
+  const { state } = useLocation();
   const [tab, setTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +18,10 @@ const Login = () => {
 
   // Redirect if already authenticated
   React.useEffect(() => {
+    if (state?.redirectLink && isAuthenticated){
+      navigate(state?.redirectLink)
+      return;
+    }
     if (isAuthenticated) {
       navigate('/');
     }
@@ -36,6 +41,10 @@ const Login = () => {
 
       if (result.success) {
         showToast('Đăng nhập thành công!', 'success');
+        if (state?.redirectLink){
+          navigate(state?.redirectLink)
+          return;
+        }
         navigate('/');
       } else {
         showToast(result.message, 'error');

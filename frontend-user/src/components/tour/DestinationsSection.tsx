@@ -61,8 +61,12 @@ const DestinationsSection = () => {
     };
 
     return (
-        <section ref={sectionRef} className="py-4 bg-background">
-            <div className="container">
+        <section
+            ref={sectionRef}
+            className="py-16 bg-gradient-to-b from-slate-50 via-white to-slate-50 relative overflow-hidden"
+        >
+            <div className="absolute inset-x-0 -top-10 h-40 bg-primary/10 blur-3xl opacity-50 pointer-events-none" />
+            <div className="container relative">
                 {/* Header */}
                 <div className={`text-center mb-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div className="inline-flex items-center gap-2 bg-[#dff6ff] text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
@@ -78,7 +82,7 @@ const DestinationsSection = () => {
                 </div>
 
                 {/* Destination Cards */}
-                <div className={`relative mb-8 py-8 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+                <div className={`relative mb-8 py-4 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
                     {loading ? (
                         <div className="flex items-center justify-center py-12">
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -93,11 +97,11 @@ const DestinationsSection = () => {
                         </div>
                     ) : (
                         <div className="flex justify-center">
-                            <div className="flex items-center gap-4 max-w-6xl overflow-visible">
+                            <div className="flex items-center gap-6 max-w-6xl overflow-visible">
                                 {destinations.map((destination, index) => (
                                     <div
                                         key={destination.id}
-                                        className={`relative flex-shrink-0 w-64 h-80 rounded-xl overflow-hidden cursor-pointer transition-all duration-500 ${getCardOpacity(index, currentIndex)}`}
+                                        className={`relative flex-shrink-0 w-64 h-80 rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 shadow-xl shadow-primary/10 border border-white/10 backdrop-blur-lg ${getCardOpacity(index, currentIndex)}`}
                                         style={{
                                             transform: index === currentIndex ? 'scale(1.05) translateY(-10px)' : 'scale(1) translateY(0px)',
                                             zIndex: index === currentIndex ? 10 : 5
@@ -107,13 +111,18 @@ const DestinationsSection = () => {
                                         <img
                                             src={destination.image || '/placeholder.svg'}
                                             alt={destination.name}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             onError={(e) => {
                                                 e.currentTarget.src = '/placeholder.svg';
                                             }}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                                        <div className="absolute bottom-6 left-6 text-white">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                                        <div className="absolute top-4 left-4">
+                                            <span className="px-3 py-1 rounded-full bg-white/80 text-primary text-xs font-semibold backdrop-blur">
+                                                {destination.category || 'Điểm đến'}
+                                            </span>
+                                        </div>
+                                        <div className="absolute bottom-6 left-6 text-white drop-shadow-lg">
                                             <h3 className="text-xl font-bold mb-1">
                                                 {destination.name}
                                             </h3>

@@ -45,64 +45,84 @@ export function BookingList() {
   ];
 
   // MOCK booking
- useEffect(() => {
-  const mock: Booking[] = [
-    {
-      bookingId: "b1",
-      userId: "u1",
-      name: "Nguyễn Văn A",
-      phone: "0123456789",
-      email: "a@gmail.com",
-      pickupAddress: "Hà Nội",
-      departureDate: "2025-12-01T08:00:00.000Z",
-      status: "completed",
-      paymentType: "momo",
-      totalPrice: 1500000,
-      specialRequests: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      bookingDetails: [
-  { bookingDetailId: "bd1", ticketTypeId: "adult", ticketTypeName: "Vé người lớn", quantity: 2, totalPrice: 1000000 },
-  { bookingDetailId: "bd2", ticketTypeId: "child", ticketTypeName: "Vé trẻ em", quantity: 1, totalPrice: 300000 },
-]
-    },
-    {
-      bookingId: "b2",
-      userId: "u2",
-      name: "Trần Thị B",
-      phone: "0987654321",
-      email: "b@gmail.com",
-      pickupAddress: "HCM",
-      departureDate: "2025-12-05T08:00:00.000Z",
-      status: "pending",
-      paymentType: "cash",
-      totalPrice: 900000,
-      specialRequests: "",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      bookingDetails: [
-       { bookingDetailId: "bd3", ticketTypeId: "child", ticketTypeName: "Vé trẻ em", quantity: 1, totalPrice: 300000 },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const mock: Booking[] = [
+      {
+        bookingId: "b1",
+        userId: "u1",
+        name: "Nguyễn Văn A",
+        phone: "0123456789",
+        email: "a@gmail.com",
+        pickupAddress: "Hà Nội",
+        departureDate: "2025-12-01T08:00:00.000Z",
+        status: "completed",
+        paymentType: "momo",
+        totalPrice: 1500000,
+        specialRequests: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        bookingDetails: [
+          {
+            bookingDetailId: "bd1",
+            ticketTypeId: "adult",
+            ticketTypeName: "Vé người lớn",
+            quantity: 2,
+            totalPrice: 1000000,
+          },
+          {
+            bookingDetailId: "bd2",
+            ticketTypeId: "child",
+            ticketTypeName: "Vé trẻ em",
+            quantity: 1,
+            totalPrice: 300000,
+          },
+        ],
+      },
+      {
+        bookingId: "b2",
+        userId: "u2",
+        name: "Trần Thị B",
+        phone: "0987654321",
+        email: "b@gmail.com",
+        pickupAddress: "HCM",
+        departureDate: "2025-12-05T08:00:00.000Z",
+        status: "pending",
+        paymentType: "cash",
+        totalPrice: 900000,
+        specialRequests: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        bookingDetails: [
+          {
+            bookingDetailId: "bd3",
+            ticketTypeId: "child",
+            ticketTypeName: "Vé trẻ em",
+            quantity: 1,
+            totalPrice: 300000,
+          },
+        ],
+      },
+    ];
 
-  setBookings(mock);
-}, []);
-
+    setBookings(mock);
+  }, []);
 
   const filtered = useMemo(() => {
-  const q = query.toLowerCase();
-  return bookings.filter((b) => {
-    const ticketNames = b.bookingDetails.map(d => d.ticketTypeName).join(" ").toLowerCase();
-    const matchesQuery =
-      b.name.toLowerCase().includes(q) ||
-      b.email.toLowerCase().includes(q) ||
-      ticketNames.includes(q);
+    const q = query.toLowerCase();
+    return bookings.filter((b) => {
+      const ticketNames = b.bookingDetails
+        .map((d) => d.ticketTypeName)
+        .join(" ")
+        .toLowerCase();
+      const matchesQuery =
+        b.name.toLowerCase().includes(q) ||
+        b.email.toLowerCase().includes(q) ||
+        ticketNames.includes(q);
 
-    const matchesStatus = status === "all" ? true : b.status === status;
-    return matchesQuery && matchesStatus;
-  });
-}, [bookings, query, status]);
+      const matchesStatus = status === "all" ? true : b.status === status;
+      return matchesQuery && matchesStatus;
+    });
+  }, [bookings, query, status]);
 
   function removeBooking(id: string) {
     setBookings((prev) => prev.filter((b) => b.bookingId !== id));
@@ -178,11 +198,11 @@ export function BookingList() {
                   <th className="px-4 py-3">Khách hàng</th>
                   <th className="px-4 py-3">Số điện thoại</th>
                   <th className="px-4 py-3">Email</th>
-               
+
                   <th className="px-4 py-3">Ngày đặt</th>
                   <th className="px-4 py-3">Khởi hành</th>
                   <th className="px-4 py-3">Tổng giá</th>
-          
+
                   <th className="px-4 py-3">Trạng thái</th>
                   <th className="px-4 py-3">Hành động</th>
                 </tr>
@@ -197,10 +217,14 @@ export function BookingList() {
                     <td className="px-4 py-3">{b.name}</td>
                     <td className="px-4 py-3">{b.phone}</td>
                     <td className="px-4 py-3">{b.email}</td>
-                    
+
                     <td className="px-4 py-3">{b.createdAt.slice(0, 10)}</td>
-                    <td className="px-4 py-3">{b.departureDate.slice(0, 10)}</td>
-                    <td className="px-4 py-3">{b.totalPrice.toLocaleString()} ₫</td>
+                    <td className="px-4 py-3">
+                      {b.departureDate.slice(0, 10)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {b.totalPrice.toLocaleString()} ₫
+                    </td>
                     <td className="px-4 py-3">
                       <StatusPill status={b.status} />
                     </td>

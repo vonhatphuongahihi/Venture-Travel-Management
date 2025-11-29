@@ -13,15 +13,24 @@ function StopDetail({
   stop,
   zoomStop,
   isActive,
+  openDetail,
+  setOpenDetail,
 }: {
   stop: TourStop;
   zoomStop: (geom: [number, number]) => void;
   isActive: boolean;
+  openDetail: boolean;
+  setOpenDetail: (open: boolean) => void;
 }) {
-  const [openDetail, setOpenDetail] = useState<boolean>(false);
   return (
-    <div className={`w-full min-h-14 flex items-start space-x-5 transition-all ${isActive ? 'bg-primary/5 rounded-lg p-3' : ''}`}>
-      <div className="bg-primary flex items-center justify-center w-14 h-14 rounded-full text-white p-2 font-bold text-lg shrink-0">
+    <div className="w-full min-h-14 flex items-start space-x-5">
+      <div
+        className="bg-primary flex items-center justify-center w-14 h-14 rounded-full text-white p-2 font-bold text-lg shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => {
+          setOpenDetail(!openDetail);
+          zoomStop(stop.attractionGeom);
+        }}
+      >
         {stop.stopOrder}
       </div>
       <div className="flex-1 cursor-pointer">
@@ -45,11 +54,9 @@ function StopDetail({
                 />
               )}
               {stop.details && (
-                <p className="text-gray-600 leading-relaxed">{stop.details}</p>
+                <p className="text-gray-600 leading-relaxed text-justify">{stop.details}</p>
               )}
-              <Button className="bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white transition-colors">
-                Tìm hiểu thêm về {stop.attractionName}
-              </Button>
+
             </div>
           </CollapsibleContent>
           <CollapsibleTrigger asChild>
@@ -64,6 +71,7 @@ function StopDetail({
 }
 
 export default function Itinerary({
+  tourId,
   tourStop,
   tourRoute,
   setPUOpen,
@@ -72,6 +80,7 @@ export default function Itinerary({
   endPoint,
   endPointGeom,
 }: {
+  tourId?: string;
   tourStop: TourStop[];
   tourRoute: TourRoute | null;
   setPUOpen: (open: boolean) => void;
@@ -81,6 +90,7 @@ export default function Itinerary({
   endPointGeom?: [number, number];
 }) {
   const [activeStop, setActiveStop] = useState<number | null>(null);
+  const [openStops, setOpenStops] = useState<Record<number, boolean>>({});
 
   const zoomStop = (geom: [number, number]) => {
     const stop = tourStop.find(s =>
@@ -88,7 +98,27 @@ export default function Itinerary({
     );
     if (stop) {
       setActiveStop(stop.stopOrder);
+      // Close all other stops and open only the clicked one
+      const newOpenStops: Record<number, boolean> = {};
+      tourStop.forEach(s => {
+        newOpenStops[s.stopOrder] = s.stopOrder === stop.stopOrder;
+      });
+      setOpenStops(newOpenStops);
       setTimeout(() => setActiveStop(null), 2000);
+    }
+  };
+
+  const toggleStopDetail = (stopOrder: number, isOpen: boolean) => {
+    if (isOpen) {
+      // Close all others when opening this one
+      const newOpenStops: Record<number, boolean> = {};
+      tourStop.forEach(s => {
+        newOpenStops[s.stopOrder] = s.stopOrder === stopOrder;
+      });
+      setOpenStops(newOpenStops);
+    } else {
+      // Just close this one
+      setOpenStops(prev => ({ ...prev, [stopOrder]: false }));
     }
   };
 
@@ -131,6 +161,8 @@ export default function Itinerary({
             stop={stop}
             zoomStop={zoomStop}
             isActive={activeStop === stop.stopOrder}
+            openDetail={openStops[stop.stopOrder] || false}
+            setOpenDetail={(isOpen) => toggleStopDetail(stop.stopOrder, isOpen)}
           />
         ))}
 
@@ -153,6 +185,7 @@ export default function Itinerary({
       {/* Map - Right Side */}
       <div className="w-full lg:w-[600px]">
         <ItineraryMap
+          tourId={tourId}
           tourStop={tourStop}
           tourRoute={tourRoute}
           pickUpPoint={pickUpPoint}

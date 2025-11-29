@@ -10,7 +10,11 @@ import tourRoutes from "./tourRoutes";
 import attractionRoutes from "./attractionRoutes";
 import uploadRoutes from "./uploadRoutes";
 import adminAttractionRoutes from "./adminAttractionRoutes";
+
 import bookingRoutes from "./bookingRoutes";
+
+import routeRoutes from "./routeRoutes";
+
 
 const router = Router();
 
@@ -24,7 +28,11 @@ router.use('/tours', tourRoutes);
 router.use('/attractions', attractionRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/admin/attractions', adminAttractionRoutes);
+
 router.use("/bookings", bookingRoutes);
+
+router.use('/routes', routeRoutes);
+
 
 
 router.get("/health", (req, res) => {

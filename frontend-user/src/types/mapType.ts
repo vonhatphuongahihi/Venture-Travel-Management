@@ -1,8 +1,11 @@
 export interface TourType {
+  tourId?: string;
   name: string;
   description: string;
   region: string;
   coords: [number, number][];
+  image?: string;
+  location?: string;
 }
 
 export interface DestinationType {
@@ -10,6 +13,8 @@ export interface DestinationType {
   description: string;
   region: string;
   coords: [number, number];
+  image?: string;
+  address?: string;
 }
 
 export interface EventType {

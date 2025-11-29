@@ -44,6 +44,12 @@ export class AttractionController {
                                 region: true,
                             },
                         },
+                        point: {
+                            select: {
+                                latitude: true,
+                                longitude: true,
+                            },
+                        },
                         tourStops: {
                             select: {
                                 tourId: true,
@@ -87,6 +93,10 @@ export class AttractionController {
                     tourCount,
                     rating: Math.round(avgRating * 10) / 10,
                     reviewCount: attraction.reviews.length,
+                    coordinates: attraction.point ? {
+                        lat: attraction.point.latitude,
+                        lon: attraction.point.longitude,
+                    } : null,
                     createdAt: attraction.createdAt.toISOString(),
                     updatedAt: attraction.updatedAt.toISOString(),
                 };

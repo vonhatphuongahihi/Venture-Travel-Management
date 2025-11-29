@@ -16,7 +16,7 @@ export default function Inclusions({ inclusions }) {
           <AccordionContent className="flex flex-col gap-2">
             <ul>
               {inclusions.map((item, index) => (
-                <li key={index} className="mb-2 list-disc list-inside">
+                <li key={index} className="mb-2 list-disc list-inside text-justify">
                   {item}
                 </li>
               ))}

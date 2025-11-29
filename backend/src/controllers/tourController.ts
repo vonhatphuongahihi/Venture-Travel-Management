@@ -37,7 +37,6 @@ export class TourController {
                 prisma.tour.findMany({
                     where,
                     include: {
-
                         reviews: {
                             select: {
                                 rate: true,
@@ -95,6 +94,7 @@ export class TourController {
                     images: tour.images,
                     price: basePrice,
                     duration: tour.duration,
+                    location: 'Việt Nam',
                     rating: Math.round(avgRating * 10) / 10,
                     reviewCount: tour.reviews.length,
                     category: tour.categories && tour.categories.length > 0 ? tour.categories[0] : 'Tour du lịch',
@@ -183,6 +183,15 @@ export class TourController {
                     },
                     pickup: true,
                     end: true,
+                    pickupArea: {
+                        include: {
+                            polygon_points: {
+                                include: {
+                                    points: true,
+                                },
+                            },
+                        },
+                    },
                 },
             });
 
@@ -273,6 +282,14 @@ export class TourController {
                     lat: tour.end.latitude,
                     lon: tour.end.longitude,
                 } : null,
+                pickupAreaCoordinates: tour.pickupArea?.polygon_points
+                    ? tour.pickupArea.polygon_points
+                        .sort((a: any, b: any) => (a.sequence || 0) - (b.sequence || 0))
+                        .map((pp: any) => ({
+                            lat: pp.points.latitude,
+                            lon: pp.points.longitude,
+                        }))
+                    : null,
             };
 
             res.status(200).json(
@@ -283,6 +300,48 @@ export class TourController {
             res.status(500).json(
                 ResponseUtils.error(
                     'Không thể lấy thông tin tour',
+                    error instanceof Error ? error.message : 'Lỗi không xác định'
+                )
+            );
+        }
+    }
+
+    // Get all unique categories from tours
+    static async getCategories(req: Request, res: Response): Promise<void> {
+        try {
+            const tours = await prisma.tour.findMany({
+                where: {
+                    isActive: true,
+                },
+                select: {
+                    categories: true,
+                },
+            });
+
+            // Extract all unique categories
+            const allCategories = new Set<string>();
+            tours.forEach((tour) => {
+                if (tour.categories && Array.isArray(tour.categories)) {
+                    tour.categories.forEach((category) => {
+                        if (category && typeof category === 'string') {
+                            allCategories.add(category);
+                        }
+                    });
+                }
+            });
+
+            const categories = Array.from(allCategories).sort();
+
+            res.status(200).json(
+                ResponseUtils.success('Lấy danh sách categories thành công', {
+                    categories,
+                })
+            );
+        } catch (error) {
+            console.error('🔴 [TourController] Get categories error:', error);
+            res.status(500).json(
+                ResponseUtils.error(
+                    'Không thể lấy danh sách categories',
                     error instanceof Error ? error.message : 'Lỗi không xác định'
                 )
             );

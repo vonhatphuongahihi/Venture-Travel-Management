@@ -4,10 +4,12 @@ import { Navigation } from "lucide-react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { TourRoute, TourStop } from "@/types/tourDetailType";
+import RouteAPI from "@/services/routeAPI";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 interface ItineraryMapProps {
+    tourId?: string;
     tourStop: TourStop[];
     tourRoute: TourRoute | null;
     pickUpPoint?: string;
@@ -18,6 +20,7 @@ interface ItineraryMapProps {
 }
 
 export default function ItineraryMap({
+    tourId,
     tourStop,
     tourRoute,
     pickUpPoint,
@@ -29,10 +32,53 @@ export default function ItineraryMap({
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<any>(null);
     const markersRef = useRef<any[]>([]);
+    const markerElementsRef = useRef<Map<number, HTMLElement>>(new Map());
     const [mapLoaded, setMapLoaded] = useState(false);
+    const [detailedRoute, setDetailedRoute] = useState<Array<{ longitude: number; latitude: number }> | null>(null);
+    const [isLoadingRoute, setIsLoadingRoute] = useState(false);
+    const [activeMarker, setActiveMarker] = useState<number | null>(null);
 
     // Set Mapbox token
     mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    // Fetch detailed route from API
+    useEffect(() => {
+        if (!tourId) {
+            console.log('🔴 No tourId provided');
+            setIsLoadingRoute(false);
+            return;
+        }
+
+        const fetchDetailedRoute = async () => {
+            setIsLoadingRoute(true);
+            try {
+                console.log('🔵 Fetching route for tourId:', tourId);
+                const response = await RouteAPI.getTourRoute(tourId);
+                console.log('🟢 Route API Response:', response);
+
+                if (response.success && response.data && response.data.fullRoute) {
+                    console.log('✅ Route data received:');
+                    console.log('  - Route points:', response.data.routePoints);
+                    console.log('  - Route segments:', response.data.routeSegments);
+                    console.log('  - Full route length:', response.data.fullRoute?.length);
+                    console.log('  - Full route:', response.data.fullRoute);
+                    console.log('🔧 Setting detailedRoute state...');
+                    setDetailedRoute(response.data.fullRoute);
+                    console.log('✅ DetailedRoute state set!');
+                } else {
+                    console.log('⚠️ Route API failed or no fullRoute:', response.message, response.data);
+                    setDetailedRoute(null);
+                }
+            } catch (error) {
+                console.error('🔴 Error fetching detailed route:', error);
+                setDetailedRoute(null);
+            } finally {
+                setIsLoadingRoute(false);
+            }
+        };
+
+        fetchDetailedRoute();
+    }, [tourId]);
 
     // Handle stop click - zoom to stop and call callback
     const handleStopClick = (geom: [number, number]) => {
@@ -53,6 +99,8 @@ export default function ItineraryMap({
     // Render map markers and route
     const renderMap = () => {
         if (!mapInstanceRef.current) return;
+
+        console.log('🗺️ renderMap called, detailedRoute:', detailedRoute?.length || 'null');
 
         markersRef.current.forEach(marker => marker.remove());
         markersRef.current = [];
@@ -75,25 +123,23 @@ export default function ItineraryMap({
             el.className = 'start-end-marker';
             el.innerHTML = `
         <div style="
-          width: 44px;
-          height: 44px;
-          background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+          width: 48px;
+          height: 48px;
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
           border-radius: 50%;
           border: 3px solid white;
-          box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5), 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5), 0 2px 4px rgba(0,0,0,0.2);
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: bold;
-          color: #1a1a1a;
-          font-size: 11px;
-          letter-spacing: 0.5px;
-        ">BĐ</div>
+          color: white;
+          font-size: 20px;
+        ">📍</div>
       `;
 
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([pickUpGeom[0], pickUpGeom[1]])
-                .setPopup(new mapboxgl.Popup().setHTML(`<div class="p-2"><strong>Điểm khởi hành</strong><br/>${pickUpPoint || 'Điểm đón'}</div>`))
                 .addTo(mapInstanceRef.current);
 
             markersRef.current.push(marker);
@@ -107,39 +153,57 @@ export default function ItineraryMap({
 
             const el = document.createElement('div');
             el.className = 'stop-marker';
+            const isActive = activeMarker === stop.stopOrder;
+
             el.innerHTML = `
-        <div style="
-          width: 40px;
-          height: 40px;
-          background: linear-gradient(135deg, #26B8ED 0%, #1a9bc7 100%);
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 4px 12px rgba(38, 184, 237, 0.4), 0 2px 4px rgba(0,0,0,0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          color: white;
-          font-size: 16px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        ">
-          ${stop.stopOrder}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="marker-circle" data-stop-order="${stop.stopOrder}" style="
+            width: 44px;
+            height: 44px;
+            background: ${isActive ? 'white' : '#26B8ED'};
+            border-radius: 50%;
+            border: 3px solid #26B8ED;
+            box-shadow: 0 4px 12px rgba(38, 184, 237, 0.4), 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: ${isActive ? '#26B8ED' : 'white'};
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: ${isActive ? 'scale(1.15)' : 'scale(1)'};
+          ">
+            ${stop.stopOrder}
+          </div>
+          <div class="marker-label" data-stop-order="${stop.stopOrder}" style="
+            display: ${isActive ? 'block' : 'none'};
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-weight: bold;
+            color: #26B8ED;
+            font-size: 14px;
+            white-space: nowrap;
+            pointer-events: none;
+          ">
+            ${stop.attractionName}
+          </div>
         </div>
       `;
 
+            // Store element reference
+            markerElementsRef.current.set(stop.stopOrder, el);
+
             // Add click handler to marker
             el.addEventListener('click', () => {
+                setActiveMarker(stop.stopOrder);
                 handleStopClick([lng, lat]);
             });
 
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([lng, lat])
-                .setPopup(
-                    new mapboxgl.Popup({ offset: 25 }).setHTML(
-                        `<div class="p-2"><strong>Điểm dừng ${stop.stopOrder}</strong><br/>${stop.attractionName}</div>`
-                    )
-                )
                 .addTo(mapInstanceRef.current);
 
             markersRef.current.push(marker);
@@ -152,35 +216,48 @@ export default function ItineraryMap({
             el.className = 'start-end-marker';
             el.innerHTML = `
         <div style="
-          width: 44px;
-          height: 44px;
-          background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+          width: 48px;
+          height: 48px;
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
           border-radius: 50%;
           border: 3px solid white;
-          box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5), 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5), 0 2px 4px rgba(0,0,0,0.2);
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: bold;
-          color: #1a1a1a;
-          font-size: 11px;
-          letter-spacing: 0.5px;
-        ">KT</div>
+          color: white;
+          font-size: 20px;
+        ">🏁</div>
       `;
 
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([endPointGeom[0], endPointGeom[1]])
-                .setPopup(new mapboxgl.Popup().setHTML(`<div class="p-2"><strong>Điểm kết thúc</strong><br/>${endPoint || 'Điểm đến'}</div>`))
                 .addTo(mapInstanceRef.current);
 
             markersRef.current.push(marker);
             allCoordinates.push([endPointGeom[0], endPointGeom[1]]);
         }
 
-        // Add route line if available
-        if (tourRoute && tourRoute.geom && tourRoute.geom.length > 0) {
-            const routeCoordinates = tourRoute.geom.map(([lng, lat]) => [lng, lat]);
+        // Add route line - ONLY use detailed route from API, don't show anything while loading
+        let routeCoordinates: [number, number][] = [];
 
+        if (!isLoadingRoute && detailedRoute && detailedRoute.length > 0) {
+            // Use detailed route from database (arcs + arc_points)
+            console.log('🟢 Using detailed route from API:', detailedRoute.length, 'points');
+            console.log('🔍 First 5 points of detailedRoute:', detailedRoute.slice(0, 5));
+            console.log('🔍 Last 5 points of detailedRoute:', detailedRoute.slice(-5));
+            routeCoordinates = detailedRoute.map(coord => [coord.longitude, coord.latitude]);
+            console.log('🔍 First 5 routeCoordinates:', routeCoordinates.slice(0, 5));
+        } else if (isLoadingRoute) {
+            console.log('⏳ Route is loading, not displaying anything yet...');
+        } else {
+            console.log('🔴 No route data available');
+        }
+
+        console.log('📍 Final route coordinates:', routeCoordinates.length, 'points');
+
+        if (routeCoordinates.length > 0) {
             mapInstanceRef.current.addSource('route', {
                 type: 'geojson',
                 data: {
@@ -308,12 +385,29 @@ export default function ItineraryMap({
         };
     }, []);
 
+    // Update marker styles when activeMarker changes
+    useEffect(() => {
+        markerElementsRef.current.forEach((el, stopOrder) => {
+            const circle = el.querySelector('.marker-circle') as HTMLElement;
+            const label = el.querySelector('.marker-label') as HTMLElement;
+            if (circle) {
+                const isActive = activeMarker === stopOrder;
+                circle.style.background = isActive ? 'white' : '#26B8ED';
+                circle.style.color = isActive ? '#26B8ED' : 'white';
+                circle.style.transform = isActive ? 'scale(1.15)' : 'scale(1)';
+                if (label) {
+                    label.style.display = isActive ? 'block' : 'none';
+                }
+            }
+        });
+    }, [activeMarker]);
+
     // Re-render map when data changes
     useEffect(() => {
         if (mapLoaded && mapInstanceRef.current && mapInstanceRef.current.loaded()) {
             renderMap();
         }
-    }, [tourStop, tourRoute, pickUpGeom, endPointGeom, pickUpPoint, endPoint, mapLoaded]);
+    }, [tourStop, tourRoute, pickUpGeom, endPointGeom, pickUpPoint, endPoint, mapLoaded, detailedRoute]);
 
     const recenterItinerary = () => {
         if (!mapInstanceRef.current || tourStop.length === 0) return;
@@ -361,11 +455,23 @@ export default function ItineraryMap({
                 </Button>
             </div>
             <div ref={mapRef} className="w-full h-full" style={{ minHeight: '600px' }} />
+
+            {/* Map loading */}
             {!mapLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                         <p className="text-gray-600">Đang tải bản đồ...</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Route loading overlay */}
+            {mapLoaded && isLoadingRoute && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+                    <div className="text-center bg-white p-6 rounded-lg shadow-lg">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-3"></div>
+                        <p className="text-gray-700 font-medium">Đang tải tuyến đường...</p>
                     </div>
                 </div>
             )}

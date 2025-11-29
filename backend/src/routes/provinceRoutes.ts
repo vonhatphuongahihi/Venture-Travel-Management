@@ -20,3 +20,4 @@ router.get('/:id/reviews', ProvinceController.getReviewsByProvince);
 
 export default router;
 
+

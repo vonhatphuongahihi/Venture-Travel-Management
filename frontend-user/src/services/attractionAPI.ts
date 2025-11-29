@@ -19,6 +19,10 @@ export interface Attraction {
     tourCount: number;
     rating?: number;
     reviewCount?: number;
+    coordinates?: {
+        lat: number;
+        lon: number;
+    } | null;
 }
 
 export interface TopDestination {
@@ -124,6 +128,7 @@ class AttractionAPI {
                         tourCount: attraction.tourCount || 0,
                         rating: attraction.rating,
                         reviewCount: attraction.reviewCount,
+                        coordinates: attraction.coordinates || null,
                     })),
                     pagination: result.data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 },
                 };

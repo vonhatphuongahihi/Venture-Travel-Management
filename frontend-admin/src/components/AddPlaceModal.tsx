@@ -1,7 +1,8 @@
 "use client";
 
 import { X, Image as ImageIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AttractionAPI, type Province } from "@/services/AttractionAPI";
 
 interface AddPlaceModalProps {
   open: boolean;
@@ -11,21 +12,14 @@ interface AddPlaceModalProps {
 
 const CATEGORIES = [
   "Biển",
-  "Nhà hàng",
-  "Resort",
+  "Giải trí",
+  "Văn hóa",
+  "Cảnh quan",
   "Rừng",
   "Bảo tàng",
-  "Khách sạn",
-];
-const PROVINCES = [
-  "TP. Hồ Chí Minh",
-  "Hà Nội",
-  "Đà Nẵng",
-  "Khánh Hòa",
-  "Ninh Thuận",
-  "Đồng Nai",
-  "Bà Rịa - Vũng Tàu",
-  "Lâm Đồng",
+  "Di tích lịch sử",
+  "Công viên",
+  "Chợ",
 ];
 
 export default function AddPlaceModal({
@@ -44,6 +38,27 @@ export default function AddPlaceModal({
     images: [] as File[],
   });
 
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [loadingProvinces, setLoadingProvinces] = useState(false);
+
+  // ------------------- Load provinces from API -------------------
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        setLoadingProvinces(true);
+        const res = await AttractionAPI.getProvinces();
+        if (res.success) setProvinces(res.data);
+      } catch (err) {
+        console.error("Lỗi lấy tỉnh:", err);
+      } finally {
+        setLoadingProvinces(false);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
+
+  // ------------------- Form handlers -------------------
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -142,11 +157,15 @@ export default function AddPlaceModal({
               className="w-full rounded-md border border-gray-300 p-2 text-sm"
             >
               <option value="">-- Chọn tỉnh --</option>
-              {PROVINCES.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
+              {loadingProvinces ? (
+                <option>Đang tải...</option>
+              ) : (
+                provinces.map((p) => (
+                  <option key={p.provinceId} value={p.provinceId}>
+                    {p.name}
+                  </option>
+                ))
+              )}
             </select>
 
             <input

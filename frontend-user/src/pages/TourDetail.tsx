@@ -53,7 +53,7 @@ import { useToast } from "@/contexts/ToastContext";
 const TourDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, token, updateUser } = useAuth();
+  const { user, token } = useAuth();
   const { showToast } = useToast();
   ///////////////////// Fetch /////////////////////
   const [tour, setTour] = useState<TourDetail | null>(null);
@@ -124,6 +124,7 @@ const TourDetailPage = () => {
         pickUpPoint: tourData.pickUpPoint,
         pickUpDetails: tourData.pickUpDetails,
         pickUpPointGeom: tourData.pickUpPointGeom,
+        pickUpAreaGeom: tourData.pickUpAreaGeom || [],
         endPoint: tourData.endPoint || '',
         endPointGeom: tourData.endPointGeom,
         additionalInfo: tourData.additionalInfo || '',
@@ -291,10 +292,6 @@ const TourDetailPage = () => {
             : 'Đã xóa khỏi danh sách yêu thích',
           'success'
         );
-
-        if (user && updateUser && response.data.favoriteTours) {
-          updateUser({ ...user, favoriteTours: response.data.favoriteTours });
-        }
       } else {
         showToast(response.message || 'Thất bại khi lưu tour', 'error');
       }
@@ -306,13 +303,39 @@ const TourDetailPage = () => {
     }
   };
 
+  // Check favorite status on mount or when tour/token changes
   useEffect(() => {
-    if (user && user.favoriteTours && id) {
-      setIsFavorite(user.favoriteTours.includes(id));
-    } else {
-      setIsFavorite(false);
-    }
-  }, [user, id]);
+    let isMounted = true;
+
+    const fetchFavoriteStatus = async () => {
+      if (!token || !id) {
+        if (isMounted) {
+          setIsFavorite(false);
+        }
+        return;
+      }
+
+      try {
+        const response = await UserAPI.getFavoriteTours(token);
+        if (response.success && response.data && isMounted) {
+          const isFav = response.data.some(
+            (favoriteTour: any) =>
+              favoriteTour.tourId === id ||
+              favoriteTour.id === id
+          );
+          setIsFavorite(isFav);
+        }
+      } catch (error) {
+        console.error('Error checking favorite status:', error);
+      }
+    };
+
+    fetchFavoriteStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, id]);
 
   ///////////////////// Gallery /////////////////////
   const [showGallery, setShowGallery] = useState(false);
@@ -502,12 +525,14 @@ const TourDetailPage = () => {
             >
               <Bookmark size={16} className={isFavorite ? 'fill-white' : ''} />
               <p className="font-['Inter']">
-                {isSavingFavorite ? 'Đang lưu...' : isFavorite ? 'Đã lưu' : 'Lưu'}
+                {isSavingFavorite
+                  ? isFavorite ? 'Đang bỏ lưu...' : 'Đang lưu...'
+                  : isFavorite ? 'Đã lưu' : 'Lưu'}
               </p>
             </Button>
           </div>
         </div>
-        
+
         {/*Small Gallery: Responsive Grid*/}
         <div className="flex flex-col md:flex-row w-full justify-between gap-2 md:space-x-2">
           {/* Main Image */}
@@ -619,50 +644,57 @@ const TourDetailPage = () => {
                   </button>
                 ))}
               </div>
-              
+
               <section
                 id={"overview"}
-                className="rounded mt-2 md:mt-6 px-2 md:px-6 font-['Inter']"
+                className="rounded-lg mt-2 md:mt-6 px-4 md:px-8 py-6 font-['Inter'] bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100"
               >
-                <h2 className="text-xl font-bold mb-4">Về chuyến đi</h2>
-                <p className="justify-start text-black font-normal leading-relaxed">
+                <h2 className="text-2xl font-bold mb-6 text-gray-900">Về chuyến đi</h2>
+                <p className="text-justify text-gray-700 font-normal leading-relaxed text-base mb-6">
                   {tour.description}
                 </p>
-                <div className="w-full border-t border-primary my-5"></div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Smile className="w-5 h-5 text-gray-700 shrink-0" />
-                    <span>
-                      <strong>Độ tuổi: </strong>
+                <div className="w-full border-t border-primary/20 my-6"></div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 transition-colors">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Smile className="w-5 h-5 text-primary shrink-0" />
+                    </div>
+                    <span className="text-gray-700">
+                      <strong className="text-gray-900">Độ tuổi: </strong>
                       {`${tour.age} tuổi`}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-gray-700 shrink-0" />
-                    <span>
-                      <strong>Giới hạn nhóm:</strong> Tối đa {tour.maxGroup}{" "}
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 transition-colors">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Users className="w-5 h-5 text-primary shrink-0" />
+                    </div>
+                    <span className="text-gray-700">
+                      <strong className="text-gray-900">Giới hạn nhóm:</strong> Tối đa {tour.maxGroup}{" "}
                       người/nhóm
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-gray-700 shrink-0" />
-                    <span>
-                      <strong>Thời lượng:</strong> {tour.duration}
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 transition-colors">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Clock className="w-5 h-5 text-primary shrink-0" />
+                    </div>
+                    <span className="text-gray-700">
+                      <strong className="text-gray-900">Thời lượng:</strong> {tour.duration}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Languages className="w-5 h-5 text-gray-700 shrink-0" />
-                    <span>
-                      <strong>Hướng dẫn viên:</strong> {tour.languages}
+                  <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/60 transition-colors">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Languages className="w-5 h-5 text-primary shrink-0" />
+                    </div>
+                    <span className="text-gray-700">
+                      <strong className="text-gray-900">Hướng dẫn viên:</strong> {tour.languages}
                     </span>
                   </div>
                 </div>
-                <div className="w-full border-t border-primary mt-5 mb-2"></div>
               </section>
-              <section id={"details"} className="rounded px-2 md:px-6 font-['Inter']">
+              <section id={"details"} className="rounded-lg px-4 md:px-8 py-6 font-['Inter'] bg-white mt-4 shadow-sm border border-gray-100">
                 <Highlights highlight={tour.highlight} />
                 <Inclusions inclusions={tour.inclusions} />
                 <Exclusions exclusions={tour.exclusions} />
@@ -671,6 +703,8 @@ const TourDetailPage = () => {
                   id={"pickUp"}
                   pickUpPoint={tour.pickUpPoint}
                   pickUpDetails={tour.pickUpDetails}
+                  pickUpPointGeom={tour.pickUpPointGeom}
+                  pickUpAreaGeom={tour.pickUpAreaGeom}
                   endPoint={tour.endPoint}
                   open={puOpen}
                   setOpen={setPUOpen}
@@ -682,9 +716,9 @@ const TourDetailPage = () => {
 
             {/* Right sticky price card (Desktop) / Bottom flow (Mobile) */}
             <div id={"booking"} className="col-span-1 font-['Inter'] mt-6 lg:mt-0">
-              <div className="lg:sticky lg:top-24 min-h-[360px] h-auto bg-white rounded-xl shadow-xl shadow-primary/20 border border-gray-100">
-                <div className="flex items-center font-semibold font-xl bg-primary w-full h-14 text-white rounded-t-xl p-5">
-                  <p className="font-bold text-lg">
+              <div className="lg:sticky lg:top-24 min-h-[360px] h-auto bg-white rounded-2xl shadow-2xl shadow-primary/10 border-2 border-primary/20 hover:shadow-primary/20 transition-shadow duration-300">
+                <div className="flex items-center font-semibold font-xl bg-gradient-to-r from-primary to-primary/90 w-full h-16 text-white rounded-t-2xl px-6 py-4">
+                  <p className="font-bold text-xl">
                     Chọn ngày và số lượng
                   </p>
                 </div>
@@ -701,22 +735,33 @@ const TourDetailPage = () => {
                   />
                 </div>
                 <TicketTypePicker userTicket={userTicket} setUserTicket={setUserTicket} ticketPrices={ticketPrices} totalPrice={totalPrice} />
-                <div className="w-full flex justify-center mt-4">
-                  <Button className="flex justify-center space-x-2 w-11/12 md:w-80 text-white rounded-2xl hover:bg-primary/90 border border-2 border-transparent transition shadow-lg">
+
+                {/* Total Price Display */}
+                {totalPrice > 0 && (
+                  <div className="mx-4 mt-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-700 font-semibold">Tổng cộng:</span>
+                      <span className="text-2xl font-bold text-primary">{totalPrice.toLocaleString('vi-VN')} ₫</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="w-full flex justify-center mt-6 px-4">
+                  <Button className="flex justify-center items-center space-x-2 w-full text-white rounded-xl hover:bg-primary/90 border-2 border-transparent transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] bg-gradient-to-r from-primary to-primary/90 py-6">
                     <Ticket size={24} />
                     <p className="text-lg md:text-xl font-semibold">Đặt chỗ ngay</p>
                   </Button>
                 </div>
-                <div className="w-full px-5">
-                   <div className="border-t border-primary my-5"></div>
+                <div className="w-full px-5 mt-6">
+                  <div className="border-t border-gray-200"></div>
                 </div>
-                
-                <div className="px-5 flex items-start text-xs gap-2 pb-5">
+
+                <div className="px-5 flex items-start text-xs gap-2 pb-5 pt-4">
                   <CalendarCog className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <p>
+                  <p className="text-gray-600 leading-relaxed">
                     <PoilcyModal cancelPolicy={tour.cancelPolicy} /> – Hủy bất
                     cứ lúc nào trước{" "}
-                    <span className="font-medium">
+                    <span className="font-medium text-primary">
                       {formatDate(
                         new Date(
                           selectedDate.getTime() - 1 * 24 * 60 * 60 * 1000
@@ -733,11 +778,12 @@ const TourDetailPage = () => {
 
         {/*Itinerary*/}
         <div className="flex w-full justify-between space-x-2">
-          <section id={"itinerary"} className="h-full w-full rounded p-2 md:p-6">
-            <h2 className="text-2xl font-['Inter'] font-bold mb-4">
+          <section id={"itinerary"} className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-['Inter'] font-bold mb-6 text-gray-900">
               Hành trình
             </h2>
             <Itinerary
+              tourId={id}
               tourStop={tourStop}
               tourRoute={tourRoute}
               setPUOpen={setPUOpen}
@@ -747,8 +793,8 @@ const TourDetailPage = () => {
 
         {/*Reviews*/}
         <div className="flex w-full justify-between space-x-2">
-          <section id={"reviews"} className="h-full w-full rounded p-2 md:p-6">
-            <h2 className="text-2xl font-bold font-['Inter'] mb-4">Đánh giá</h2>
+          <section id={"reviews"} className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100 mt-6">
+            <h2 className="text-2xl font-bold font-['Inter'] mb-6 text-gray-900">Đánh giá</h2>
             <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-8">
               {/* Filter & Reviews List */}
               <div className="w-full lg:flex-1 flex flex-col order-2 lg:order-1">
@@ -761,11 +807,11 @@ const TourDetailPage = () => {
                   <ReviewFilter value={filter} setValue={setFilter} options={options} />
                 </div>
                 {/* Reviews List */}
-                <ul className="mt-4 space-y-4">
+                <ul className="mt-6 space-y-4">
                   {filteredReviews.map((review) => (
                     <li
                       key={review.reviewId}
-                      className="p-3 border-b border-primary/20 rounded space-y-3"
+                      className="p-5 bg-white rounded-xl border border-gray-200 hover:border-primary/30 hover:shadow-md transition-all duration-300 space-y-4"
                     >
                       {/*General Review Info*/}
                       <div className="w-full flex justify-between items-start">
@@ -788,34 +834,34 @@ const TourDetailPage = () => {
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-1">
-                             <RatingDisplay rating={review.rate} />
-                             <div
-                              className={`flex items-center px-2 py-1 rounded-lg transition-colors cursor-pointer text-sm ${review.liked
-                                ? 'text-white bg-primary'
-                                : 'text-primary hover:bg-primary/10'
-                                }`}
-                              onClick={() => handleLikeReview(review.reviewId)}
-                            >
-                              <ThumbsUp
-                                size={14}
-                                className={`mr-1 ${review.liked ? 'fill-white' : ''}`}
-                              />
-                              {review.likesCount}
-                            </div>
+                          <RatingDisplay rating={review.rate} />
+                          <div
+                            className={`flex items-center px-3 py-1.5 rounded-lg transition-all duration-300 cursor-pointer text-sm font-medium ${review.liked
+                              ? 'text-white bg-primary shadow-md'
+                              : 'text-primary hover:bg-primary/10 hover:shadow-sm'
+                              }`}
+                            onClick={() => handleLikeReview(review.reviewId)}
+                          >
+                            <ThumbsUp
+                              size={14}
+                              className={`mr-1.5 ${review.liked ? 'fill-white' : ''}`}
+                            />
+                            {review.likesCount}
+                          </div>
                         </div>
                       </div>
 
-                      <p className="text-sm md:text-base">{review.content}</p>
+                      <p className="text-sm md:text-base text-justify">{review.content}</p>
 
                       {/* Review Images */}
                       {review.images.length > 0 && (
-                        <div className="flex space-x-2 overflow-x-auto pb-2">
+                        <div className="flex space-x-3 overflow-x-auto pb-2">
                           {review.images.map((img, idx) => (
                             <img
                               key={idx}
                               src={img}
                               alt={`Review ${review.reviewId} Image ${idx + 1}`}
-                              className="w-24 h-24 md:w-32 md:h-32 object-cover rounded cursor-pointer shrink-0"
+                              className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-lg cursor-pointer shrink-0 shadow-sm hover:shadow-lg hover:scale-105 transition-all duration-300 border-2 border-gray-100 hover:border-primary/30"
                               onClick={() => {
                                 setStartImageIndex(idx);
                                 setTargetGallery(review.images);
@@ -831,7 +877,7 @@ const TourDetailPage = () => {
               </div>
 
               {/* Rating Summary - Moves to top on mobile via order-1, right on desktop via order-2 */}
-              <div className="w-full lg:w-[350px] order-1 lg:order-2 flex flex-col items-center space-y-5 h-auto lg:h-[250px] outline outline-1 outline-primary/30 rounded-xl bg-background p-6">
+              <div className="w-full lg:w-[350px] order-1 lg:order-2 flex flex-col items-center space-y-5 h-auto lg:h-[250px] bg-gradient-to-br from-primary/5 to-white border-2 border-primary/20 rounded-2xl shadow-lg p-6">
                 <div className="flex items-center justify-center space-x-2">
                   <RatingDisplay rating={rating} />
                   <p className="text-black font-light font-['Inter']">

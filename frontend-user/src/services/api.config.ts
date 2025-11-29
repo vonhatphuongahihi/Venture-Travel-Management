@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     list: "/tours",
     detail: (id: string) => `/tours/${id}`,
     search: "/tours/search",
+    categories: "/tours/categories",
   },
   // Bookings
   bookings: {

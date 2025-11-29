@@ -8,7 +8,8 @@ interface TourRatingProps {
 
 export const TourRating = ({ rating, reviewCount, maxStars = 5 }: TourRatingProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3 bg-slate-50 rounded-full px-4 py-2 w-fit">
+      <span className="text-[#FFBA0A] font-semibold text-lg">{rating.toFixed(1)}</span>
       <div className="flex items-center gap-1">
         {[...Array(maxStars)].map((_, index) => (
           <Star
@@ -21,8 +22,8 @@ export const TourRating = ({ rating, reviewCount, maxStars = 5 }: TourRatingProp
           />
         ))}
       </div>
-      <span className="text-[#5E6282] text-[16px]">
-        ({reviewCount.toLocaleString('vi-VN')}k đánh giá)
+      <span className="text-[#5E6282] text-[14px]">
+        {reviewCount.toLocaleString('vi-VN')} đánh giá
       </span>
     </div>
   );

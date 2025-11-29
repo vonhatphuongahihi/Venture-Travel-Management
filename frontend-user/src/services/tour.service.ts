@@ -194,6 +194,9 @@ export const tourService = {
           pickUpPointGeom: tour.pickupCoordinates ?
             [tour.pickupCoordinates.lon || 0, tour.pickupCoordinates.lat || 0] :
             [0, 0],
+          pickUpAreaGeom: tour.pickupAreaCoordinates ?
+            tour.pickupAreaCoordinates.map((coord: any) => [coord.lon, coord.lat] as [number, number]) :
+            [],
           endPoint: tour.endPoint || '',
           endPointGeom: tour.endCoordinates ?
             [tour.endCoordinates.lon || 0, tour.endCoordinates.lat || 0] :
@@ -262,6 +265,28 @@ export const tourService = {
       return [];
     } catch (error) {
       console.error('Error searching tours:', error);
+      return [];
+    }
+  },
+
+  // Get all categories
+  async getCategories(): Promise<string[]> {
+    try {
+      const response = await apiClient.get<{
+        success: boolean;
+        message: string;
+        data: {
+          categories: string[];
+        };
+      }>(API_ENDPOINTS.tours.categories);
+
+      if (response.success && response.data) {
+        return response.data.categories || [];
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error fetching categories:', error);
       return [];
     }
   },

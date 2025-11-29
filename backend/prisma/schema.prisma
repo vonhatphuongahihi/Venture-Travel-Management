@@ -8,32 +8,32 @@ datasource db {
 }
 
 model User {
-  userId               String                 @id @default(uuid()) @map("user_id")
-  name                 String
-  email                String                 @unique
-  password             String?
-  phone                String?
-  address              String?
-  profilePhoto         String?                @map("profile_photo")
-  dateOfBirth          DateTime?              @map("date_of_birth")
-  gender               String?
-  role                 Role                   @default(USER)
-  isActive             Boolean                @default(true) @map("is_active")
-  isVerified           Boolean                @default(false) @map("is_verified")
-  verificationToken    String?                @map("verification_token")
-  verificationExpires  DateTime?              @map("verification_expires")
-  resetToken           String?                @unique @map("reset_token")
-  resetExpires         DateTime?              @map("reset_expires")
-  lastLogin            DateTime?              @map("last_login")
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @updatedAt @map("updated_at")
-  googleId             String?                @unique @map("google_id")
-  authProvider         AuthProvider           @default(LOCAL) @map("auth_provider")
-  attractionReviews    AttractionReview[]
-  bookings             bookings[]
-  favorite_attractions favorite_attractions[]
-  favorite_tours       favorite_tours[]
-  tourReviews          TourReview[]
+  userId              String               @id @default(uuid()) @map("user_id")
+  name                String
+  email               String               @unique
+  password            String?
+  phone               String?
+  address             String?
+  profilePhoto        String?              @map("profile_photo")
+  dateOfBirth         DateTime?            @map("date_of_birth")
+  gender              String?
+  role                Role                 @default(USER)
+  isActive            Boolean              @default(true) @map("is_active")
+  isVerified          Boolean              @default(false) @map("is_verified")
+  verificationToken   String?              @map("verification_token")
+  verificationExpires DateTime?            @map("verification_expires")
+  resetToken          String?              @unique @map("reset_token")
+  resetExpires        DateTime?            @map("reset_expires")
+  lastLogin           DateTime?            @map("last_login")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  googleId            String?              @unique @map("google_id")
+  authProvider        AuthProvider         @default(LOCAL) @map("auth_provider")
+  attractionReviews   AttractionReview[]
+  bookings            bookings[]
+  favoriteAttractions FavoriteAttraction[]
+  favoriteTours       FavoriteTour[]
+  tourReviews         TourReview[]
 
   @@map("users")
 }
@@ -54,59 +54,59 @@ model Province {
 }
 
 model Attraction {
-  attractionId         String                 @id @map("attraction_id")
-  name                 String
-  images               String[]
-  address              String
-  description          String
-  geom                 String
-  provinceId           String                 @map("province_id")
-  category             String
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @updatedAt @map("updated_at")
-  reviews              AttractionReview[]
-  point                Point                  @relation(fields: [geom], references: [pointId])
-  province             Province               @relation(fields: [provinceId], references: [provinceId])
-  favorite_attractions favorite_attractions[]
-  tourStops            TourStop[]
+  attractionId        String               @id @map("attraction_id")
+  name                String
+  images              String[]
+  address             String
+  description         String
+  geom                String
+  provinceId          String               @map("province_id")
+  category            String
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  reviews             AttractionReview[]
+  point               Point                @relation(fields: [geom], references: [pointId])
+  province            Province             @relation(fields: [provinceId], references: [provinceId])
+  favoriteAttractions FavoriteAttraction[]
+  tourStops           TourStop[]
 
   @@map("attractions")
 }
 
 model Tour {
-  tourId                String           @id @default(uuid()) @map("tour_id")
+  tourId                String         @id @default(uuid()) @map("tour_id")
   name                  String
   images                String[]
   about                 String
-  ageRange              String           @map("age_range")
-  maxGroupSize          Int              @map("max_group_size")
+  ageRange              String         @map("age_range")
+  maxGroupSize          Int            @map("max_group_size")
   duration              String
   languages             String[]
   categories            String[]
   expectations          String
-  pickupPoint           String           @map("pickup_point")
-  pickupPointGeom       String           @map("pickup_point_geom")
-  pickupDetails         String           @map("pickup_details")
-  pickupAreaGeom        String           @map("pickup_area")
-  endPoint              String?          @map("end_point")
-  endPointGeom          String?          @map("end_point_geom")
-  additionalInformation String?          @map("additional_information")
-  cancellationPolicy    String           @map("cancellation_policy")
-  startDate             DateTime?        @map("start_date")
-  endDate               DateTime?        @map("end_date")
-  isActive              Boolean          @default(true) @map("is_active")
-  createdAt             DateTime         @default(now()) @map("created_at")
-  updatedAt             DateTime         @updatedAt @map("updated_at")
+  pickupPoint           String         @map("pickup_point")
+  pickupPointGeom       String         @map("pickup_point_geom")
+  pickupDetails         String         @map("pickup_details")
+  pickupAreaGeom        String         @map("pickup_area")
+  endPoint              String?        @map("end_point")
+  endPointGeom          String?        @map("end_point_geom")
+  additionalInformation String?        @map("additional_information")
+  cancellationPolicy    String         @map("cancellation_policy")
+  startDate             DateTime?      @map("start_date")
+  endDate               DateTime?      @map("end_date")
+  isActive              Boolean        @default(true) @map("is_active")
+  createdAt             DateTime       @default(now()) @map("created_at")
+  updatedAt             DateTime       @updatedAt @map("updated_at")
   highlights            String[]
   inclusions            String[]
   exclusions            String[]
-  favorite_tours        favorite_tours[]
+  favoriteTours         FavoriteTour[]
   ticketTypes           TicketType[]
   reviews               TourReview[]
   tourStops             TourStop[]
-  end                   Point?           @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
-  pickupArea            Polygon          @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
-  pickup                Point            @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
+  end                   Point?         @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
+  pickupArea            Polygon        @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
+  pickup                Point          @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
 
   @@map("tours")
 }
@@ -266,15 +266,32 @@ model AttractionReview {
   @@map("attraction_reviews")
 }
 
-model booking_details {
-  booking_detail_id String      @id
-  booking_id        String
-  ticket_price_id   String
-  quantity          Int
-  total_price       Float
-  created_at        DateTime    @default(now()) @db.Timestamp(6)
-  bookings          bookings    @relation(fields: [booking_id], references: [booking_id])
-  ticket_prices     TicketPrice @relation(fields: [ticket_price_id], references: [ticketPriceId])
+model FavoriteTour {
+  favoriteId String   @id @default(uuid()) @map("favorite_id")
+  userId     String   @map("user_id")
+  tourId     String   @map("tour_id")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  tour       Tour     @relation(fields: [tourId], references: [tourId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_tour")
+  user       User     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_user")
+
+  @@unique([userId, tourId], map: "unique_user_tour")
+  @@index([tourId], map: "idx_favorite_tours_tour_id")
+  @@index([userId], map: "idx_favorite_tours_user_id")
+  @@map("favorite_tours")
+}
+
+model FavoriteAttraction {
+  favoriteId   String     @id @default(uuid()) @map("favorite_id")
+  userId       String     @map("user_id")
+  attractionId String     @map("attraction_id")
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  attraction   Attraction @relation(fields: [attractionId], references: [attractionId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_attraction")
+  user         User       @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_user")
+
+  @@unique([userId, attractionId], map: "unique_user_attraction")
+  @@index([attractionId], map: "idx_favorite_attractions_attraction_id")
+  @@index([userId], map: "idx_favorite_attractions_user_id")
+  @@map("favorite_attractions")
 }
 
 model bookings {
@@ -294,33 +311,18 @@ model bookings {
   updated_at       DateTime          @db.Timestamp(6)
   booking_details  booking_details[]
   ticket_types     TicketType        @relation(fields: [ticket_type_id], references: [ticketTypeId])
-  users            User              @relation(fields: [user_id], references: [userId])
+  users            User              @relation(fields: [user_id], references: [userId], map: "fk_booking_user")
 }
 
-model favorite_attractions {
-  favorite_id   String     @id
-  user_id       String
-  attraction_id String
-  created_at    DateTime   @default(now()) @db.Timestamp(6)
-  attractions   Attraction @relation(fields: [attraction_id], references: [attractionId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_attraction")
-  users         User       @relation(fields: [user_id], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_user")
-
-  @@unique([user_id, attraction_id], map: "unique_user_attraction")
-  @@index([attraction_id], map: "idx_favorite_attractions_attraction_id")
-  @@index([user_id], map: "idx_favorite_attractions_user_id")
-}
-
-model favorite_tours {
-  favorite_id String   @id
-  user_id     String
-  tour_id     String
-  created_at  DateTime @default(now()) @db.Timestamp(6)
-  tours       Tour     @relation(fields: [tour_id], references: [tourId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_tour")
-  users       User     @relation(fields: [user_id], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_user")
-
-  @@unique([user_id, tour_id], map: "unique_user_tour")
-  @@index([tour_id], map: "idx_favorite_tours_tour_id")
-  @@index([user_id], map: "idx_favorite_tours_user_id")
+model booking_details {
+  booking_detail_id String      @id
+  booking_id        String
+  ticket_price_id   String
+  quantity          Int
+  total_price       Float
+  created_at        DateTime    @default(now()) @db.Timestamp(6)
+  bookings          bookings    @relation(fields: [booking_id], references: [booking_id])
+  ticket_prices     TicketPrice @relation(fields: [ticket_price_id], references: [ticketPriceId])
 }
 
 enum Role {

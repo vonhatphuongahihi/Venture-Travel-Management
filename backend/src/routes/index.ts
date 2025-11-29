@@ -9,6 +9,8 @@ import reviewRoutes from "./reviewRoutes";
 import tourRoutes from "./tourRoutes";
 import attractionRoutes from "./attractionRoutes";
 import uploadRoutes from "./uploadRoutes";
+import adminAttractionRoutes from "./adminAttractionRoutes";
+import routeRoutes from "./routeRoutes";
 
 const router = Router();
 
@@ -21,6 +23,8 @@ router.use('/reviews', reviewRoutes);
 router.use('/tours', tourRoutes);
 router.use('/attractions', attractionRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/admin/attractions', adminAttractionRoutes);
+router.use('/routes', routeRoutes);
 
 
 router.get("/health", (req, res) => {

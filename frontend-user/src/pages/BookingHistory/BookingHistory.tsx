@@ -7,8 +7,11 @@ import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import ReviewDialog from "./ReviewDialog";
+import { bookingService } from "@/services/booking.service";
+import { BookingHistoryItem } from "@/types/tour.types";
+import { Loader2 } from "lucide-react";
 // Import icons cho menu toggle
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -16,10 +19,14 @@ const BookingHistory = () => {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
+  const [bookings, setBookings] = useState<BookingHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // State quản lý đóng mở sidebar trên mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -78,6 +85,37 @@ const BookingHistory = () => {
     navigate("/login");
   };
 
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!window.confirm("Bạn có chắc chắn muốn hủy tour này không?")) {
+      return;
+    }
+
+    try {
+      await bookingService.cancelBooking(bookingId);
+      showToast("Hủy tour thành công", "success");
+      
+      // Refresh bookings list
+      const data = await bookingService.getUserBookings();
+      const mappedBookings: any[] = data.map((booking) => ({
+        id: booking.bookingId,
+        tourCode: booking.bookingId.substring(0, 4).toUpperCase(),
+        tourName: booking.tourName,
+        bookingDate: booking.bookingDate,
+        startDate: booking.startDate,
+        status: booking.status,
+        totalPrice: booking.totalPrice,
+        participants: booking.participants,
+        tourImage: booking.tourImage || halongImg,
+        tourId: booking.tourId,
+      }));
+      setBookings(mappedBookings);
+    } catch (err: unknown) {
+      console.error("Error canceling booking:", err);
+      const errorMessage = (err as any)?.response?.data?.message || "Không thể hủy tour. Vui lòng thử lại.";
+      showToast(errorMessage, "error");
+    }
+  };
+
   // Check authentication on component mount
   useEffect(() => {
     if (!user) {
@@ -86,76 +124,74 @@ const BookingHistory = () => {
     }
   }, [user, navigate]);
 
-  // Dữ liệu tour mẫu
-  const sampleBookings = [
-    {
-      id: 1,
-      tourCode: "T001",
-      tourName: "Du lịch Hạ Long 3N2Đ",
-      bookingDate: "2024-11-01T17:25:00",
-      startDate: "2024-11-15",
-      status: "processing",
-      totalPrice: 2500000,
-      participants: 2,
-      tourImage: halongImg,
-    },
-    {
-      id: 2,
-      tourCode: "T002",
-      tourName: "Tour Sapa 2N1Đ",
-      bookingDate: "2024-10-15T14:30:00",
-      startDate: "2024-10-28",
-      status: "completed",
-      totalPrice: 1800000,
-      participants: 1,
-      tourImage: fansipanImg,
-    },
-    {
-      id: 3,
-      tourCode: "T003",
-      tourName: "Phú Quốc 4N3Đ",
-      bookingDate: "2024-09-20T09:15:00",
-      startDate: "2024-10-05",
-      status: "completed",
-      totalPrice: 3200000,
-      participants: 3,
-      tourImage: avatarImg,
-    },
-    {
-      id: 4,
-      tourCode: "T004",
-      tourName: "Đà Nẵng - Hội An 3N2Đ",
-      bookingDate: "2024-12-01T20:45:00",
-      startDate: "2024-12-20",
-      status: "cancelled",
-      totalPrice: 2100000,
-      participants: 2,
-      tourImage: festivalImg,
-    },
-  ];
+  // Fetch bookings from API
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!user) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const data = await bookingService.getUserBookings();
+        
+        // Map API data to component format
+        const mappedBookings: any[] = data.map((booking) => ({
+          id: booking.bookingId,
+          tourCode: booking.bookingId.substring(0, 4).toUpperCase(),
+          tourName: booking.tourName,
+          bookingDate: booking.bookingDate,
+          startDate: booking.startDate,
+          status: booking.status,
+          totalPrice: booking.totalPrice,
+          participants: booking.participants,
+          tourImage: booking.tourImage || halongImg,
+          tourId: booking.tourId,
+        }));
+
+        setBookings(mappedBookings);
+
+        // Check if there's a new booking from navigation state
+        if (location.state?.newBooking) {
+          showToast("Đặt tour thành công!", "success");
+          // Clear navigation state
+          window.history.replaceState({}, document.title);
+        }
+      } catch (err: unknown) {
+        console.error("Error fetching bookings:", err);
+        const errorMessage = (err as any)?.response?.data?.message || "Không thể tải lịch sử đặt tour";
+        setError(errorMessage);
+        showToast(errorMessage, "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [user, location.state, showToast]);
 
   // Filter tours based on selected filter
   const filteredBookings =
     selectedFilter === "all"
-      ? sampleBookings
-      : sampleBookings.filter((booking) => booking.status === selectedFilter);
+      ? bookings
+      : bookings.filter((booking) => booking.status === selectedFilter);
 
   const filterOptions = [
-    { value: "all", label: "Tất cả", count: sampleBookings.length },
+    { value: "all", label: "Tất cả", count: bookings.length },
     {
       value: "processing",
       label: "Đang xử lý",
-      count: sampleBookings.filter((b) => b.status === "processing").length,
+      count: bookings.filter((b) => b.status === "processing").length,
     },
     {
       value: "completed",
       label: "Hoàn tất",
-      count: sampleBookings.filter((b) => b.status === "completed").length,
+      count: bookings.filter((b) => b.status === "completed").length,
     },
     {
       value: "cancelled",
       label: "Bị hủy",
-      count: sampleBookings.filter((b) => b.status === "cancelled").length,
+      count: bookings.filter((b) => b.status === "cancelled").length,
     },
   ];
 
@@ -283,6 +319,15 @@ const BookingHistory = () => {
               </div>
 
               {/* Booking history content */}
+              {loading ? (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="animate-spin text-primary" size={48} />
+                </div>
+              ) : error ? (
+                <div className="text-center py-10 text-red-500">
+                  {error}
+                </div>
+              ) : (
               <div className="space-y-4">
                 {filteredBookings.map((booking) => (
                   <div
@@ -370,7 +415,10 @@ const BookingHistory = () => {
                         ) : null}
                         
                         {booking.status === "processing" && (
-                          <button className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors">
+                          <button 
+                            className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
+                            onClick={() => handleCancelBooking(booking.id)}
+                          >
                             Hủy tour
                           </button>
                         )}
@@ -386,6 +434,7 @@ const BookingHistory = () => {
                    </div>
                 )}
               </div>
+              )}
             </div>
           </section>
         </div>
@@ -396,7 +445,7 @@ const BookingHistory = () => {
       <ReviewDialog 
         open={openReviewDialog} 
         setOpen={setOpenReviewDialog}
-        tourId={selectedBooking?.tourCode || selectedBooking?.tourId}
+        tourId={selectedBooking?.tourId || selectedBooking?.tourCode}
         tourName={selectedBooking?.tourName}
         tourImage={selectedBooking?.tourImage}
         tourDescription={selectedBooking?.description}

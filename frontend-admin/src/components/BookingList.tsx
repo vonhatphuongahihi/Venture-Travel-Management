@@ -2,40 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { StatusPill } from "./StatusPill";
 import { ChevronDown, Pencil, Search, Trash, Plus } from "lucide-react";
-
-export type BookingStatus = "completed" | "pending" | "canceled";
-
-export type BookingDetail = {
-  bookingDetailId: string;
-  ticketTypeId: string;
-  ticketTypeName: string;
-  quantity: number;
-  totalPrice: number;
-};
-
-export type Booking = {
-  bookingId: string;
-  userId: string;
-  name: string;
-  phone: string;
-  email: string;
-  pickupAddress: string;
-  departureDate: string;
-  status: "pending" | "completed" | "canceled";
-  paymentType: "cash" | "bank" | "momo";
-  totalPrice: number;
-  specialRequests: string;
-  createdAt: string;
-  updatedAt: string;
-  bookingDetails: BookingDetail[];
-};
+import { BookingAPI } from "@/services/BookingAPI"; // client API
+import type { Booking } from "./BookingModal";
+import DeleteConfirm from "./DeleteConfirm";
 
 export function BookingList() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<BookingStatus | "all">("all");
+  const [status, setStatus] = useState<Booking["status"] | "all">("all");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
 
   const statusOptions = [
     { label: "Chọn trạng thái", value: "all" },
@@ -44,67 +22,21 @@ export function BookingList() {
     { label: "Huỷ", value: "canceled" },
   ];
 
-  // MOCK booking
-  useEffect(() => {
-    const mock: Booking[] = [
-      {
-        bookingId: "b1",
-        userId: "u1",
-        name: "Nguyễn Văn A",
-        phone: "0123456789",
-        email: "a@gmail.com",
-        pickupAddress: "Hà Nội",
-        departureDate: "2025-12-01T08:00:00.000Z",
-        status: "completed",
-        paymentType: "momo",
-        totalPrice: 1500000,
-        specialRequests: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        bookingDetails: [
-          {
-            bookingDetailId: "bd1",
-            ticketTypeId: "adult",
-            ticketTypeName: "Vé người lớn",
-            quantity: 2,
-            totalPrice: 1000000,
-          },
-          {
-            bookingDetailId: "bd2",
-            ticketTypeId: "child",
-            ticketTypeName: "Vé trẻ em",
-            quantity: 1,
-            totalPrice: 300000,
-          },
-        ],
-      },
-      {
-        bookingId: "b2",
-        userId: "u2",
-        name: "Trần Thị B",
-        phone: "0987654321",
-        email: "b@gmail.com",
-        pickupAddress: "HCM",
-        departureDate: "2025-12-05T08:00:00.000Z",
-        status: "pending",
-        paymentType: "cash",
-        totalPrice: 900000,
-        specialRequests: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        bookingDetails: [
-          {
-            bookingDetailId: "bd3",
-            ticketTypeId: "child",
-            ticketTypeName: "Vé trẻ em",
-            quantity: 1,
-            totalPrice: 300000,
-          },
-        ],
-      },
-    ];
+  // --- Load bookings từ backend ---
+  const fetchBookings = async () => {
+    setLoading(true);
+    try {
+      const data = await BookingAPI.getBookings();
+      setBookings(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setBookings(mock);
+  useEffect(() => {
+    fetchBookings();
   }, []);
 
   const filtered = useMemo(() => {
@@ -118,27 +50,40 @@ export function BookingList() {
         b.name.toLowerCase().includes(q) ||
         b.email.toLowerCase().includes(q) ||
         ticketNames.includes(q);
-
       const matchesStatus = status === "all" ? true : b.status === status;
       return matchesQuery && matchesStatus;
     });
   }, [bookings, query, status]);
 
-  function removeBooking(id: string) {
-    setBookings((prev) => prev.filter((b) => b.bookingId !== id));
-  }
-
-  function saveBooking(updated: Booking, isNew = false) {
-    if (isNew) {
-      setBookings((prev) => [...prev, updated]);
-    } else {
-      setBookings((prev) =>
-        prev.map((b) => (b.bookingId === updated.bookingId ? updated : b))
-      );
+  const removeBooking = async (id: string) => {
+    try {
+      await BookingAPI.deleteBooking(id);
+      setBookings((prev) => prev.filter((b) => b.bookingId !== id));
+    } catch (err) {
+      console.error(err);
     }
-    setSelected(null);
-    setIsAdding(false);
-  }
+  };
+
+  const saveBooking = async (b: Booking, isNew = false) => {
+    try {
+      let updated: Booking;
+      if (isNew) {
+        updated = await BookingAPI.createBooking(b);
+        setBookings((prev) => [...prev, updated]);
+      } else {
+        updated = await BookingAPI.updateBooking(b.bookingId, b);
+        setBookings((prev) =>
+          prev.map((item) =>
+            item.bookingId === updated.bookingId ? updated : item
+          )
+        );
+      }
+      setSelected(null);
+      setIsAdding(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -150,8 +95,7 @@ export function BookingList() {
           className="inline-flex items-center gap-2 rounded bg-sky-500 px-4 py-2 text-white hover:bg-sky-600"
           onClick={() => setIsAdding(true)}
         >
-          <Plus size={16} />
-          Thêm Booking
+          <Plus size={16} /> Thêm Booking
         </button>
       </div>
 
@@ -165,7 +109,7 @@ export function BookingList() {
             <input
               type="text"
               className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm"
-              placeholder="Tìm tên, email, tour..."
+              placeholder="Tìm tên, email, ..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -189,73 +133,72 @@ export function BookingList() {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="px-4 py-3">Khách hàng</th>
-                  <th className="px-4 py-3">Số điện thoại</th>
-                  <th className="px-4 py-3">Email</th>
-
-                  <th className="px-4 py-3">Ngày đặt</th>
-                  <th className="px-4 py-3">Khởi hành</th>
-                  <th className="px-4 py-3">Tổng giá</th>
-
-                  <th className="px-4 py-3">Trạng thái</th>
-                  <th className="px-4 py-3">Hành động</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filtered.map((b) => (
-                  <tr
-                    key={b.bookingId}
-                    className="border-t border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="px-4 py-3">{b.name}</td>
-                    <td className="px-4 py-3">{b.phone}</td>
-                    <td className="px-4 py-3">{b.email}</td>
-
-                    <td className="px-4 py-3">{b.createdAt.slice(0, 10)}</td>
-                    <td className="px-4 py-3">
-                      {b.departureDate.slice(0, 10)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {b.totalPrice.toLocaleString()} ₫
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusPill status={b.status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <button
-                          className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
-                          onClick={() => setSelected(b)}
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-red-50 text-red-600"
-                          onClick={() => removeBooking(b.bookingId)}
-                        >
-                          <Trash size={16} />
-                        </button>
-                      </div>
-                    </td>
+        {loading ? (
+          <p className="text-center py-4 text-gray-500">Đang tải dữ liệu...</p>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 text-gray-600">
+                  <tr>
+                    <th className="px-4 py-3">Khách hàng</th>
+                    <th className="px-4 py-3">Số điện thoại</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Ngày đặt</th>
+                    <th className="px-4 py-3">Khởi hành</th>
+                    <th className="px-4 py-3">Tổng giá</th>
+                    <th className="px-4 py-3">Trạng thái</th>
+                    <th className="px-4 py-3">Hành động</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filtered.map((b) => (
+                    <tr
+                      key={b.bookingId}
+                      className="border-t border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-3">{b.name}</td>
+                      <td className="px-4 py-3">{b.phone}</td>
+                      <td className="px-4 py-3">{b.email}</td>
+                      <td className="px-4 py-3">{b.createdAt.slice(0, 10)}</td>
+                      <td className="px-4 py-3">
+                        {b.departureDate.slice(0, 10)}
+                      </td>
+                      <td className="px-4 py-3">
+                        {b.totalPrice.toLocaleString()} ₫
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusPill status={b.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <button
+                            className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
+                            onClick={() => setSelected(b)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-red-50 text-red-600"
+                            onClick={() => setDeleteTarget(b)}
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
         {selected && (
           <BookingModal
             booking={selected}
             onClose={() => setSelected(null)}
-            onSave={(b) => saveBooking(b)}
+            onSave={saveBooking}
           />
         )}
 
@@ -267,6 +210,17 @@ export function BookingList() {
           />
         )}
       </div>
+
+      <DeleteConfirm
+        open={!!deleteTarget}
+        itemName={deleteTarget?.name ?? ""}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={async () => {
+          if (!deleteTarget) return;
+          await removeBooking(deleteTarget.bookingId);
+          setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
 
 // CORS configuration
 export const corsOptions = {
     origin: function (origin: string | undefined, callback: Function) {
         const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+            'http://localhost:8080',
             'http://localhost:8081', 
             'http://localhost:8082',
             'http://localhost:5173' // Vite default port

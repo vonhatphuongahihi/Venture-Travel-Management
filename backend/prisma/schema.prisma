@@ -295,7 +295,7 @@ model BookingDetail {
   quantity        Int
   totalPrice      Float       @map("total_price")
   createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-  booking         Booking     @relation(fields: [bookingId], references: [bookingId])
+  booking         Booking     @relation(fields: [bookingId], references: [bookingId], onDelete: Cascade, onUpdate: NoAction)
   ticketPrice     TicketPrice @relation(fields: [ticketPriceId], references: [ticketPriceId])
 
   @@map("booking_details")

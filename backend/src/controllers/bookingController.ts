@@ -6,9 +6,15 @@ const prisma = new PrismaClient();
 // --- GET tất cả bookings ---
 export const getBookings = async (req: Request, res: Response) => {
   try {
-    const bookings = await prisma.bookings.findMany({
-      include: { users: true, tours: true },
-      orderBy: { booked_at: "desc" },
+    const bookings = await prisma.booking.findMany({
+      include: {
+        users: true,
+        ticketTypes: true,
+        bookingDetails: {
+          include: { ticketPrice: true }
+        }
+      },
+      orderBy: { createdAt: "desc" },
     });
     res.json({ success: true, data: bookings });
   } catch (err: any) {
@@ -20,9 +26,15 @@ export const getBookings = async (req: Request, res: Response) => {
 export const getBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const booking = await prisma.bookings.findUnique({
-      where: { booking_id: id },
-      include: { users: true, tours: true },
+    const booking = await prisma.booking.findUnique({
+      where: { bookingId: id },
+      include: {
+        users: true,
+        ticketTypes: true,
+        bookingDetails: {
+          include: { ticketPrice: true }
+        }
+      },
     });
     if (!booking)
       return res.status(404).json({ success: false, message: "Booking not found" });
@@ -37,40 +49,49 @@ export const createBooking = async (req: Request, res: Response) => {
   try {
     const b = req.body;
 
-    if (!b.user_id || !b.tour_id || !b.startAt || !b.quantity) {
+    if (!b.userId || !b.ticketTypeId || !b.pickupAddress || !b.departureDate) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
-    const booking = await prisma.bookings.create({
+    const booking = await prisma.booking.create({
       data: {
-        user_id: b.user_id,
-        tour_id: b.tour_id,
-        start_at: new Date(b.startAt),
-        booked_at: b.bookedAt ? new Date(b.bookedAt) : undefined,
+        userId: b.userId,
+        ticketTypeId: b.ticketTypeId,
+        pickupAddress: b.pickupAddress,
+        departureDate: new Date(b.departureDate),
+        name: b.name,
+        phone: b.phone,
+        email: b.email,
         status: b.status ?? "pending",
-        payment_status: b.paymentStatus ?? "unpaid",
-        quantity: Number(b.quantity),
-        note: b.note ?? null,
+        paymentType: b.paymentType ?? "cash",
+        totalPrice: b.totalPrice ?? 0,
+        specialRequests: b.specialRequests ?? null,
+        bookingDetails: b.bookingDetails ? {
+          create: b.bookingDetails.map((d: any) => ({
+            ticketPriceId: d.ticketPriceId,
+            quantity: d.quantity,
+            totalPrice: d.totalPrice
+          }))
+        } : undefined
       },
-      include: { users: true, tours: true },
+      include: { users: true, ticketTypes: true, bookingDetails: { include: { ticketPrice: true } } },
     });
 
-    res.status(201).json({ success: true, data: booking });
+    return res.status(201).json({ success: true, data: booking });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 // --- UPDATE booking ---
 export const updateBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
   try {
-    const booking = await prisma.bookings.update({
-      where: { booking_id: id },
+    const booking = await prisma.booking.update({
+      where: { bookingId: id },
       data,
-      include: { users: true, tours: true },
+      include: { users: true, ticketTypes: true, bookingDetails: { include: { ticketPrice: true } } },
     });
     res.json({ success: true, data: booking });
   } catch (err: any) {
@@ -82,25 +103,12 @@ export const updateBooking = async (req: Request, res: Response) => {
 export const deleteBooking = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    await prisma.bookings.delete({ where: { booking_id: id } });
+    await prisma.booking.delete({ where: { bookingId: id } });
     res.json({ success: true });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// Lấy tất cả tour
-export const getTours = async (req: Request, res: Response) => {
-  try {
-    const tours = await prisma.tour.findMany({
-      orderBy: { createdAt: "desc" }, 
-      select: {
-        tourId: true,
-        name: true,
-      }
-    });
-    res.json({ success: true, data: tours });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
+
+

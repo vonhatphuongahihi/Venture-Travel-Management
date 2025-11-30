@@ -8,6 +8,6 @@ router.get("/:id", bookingController.getBooking);
 router.post("/", bookingController.createBooking);
 router.patch("/:id", bookingController.updateBooking);
 router.delete("/:id", bookingController.deleteBooking);
-router.get("/tours", bookingController.getTours);
+
 
 export default router;

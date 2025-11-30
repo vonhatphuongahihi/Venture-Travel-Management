@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,8 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -15,127 +14,449 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  Download,
+  FileText,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import {
-  BarChart,
+  Area,
+  AreaChart,
   Bar,
-  PieChart,
-  Pie,
+  BarChart,
+  CartesianGrid,
   Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  AreaChart,
-  Area,
 } from "recharts";
 import {
-  Calendar as CalendarIcon,
-  TrendingUp,
-  Search,
-  TrendingDown,
-} from "lucide-react";
-import { format, subMonths } from "date-fns";
-import { vi } from "date-fns/locale";
+  AdminReportAPI,
+  type AdminReportsStats,
+  type BookingByAttractionData,
+  type MonthlyBookingData,
+  type TopTourData,
+  type TourByStatusData,
+} from "../services/adminReportAPI";
+import { Skeleton } from "./ui/skeleton";
 
-const monthlyData = [
-  { month: "Tháng 1", nội_địa: 2400, quốc_tế: 400, công_tác: 200 },
-  { month: "Tháng 2", nội_địa: 1800, quốc_tế: 350, công_tác: 180 },
-  { month: "Tháng 3", nội_địa: 3200, quốc_tế: 600, công_tác: 250 },
-  { month: "Tháng 4", nội_địa: 2800, quốc_tế: 520, công_tác: 220 },
-  { month: "Tháng 5", nội_địa: 4100, quốc_tế: 750, công_tác: 300 },
-  { month: "Tháng 6", nội_địa: 3800, quốc_tế: 680, công_tác: 280 },
-  { month: "Tháng 7", nội_địa: 4300, quốc_tế: 820, công_tác: 350 },
-];
 
-const destinationData = [
-  { name: "Vịnh Hạ Long", visitors: 15230, revenue: 11520000, rating: 4.9 },
-  { name: "Phố cổ Hội An", visitors: 12100, revenue: 3987000, rating: 4.8 },
-  { name: "Nhà thờ Đức Bà Sài Gòn", visitors: 9800, revenue: 2756000, rating: 4.7 },
-  { name: "Bán đảo Sơn Trà", visitors: 8700, revenue: 3689000, rating: 4.6 },
-  { name: "Tháp Bà Ponagar", visitors: 7650, revenue: 8543000, rating: 4.5 },
-];
-
-const visitorTypeData = [
-  { name: "Khách nội địa", value: 65, color: "#22c55e" },
-  { name: "Khách quốc tế", value: 25, color: "#3b82f6" },
-  { name: "Khách công tác", value: 10, color: "#06b6d4" },
-];
-
-const eventPerformance = [
-  { event: "Vịnh Hạ Long", attendance: 45000, revenue: 2250000 },
-  { event: "Hội An", attendance: 8500, revenue: 425000 },
-  { event: "Nhà thờ Đức Bà Sài Gòn", attendance: 150, revenue: 7500 },
-  { event: "Bán đảo Sơn Trà", attendance: 12000, revenue: 600000 },
-];
 
 export function TouristReports() {
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
-    from: subMonths(new Date(), 6),
-    to: new Date(),
-  });
+  const [reportType, setReportType] = useState<'popularity' | 'rating' | 'revenue'>('popularity');
+  const [loading, setLoading] = useState(true);
+  
+  // State cho dữ liệu
+  const [stats, setStats] = useState<AdminReportsStats | null>(null);
+  const [monthlyData, setMonthlyData] = useState<MonthlyBookingData[]>([]);
+  const [tourStatusData, setTourStatusData] = useState<TourByStatusData[]>([]);
+  const [topTours, setTopTours] = useState<TopTourData[]>([]);
+  const [attractionData, setAttractionData] = useState<BookingByAttractionData[]>([]);
 
-  const [query, setQuery] = useState("");
-  const [reportType, setReportType] = useState("overview");
+  // Fetch dữ liệu từ API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [statsData, monthlyData, statusData, toursData, attractionData] = await Promise.all([
+          AdminReportAPI.getReportsStats(),
+          AdminReportAPI.getMonthlyData(),
+          AdminReportAPI.getTourByStatus(),
+          AdminReportAPI.getTopTours(reportType),
+          AdminReportAPI.getBookingsByAttraction(),
+        ]);
+        
+        setStats(statsData);
+        setMonthlyData(monthlyData);
+        setTourStatusData(statusData);
+        setTopTours(toursData);
+        setAttractionData(attractionData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [reportType]);
+
+  // Chuyển đổi reportType string thành enum
+  const handleReportTypeChange = (value: string) => {
+    if (value === 'overview' || value === 'destinations' || value === 'visitors') {
+      const mapping = {
+        'overview': 'popularity' as const,
+        'destinations': 'rating' as const,
+        'visitors': 'revenue' as const,
+      };
+      setReportType(mapping[value]);
+    }
+  };
+
+  // Hàm chuyển đổi tiếng Việt sang ASCII
+  const convertVietnameseToAscii = (text: string) => {
+    return text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/ă/g, 'a')
+      .replace(/Ă/g, 'A')
+      .replace(/â/g, 'a')
+      .replace(/Â/g, 'A')
+      .replace(/ê/g, 'e')
+      .replace(/Ê/g, 'E')
+      .replace(/ô/g, 'o')
+      .replace(/Ô/g, 'O')
+      .replace(/ơ/g, 'o')
+      .replace(/Ơ/g, 'O')
+      .replace(/ư/g, 'u')
+      .replace(/Ư/g, 'U');
+  };
+
+  // Hàm xuất PDF với toàn bộ nội dung trang báo cáo
+  const exportToPDF = async () => {
+    try {
+      const jsPDFModule = await import('jspdf');
+      const jsPDF = jsPDFModule.default;
+      const pdf = new jsPDF();
+      
+      // Tiêu đề chính
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(convertVietnameseToAscii('BAO CAO THONG KE DU LICH'), 105, 20, { align: 'center' });
+      
+      // Ngày tạo báo cáo
+      const currentDate = new Date().toLocaleDateString('vi-VN');
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(convertVietnameseToAscii(`Bao cao duoc tao ngay: ${currentDate}`), 105, 30, { align: 'center' });
+      
+      let yPosition = 50;
+      
+      // 1. THỐNG KÊ TỔNG QUAN
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(convertVietnameseToAscii('1. THONG KE TONG QUAN'), 20, yPosition);
+      yPosition += 15;
+      
+      if (stats) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        // Tổng lượt khách
+        pdf.text(convertVietnameseToAscii(`• Tong luot khach: ${stats.totalTickets.toLocaleString()}`), 25, yPosition);
+        yPosition += 8;
+        pdf.text(convertVietnameseToAscii(`  Tang truong: ${stats.ticketGrowth >= 0 ? '+' : ''}${stats.ticketGrowth.toFixed(1)}% so voi thang truoc`), 25, yPosition);
+        yPosition += 12;
+        
+        // Tổng đặt chỗ  
+        pdf.text(convertVietnameseToAscii(`• Tong dat cho: ${stats.totalBookings.toLocaleString()}`), 25, yPosition);
+        yPosition += 8;
+        pdf.text(convertVietnameseToAscii(`  Tang truong: ${stats.bookingGrowth >= 0 ? '+' : ''}${stats.bookingGrowth.toFixed(1)}% so voi thang truoc`), 25, yPosition);
+        yPosition += 12;
+        
+        // Tổng doanh thu
+        pdf.text(convertVietnameseToAscii(`• Tong doanh thu: ${stats.totalRevenue.toLocaleString()} VND`), 25, yPosition);
+        yPosition += 8;
+        pdf.text(convertVietnameseToAscii(`  Tang truong: ${stats.revenueGrowth >= 0 ? '+' : ''}${stats.revenueGrowth.toFixed(1)}% so voi thang truoc`), 25, yPosition);
+        yPosition += 20;
+      }
+      
+      // 2. DU LIEU THEO THANG
+      if (yPosition > 220) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(convertVietnameseToAscii('2. DU LIEU THEO THANG (7 thang gan nhat)'), 20, yPosition);
+      yPosition += 15;
+      
+      if (monthlyData.length > 0) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        monthlyData.forEach((data) => {
+          if (yPosition > 270) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          const monthText = convertVietnameseToAscii(`• ${data.month}: ${data.bookings} dat cho, ${data.revenue.toLocaleString()} VND`);
+          pdf.text(monthText, 25, yPosition);
+          yPosition += 10;
+        });
+        yPosition += 10;
+      }
+      
+      // 3. TY LE TRANG THAI DAT TOUR
+      if (yPosition > 200) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(convertVietnameseToAscii('3. TY LE TRANG THAI DAT TOUR'), 20, yPosition);
+      yPosition += 15;
+      
+      if (tourStatusData.length > 0) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        tourStatusData.forEach((status) => {
+          pdf.text(convertVietnameseToAscii(`• ${status.name}: ${status.value}%`), 25, yPosition);
+          yPosition += 10;
+        });
+        yPosition += 10;
+      }
+      
+      // 4. TOP TOURS PHO BIEN NHAT
+      if (yPosition > 150) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      const sortTypeText = reportType === 'popularity' ? 'Pho bien nhat' : 
+                          reportType === 'rating' ? 'Danh gia cao' : 'Doanh thu cao';
+      pdf.text(convertVietnameseToAscii(`4. TOP TOURS (${sortTypeText})`), 20, yPosition);
+      yPosition += 15;
+      
+      if (topTours.length > 0) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        topTours.forEach((tour, index) => {
+          if (yPosition > 250) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          
+          const tourText = convertVietnameseToAscii(`${index + 1}. ${tour.tourName}`);
+          pdf.text(tourText, 25, yPosition);
+          yPosition += 8;
+          
+          pdf.text(convertVietnameseToAscii(`   - Luot dat: ${tour.bookings}`), 25, yPosition);
+          yPosition += 6;
+          pdf.text(convertVietnameseToAscii(`   - Doanh thu: ${tour.revenue.toLocaleString()} VND`), 25, yPosition);
+          yPosition += 6;
+          pdf.text(convertVietnameseToAscii(`   - Danh gia: ${tour.avgRating} sao`), 25, yPosition);
+          yPosition += 6;
+          pdf.text(convertVietnameseToAscii(`   - Tang truong: ${tour.growthRate >= 0 ? '+' : ''}${tour.growthRate}%`), 25, yPosition);
+          yPosition += 12;
+        });
+      }
+      
+      // 5. DIEM DEN PHO BIEN
+      if (yPosition > 150) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(convertVietnameseToAscii('5. DIEM DEN PHO BIEN NHAT'), 20, yPosition);
+      yPosition += 15;
+      
+      if (attractionData.length > 0) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        
+        attractionData.slice(0, 10).forEach((attraction, index) => {
+          if (yPosition > 260) {
+            pdf.addPage();
+            yPosition = 20;
+          }
+          
+          const attractionText = convertVietnameseToAscii(`${index + 1}. ${attraction.attractionName}`);
+          pdf.text(attractionText, 25, yPosition);
+          yPosition += 8;
+          pdf.text(convertVietnameseToAscii(`   - Luot dat tour: ${attraction.bookings}`), 25, yPosition);
+          yPosition += 6;
+          pdf.text(convertVietnameseToAscii(`   - Tong doanh thu: ${attraction.revenue.toLocaleString()} VND`), 25, yPosition);
+          yPosition += 12;
+        });
+      }
+      
+      pdf.save('Bao_cao_thong_ke_du_lich.pdf');
+    } catch (error) {
+      console.error('Lỗi xuất PDF:', error);
+      alert('Có lỗi xảy ra khi xuất PDF');
+    }
+  };
+
+  // Hàm xuất Excel với toàn bộ nội dung trang báo cáo
+  const exportToExcel = async () => {
+    try {
+      const XLSX = await import('xlsx');
+      
+      // Tạo workbook mới
+      const wb = XLSX.utils.book_new();
+      
+      // Sheet 1: Thống kê tổng quan
+      const statsData = [[
+        'Chỉ số', 'Giá trị', 'Tăng trưởng (%)', 'So với tháng trước'
+      ]];
+      
+      if (stats) {
+        statsData.push(
+          ['Tổng lượt khách', stats.totalTickets.toString(), stats.ticketGrowth.toFixed(1), stats.ticketGrowth >= 0 ? 'Tăng' : 'Giảm'],
+          ['Tổng đặt chỗ', stats.totalBookings.toString(), stats.bookingGrowth.toFixed(1), stats.bookingGrowth >= 0 ? 'Tăng' : 'Giảm'],
+          ['Tổng doanh thu (VND)', stats.totalRevenue.toString(), stats.revenueGrowth.toFixed(1), stats.revenueGrowth >= 0 ? 'Tăng' : 'Giảm']
+        );
+      }
+      
+      const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
+      XLSX.utils.book_append_sheet(wb, statsSheet, 'Thống kê tổng quan');
+      
+      // Sheet 2: Dữ liệu theo tháng (7 tháng gần nhất)
+      const monthlyDataArray = [[
+        'Tháng', 'Số đặt chỗ', 'Doanh thu (VND)', 'Ghi chú'
+      ]];
+      
+      monthlyData.forEach((data, index) => {
+        const note = index === monthlyData.length - 1 ? 'Tháng hiện tại' : '';
+        monthlyDataArray.push([
+          data.month,
+          data.bookings.toString(),
+          data.revenue.toString(),
+          note
+        ]);
+      });
+      
+      const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyDataArray);
+      XLSX.utils.book_append_sheet(wb, monthlySheet, 'Dữ liệu theo tháng');
+      
+      // Sheet 3: Tỷ lệ trạng thái đặt tour
+      const statusData = [[
+        'Trạng thái', 'Tỷ lệ (%)', 'Màu hiển thị'
+      ]];
+      
+      tourStatusData.forEach((status) => {
+        statusData.push([
+          status.name,
+          status.value.toString(),
+          status.color
+        ]);
+      });
+      
+      const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
+      XLSX.utils.book_append_sheet(wb, statusSheet, 'Trạng thái đặt tour');
+      
+      // Sheet 4: Top Tours (theo tiêu chí hiện tại)
+      const sortTypeText = reportType === 'popularity' ? 'Phổ biến nhất' : 
+                          reportType === 'rating' ? 'Đánh giá cao' : 'Doanh thu cao';
+      
+      const toursData = [[
+        'STT', 'Tên Tour', 'Số đặt chỗ', 'Doanh thu (VND)', 'Đánh giá (Sao)', 'Tăng trưởng (%)', `Sắp xếp theo: ${sortTypeText}`
+      ]];
+      
+      topTours.forEach((tour, index) => {
+        toursData.push([
+          (index + 1).toString(),
+          tour.tourName,
+          tour.bookings.toString(),
+          tour.revenue.toString(),
+          tour.avgRating.toString(),
+          tour.growthRate.toString(),
+          tour.growthRate >= 0 ? 'Tăng' : 'Giảm'
+        ]);
+      });
+      
+      const toursSheet = XLSX.utils.aoa_to_sheet(toursData);
+      XLSX.utils.book_append_sheet(wb, toursSheet, 'Top Tours');
+      
+      // Sheet 5: Điểm đến phổ biến nhất
+      const attractionDataArray = [[
+        'STT', 'Tên điểm đến', 'Lượt đặt tour', 'Doanh thu (VND)', 'Tỷ lệ (%)'
+      ]];
+      
+      const totalAttractionBookings = attractionData.reduce((sum, item) => sum + item.bookings, 0);
+      
+      attractionData.slice(0, 10).forEach((attraction, index) => {
+        const percentage = totalAttractionBookings > 0 ? ((attraction.bookings / totalAttractionBookings) * 100).toFixed(1) : '0';
+        attractionDataArray.push([
+          (index + 1).toString(),
+          attraction.attractionName,
+          attraction.bookings.toString(),
+          attraction.revenue.toString(),
+          percentage
+        ]);
+      });
+      
+      const attractionSheet = XLSX.utils.aoa_to_sheet(attractionDataArray);
+      XLSX.utils.book_append_sheet(wb, attractionSheet, 'Điểm đến phổ biến');
+      
+      // Sheet 6: Tóm tắt báo cáo
+      const summaryData = [[
+        'Thông tin báo cáo'
+      ], [
+        'Tên báo cáo', 'Báo cáo thống kê du lịch'
+      ], [
+        'Ngày tạo', new Date().toLocaleDateString('vi-VN')
+      ], [
+        'Thời gian tạo', new Date().toLocaleTimeString('vi-VN')
+      ], [
+        'Phạm vi dữ liệu', '7 tháng gần nhất'
+      ], [
+        'Tiêu chí sắp xếp tours', sortTypeText
+      ], [
+        'Tổng số tours trong top', topTours.length.toString()
+      ], [
+        'Tổng số điểm đến', attractionData.length.toString()
+      ], [
+        ''
+      ], [
+        'Ghi chú:'
+      ], [
+        '- Dữ liệu thống kê chỉ tính các đơn đặt đã xác nhận'
+      ], [
+        '- Tăng trưởng được tính so với tháng trước'
+      ], [
+        '- Doanh thu tính bằng VND'
+      ], [
+        '- Điểm đánh giá tính theo thang 5 sao'
+      ]];
+      
+      const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, summarySheet, 'Tóm tắt báo cáo');
+      
+      XLSX.writeFile(wb, `Bao_cao_thong_ke_du_lich.xlsx`);
+    } catch (error) {
+      console.error('Lỗi xuất Excel:', error);
+      alert('Có lỗi xảy ra khi xuất Excel');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 w-full">
+        <Card>
+          <CardContent className="pt-6">
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="p-4">
+              <Skeleton className="h-20 w-full" />
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 w-full">
-      {/* Bộ lọc */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <Search size={16} />
-                </span>
-                <input
-                  type="text"
-                  className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#26B8ED] focus:ring-2 focus:ring-[#26B8ED]/50"
-                  placeholder="Tìm kiếm ..."
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(dateRange.from, "dd MMM", { locale: vi })} -{" "}
-                    {format(dateRange.to, "dd MMM yyyy", { locale: vi })}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
-                  <Calendar
-                    mode="range"
-                    selected={{
-                      from: dateRange.from,
-                      to: dateRange.to,
-                    }}
-                    onSelect={(range) => {
-                      if (range?.from && range?.to) {
-                        setDateRange({ from: range.from, to: range.to });
-                      }
-                    }}
-                    numberOfMonths={2}
-                    locale={vi}
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Thống kê tổng quan */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Tổng lượt khách */}
@@ -144,16 +465,23 @@ export function TouristReports() {
             <CardTitle className="text-lg font-medium text-[#777]">
               Tổng lượt khách
               <div className="text-2xl font-bold text-gray-900 mt-1">
-                40,689
+                {stats?.totalTickets.toLocaleString() || '0'}
               </div>
             </CardTitle>
-            <img src="/users-purple.svg" alt="Khách" width={80} height={80} />
+            <img src="/users-purple.svg" alt="Vé" width={80} height={80} />
           </CardHeader>
           <CardContent>
             <p className="mt-1 text-gray-500 flex items-center gap-1">
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 font-medium">+8.5%</span> so với
-              năm trước
+              {(stats?.ticketGrowth || 0) >= 0 ? (
+                <TrendingUp className="w-4 h-4 text-emerald-500" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-rose-500" />
+              )}
+              <span className={`font-medium ${
+                (stats?.ticketGrowth || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}>
+                {(stats?.ticketGrowth || 0) >= 0 ? '+' : ''}{stats?.ticketGrowth.toFixed(1) || '0'}%
+              </span> so với tháng trước
             </p>
           </CardContent>
         </Card>
@@ -164,16 +492,23 @@ export function TouristReports() {
             <CardTitle className="text-lg font-medium text-[#777]">
               Tổng đặt chỗ
               <div className="text-2xl font-bold text-gray-900 mt-1">
-                10,293
+                {stats?.totalBookings.toLocaleString() || '0'}
               </div>
             </CardTitle>
             <img src="/box-yellow.svg" alt="Đặt chỗ" width={80} height={80} />
           </CardHeader>
           <CardContent>
             <p className="mt-1 text-gray-500 flex items-center gap-1">
-              <TrendingUp className="w-4 h-4 text-emerald-500" />
-              <span className="text-emerald-600 font-medium">+1.3%</span> so với
-              năm trước
+              {(stats?.bookingGrowth || 0) >= 0 ? (
+                <TrendingUp className="w-4 h-4 text-emerald-500" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-rose-500" />
+              )}
+              <span className={`font-medium ${
+                (stats?.bookingGrowth || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}>
+                {(stats?.bookingGrowth || 0) >= 0 ? '+' : ''}{stats?.bookingGrowth.toFixed(1) || '0'}%
+              </span> so với tháng trước
             </p>
           </CardContent>
         </Card>
@@ -184,61 +519,69 @@ export function TouristReports() {
             <CardTitle className="text-lg font-medium text-[#777]">
               Tổng doanh thu
               <div className="text-2xl font-bold text-gray-900 mt-1">
-                589,000,000 ₫
+                {(stats?.totalRevenue || 0).toLocaleString()} ₫
               </div>
             </CardTitle>
             <img src="/chart-green.svg" alt="Doanh thu" width={80} height={80} />
           </CardHeader>
           <CardContent>
             <p className="mt-1 text-gray-500 flex items-center gap-1">
-              <TrendingDown className="w-4 h-4 text-rose-500" />
-              <span className="text-rose-600 font-medium">-1.3%</span> so với
-              năm trước
+              {(stats?.revenueGrowth || 0) >= 0 ? (
+                <TrendingUp className="w-4 h-4 text-emerald-500" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-rose-500" />
+              )}
+              <span className={`font-medium ${
+                (stats?.revenueGrowth || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+              }`}>
+                {(stats?.revenueGrowth || 0) >= 0 ? '+' : ''}{stats?.revenueGrowth.toFixed(1) || '0'}%
+              </span> so với tháng trước
             </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Biểu đồ doanh thu & loại khách */}
+      {/* Biểu đồ đặt chỗ & trạng thái tour */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Doanh thu theo loại khách</CardTitle>
+            <CardTitle>Đặt chỗ và doanh thu theo tháng</CardTitle>
             <CardDescription>7 tháng gần nhất</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={monthlyData}>
+              <AreaChart 
+                data={monthlyData}
+                margin={{ right: 20}}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(v) => `${v.toLocaleString()} khách`} />
+                <YAxis yAxisId="bookings" />
+                <YAxis yAxisId="revenue" orientation="right" />
+                <Tooltip 
+                  formatter={(value, name) => {
+                    if (name === 'bookings') return [`${value.toLocaleString()} đặt chỗ`, 'Số đặt chỗ'];
+                    if (name === 'revenue') return [`${value.toLocaleString()} ₫`, 'Doanh thu'];
+                    return [value, name];
+                  }}
+                />
                 <Area
+                  yAxisId="bookings"
                   type="monotone"
-                  dataKey="nội_địa"
-                  stackId="1"
+                  dataKey="bookings"
                   stroke="#22c55e"
                   fill="#22c55e"
                   fillOpacity={0.6}
-                  name="Nội địa"
+                  name="bookings"
                 />
                 <Area
+                  yAxisId="revenue"
                   type="monotone"
-                  dataKey="quốc_tế"
-                  stackId="1"
+                  dataKey="revenue"
                   stroke="#3b82f6"
                   fill="#3b82f6"
-                  fillOpacity={0.6}
-                  name="Quốc tế"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="công_tác"
-                  stackId="1"
-                  stroke="#06b6d4"
-                  fill="#06b6d4"
-                  fillOpacity={0.6}
-                  name="Công tác"
+                  fillOpacity={0.4}
+                  name="revenue"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -247,21 +590,21 @@ export function TouristReports() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Tỷ lệ loại khách</CardTitle>
-            <CardDescription>Phân bố theo nhóm khách</CardDescription>
+            <CardTitle>Tỷ lệ trạng thái đặt tour</CardTitle>
+            <CardDescription>Phân bố theo trạng thái đặt tour</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={visitorTypeData}
+                  data={tourStatusData.map(item => ({ ...item, [item.name]: item.value }))}
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
                   dataKey="value"
                   label={({ name, value }) => `${name}: ${value}%`}
                 >
-                  {visitorTypeData.map((entry, index) => (
+                  {tourStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
@@ -278,12 +621,12 @@ export function TouristReports() {
           <CardHeader>
             <CardTitle>Tour phổ biến nhất</CardTitle>
             <CardDescription>
-              Các tour được truy cập và đặt nhiều nhất
+              Các tour được đặt nhiều nhất
             </CardDescription>
           </CardHeader>
 
           <div className="justify-end p-6">
-            <Select value={reportType} onValueChange={setReportType}>
+            <Select value={reportType === 'popularity' ? 'overview' : reportType === 'rating' ? 'destinations' : 'visitors'} onValueChange={handleReportTypeChange}>
               <SelectTrigger>
                 <SelectValue placeholder="Sắp xếp theo" />
               </SelectTrigger>
@@ -298,79 +641,85 @@ export function TouristReports() {
 
         <CardContent>
           <div className="space-y-4">
-            {destinationData.map((destination, index) => (
-              <div
-                key={destination.name}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-semibold text-green-700">
-                      {index + 1}
-                    </span>
+            {topTours.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">Không có dữ liệu tour</p>
+            ) : (
+              topTours.map((tour, index) => (
+                <div
+                  key={tour.tourId}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-semibold text-green-700">
+                        {index + 1}
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-medium">{tour.tourName}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {tour.bookings} lượt đặt
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium">{destination.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {destination.visitors.toLocaleString()} khách trong tháng
-                      này
-                    </p>
+                  <div className="flex items-center space-x-6">
+                    <div className="text-right">
+                      <p className="text-sm font-medium">
+                        {tour.revenue.toLocaleString()} ₫
+                      </p>
+                      <p className="text-xs text-muted-foreground">Doanh thu</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">⭐ {tour.avgRating}</p>
+                      <p className="text-xs text-muted-foreground">Đánh giá</p>
+                    </div>
+                    <Badge 
+                      variant="secondary" 
+                      className={`${tour.growthRate >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50'}`}
+                    >
+                      {tour.growthRate >= 0 ? '+' : ''}{tour.growthRate}%
+                    </Badge>
                   </div>
                 </div>
-                <div className="flex items-center space-x-6">
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      {destination.revenue.toLocaleString()} ₫
-                    </p>
-                    <p className="text-xs text-muted-foreground">Doanh thu</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">⭐ {destination.rating}</p>
-                    <p className="text-xs text-muted-foreground">Đánh giá</p>
-                  </div>
-                  <Badge variant="secondary" className="text-green-600 bg-green-50">
-                    +{Math.floor(Math.random() * 20 + 5)}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Biểu đồ đặt tour */}
+      {/* Biểu đồ đặt tour theo điểm đến */}
       <Card>
         <CardHeader>
           <CardTitle>Số lượt đặt tour theo điểm đến</CardTitle>
           <CardDescription>
-            So sánh lượt đặt và doanh thu các điểm du lịch gần đây
+            So sánh lượt đặt và doanh thu các điểm du lịch
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={eventPerformance}>
+            <BarChart data={attractionData} margin={{ right: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="event" />
+              <XAxis dataKey="attractionName" />
               <YAxis yAxisId="left" />
               <YAxis yAxisId="right" orientation="right" />
               <Tooltip
                 formatter={(v, n) =>
-                  n === "attendance"
+                  n === "bookings"
                     ? [`${v.toLocaleString()} lượt`, "Lượt đặt"]
                     : [`${v.toLocaleString()} ₫`, "Doanh thu"]
                 }
               />
               <Bar
                 yAxisId="left"
-                dataKey="attendance"
+                dataKey="bookings"
                 fill="#22c55e"
-                name="Lượt đặt"
+                name="bookings"
               />
               <Bar
                 yAxisId="right"
                 dataKey="revenue"
                 fill="#3b82f6"
-                name="Doanh thu"
+                name="revenue"
               />
             </BarChart>
           </ResponsiveContainer>
@@ -384,12 +733,22 @@ export function TouristReports() {
         </CardHeader>
 
         <CardContent className="p-0 flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2 text-sm">
-            <img src="/pdf.svg" alt="PDF" width={16} height={16} />
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 text-sm"
+            onClick={exportToPDF}
+            disabled={loading}
+          >
+            <FileText size={16} />
             Xuất PDF
           </Button>
-          <Button variant="outline" className="flex items-center gap-2 text-sm">
-            <img src="/excel.svg" alt="Excel" width={16} height={16} />
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 text-sm"
+            onClick={exportToExcel}
+            disabled={loading}
+          >
+            <Download size={16} />
             Xuất Excel
           </Button>
         </CardContent>

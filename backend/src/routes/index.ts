@@ -13,6 +13,8 @@ import routeRoutes from "./routeRoutes";
 import tourRoutes from "./tourRoutes";
 import uploadRoutes from "./uploadRoutes";
 import userRoutes from "./userRoutes";
+import bookingRoutes from "./bookingRoutes";
+
 
 const router = Router();
 
@@ -28,7 +30,9 @@ router.use('/attractions', attractionRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/admin/attractions', adminAttractionRoutes);
 router.use('/admin/reports', adminReportRoutes);
+router.use("/bookings", bookingRoutes);
 router.use('/routes', routeRoutes);
+
 
 
 router.get("/health", (req, res) => {

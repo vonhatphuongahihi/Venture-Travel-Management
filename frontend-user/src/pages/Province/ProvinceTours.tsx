@@ -1,22 +1,31 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useProvinces } from "@/contexts/ProvinceContext";
+import { useOutletContext } from "react-router-dom";
+import { useProvinceToursInfinite } from "@/hooks/useProvince";
 
 // Import assets
 import ProvinceToursSection from "@/components/province/ProvinceToursSection";
-import ReviewsSection from "@/components/province/ReviewsSection";
-import { mockAttractions } from "@/data/attractions";
-import { mockTours } from "@/data/tours";
-import { Attraction, Tour } from "@/global.types";
+import { Province, Tour } from "@/global.types";
+
+interface ProvincePageContext {
+  province: Province;
+}
 
 const ProvinceTours = () => {
-  const { slug } = useParams<{ slug: string }>();
-  const { getProvinceBySlug } = useProvinces();
+  const { province } = useOutletContext<ProvincePageContext>();
   const [sortBy, setSortBy] = useState<string>("price-asc");
-  const [tours, setTours] = useState<Tour[]>(mockTours);
-  const [attractions, setAttractions] = useState<Attraction[]>(mockAttractions);
-  const province = slug ? getProvinceBySlug(slug) : undefined;
-  const textRef = useRef(null);
+  
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading
+  } = useProvinceToursInfinite(province?.id?.toString() || "", 6, sortBy);
+
+  const tours = data?.pages.flatMap((page: any) => page.data) || [];
+  const totalTours = data?.pages[0]?.pagination?.total || 0;
+
+  const textRef = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
 
   useEffect(() => {
@@ -28,6 +37,8 @@ const ProvinceTours = () => {
     }
   }, []);
 
+  if (!province) return null;
+
   return (
     <div className="container mx-auto max-w-7xl space-y-8 mb-8">
       {/* Tours Section */}
@@ -35,10 +46,11 @@ const ProvinceTours = () => {
         tours={tours}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        onLoadMore={() => fetchNextPage()}
+        hasMore={hasNextPage}
+        isLoadingMore={isFetchingNextPage}
+        totalTours={totalTours}
       />
-
-      {/* Reviews Section */}
-      <ReviewsSection province={province} />
     </div>
   );
 };

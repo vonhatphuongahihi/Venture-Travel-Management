@@ -101,7 +101,7 @@ export class AttractionAPI {
     return data;
   }
 
-  // 🟧 Create
+
   // 🟧 Create (multipart/form-data)
 static async createAttraction(formData: FormData): Promise<AbstractResponse<Attraction>> {
   const { data } = await axiosClient.post(`${this.prefix}`, formData, {
@@ -126,4 +126,5 @@ static async createAttraction(formData: FormData): Promise<AbstractResponse<Attr
     const { data } = await axiosClient.delete(`${this.prefix}/${attractionId}`);
     return data;
   }
+  
 }

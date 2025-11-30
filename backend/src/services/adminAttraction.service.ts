@@ -31,7 +31,7 @@ export class AdminAttractionService {
       orderBy: { createdAt: "desc" },
       include: {
         province: true,          // Lấy tên tỉnh
-        reviews: {
+        attractionReviews: {
           include: {
             user: true,          // Nếu muốn lấy thông tin user review
           },

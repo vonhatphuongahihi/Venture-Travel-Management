@@ -32,7 +32,6 @@ function TravellerPicker({
             setOpen(false);
             setTotalPeople(pc.reduce((sum, curr) => sum + curr.quantity, 0));
             setUserTicket((prev)=>{return {...prev, priceCategories: pc }});
-            console.log(pc?.map(tc => ({ categoryId: tc.categoryId, name: tc.name, quantity: tc.quantity })))
           }}
         />
       </PopoverContent>

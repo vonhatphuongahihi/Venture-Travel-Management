@@ -1,17 +1,17 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import session from 'express-session';
-import passport from 'passport';
-import routes from '@/routes';
-import googleAuthRoutes from '@/routes/googleAuthRoutes';
-import './config/passport';
 import {
-    securityMiddleware,
     corsOptions,
     errorHandler,
-    notFoundHandler
+    notFoundHandler,
+    securityMiddleware
 } from '@/middleware';
+import routes from '@/routes';
+import googleAuthRoutes from '@/routes/googleAuthRoutes';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import session from 'express-session';
+import passport from 'passport';
+import './config/passport';
 
 // Load environment variables
 dotenv.config();
@@ -19,11 +19,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(securityMiddleware);
 
 // CORS
 app.use(cors(corsOptions));
+
+// Security middleware
+app.use(securityMiddleware);
+
 
 // Session middleware
 app.use(session({

@@ -1,9 +1,9 @@
-import avatarImg from "@/assets/beach-destination.jpg";
 import halongImg from "@/assets/hero-vietnam-1.jpg";
 import fansipanImg from "@/assets/fansipan.jpg";
 import festivalImg from "@/assets/cultural-festival.jpg";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import UserSidebar from "@/components/UserSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useEffect, useState } from "react";
@@ -12,8 +12,6 @@ import ReviewDialog from "./ReviewDialog";
 import { bookingService } from "@/services/booking.service";
 import { BookingHistoryItem } from "@/types/tour.types";
 import { Loader2 } from "lucide-react";
-// Import icons cho menu toggle
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 const BookingHistory = () => {
   const { user, logout } = useAuth();
@@ -136,17 +134,9 @@ const BookingHistory = () => {
         const data = await bookingService.getUserBookings();
         
         // Map API data to component format
-        const mappedBookings: any[] = data.map((booking) => ({
-          id: booking.bookingId,
-          tourCode: booking.bookingId.substring(0, 4).toUpperCase(),
-          tourName: booking.tourName,
-          bookingDate: booking.bookingDate,
-          startDate: booking.startDate,
-          status: booking.status,
-          totalPrice: booking.totalPrice,
-          participants: booking.participants,
+        const mappedBookings = data.map((booking) => ({
+          ...booking,
           tourImage: booking.tourImage || halongImg,
-          tourId: booking.tourId,
         }));
 
         setBookings(mappedBookings);
@@ -210,88 +200,7 @@ const BookingHistory = () => {
           
           {/* Sidebar */}
           {/* RESPONSIVE: Width full trên mobile, fixed width trên desktop */}
-          <aside className="w-full lg:w-64 bg-white/80 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 self-start top-20 z-10">
-             {/* Header Sidebar: Click để toggle trên mobile */}
-             <div 
-                className="p-4 flex items-center justify-between cursor-pointer lg:cursor-default"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={user?.profilePhoto || avatarImg}
-                    alt="avatar"
-                    className="h-12 w-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="text-m font-medium">
-                      {user?.name || "Người dùng"}
-                    </div>
-                    <div className="text-xs text-slate-600">Thành viên</div>
-                  </div>
-                </div>
-                {/* Icon toggle chỉ hiện trên mobile/tablet */}
-                <div className="lg:hidden text-slate-400">
-                  {isSidebarOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                </div>
-            </div>
-
-            {/* Menu Nav: Ẩn/Hiện trên mobile dựa vào state, luôn hiện trên desktop */}
-            <div className={`px-4 pb-4 ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
-              <nav className="space-y-2 mt-2">
-                <Link
-                  to="/profile"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Hồ sơ của tôi
-                </Link>
-                <Link
-                  to="#"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Thông báo
-                </Link>
-                <Link
-                  to="/booking-history"
-                  className="block text-m py-2 px-3 rounded-md border text-primary border-primary/50 bg-primary/5"
-                >
-                  Lịch sử đặt tour
-                </Link>
-                <Link
-                  to="#"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Cài đặt
-                </Link>
-              </nav>
-
-              <div className="mt-6 border-t border-border pt-4">
-                <Link
-                  to="/terms"
-                  className="block w-full text-m text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Điều khoản sử dụng
-                </Link>
-                <Link
-                  to="/policy"
-                  className="block w-full text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Chính sách bảo mật
-                </Link>
-                <Link
-                  to="/about"
-                  className="block w-full text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Về VENTURE
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-l text-center py-2 px-3 rounded-md mt-6 lg:mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
-                >
-                  Đăng xuất
-                </button>
-              </div>
-            </div>
-          </aside>
+          <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="booking-history" />
 
           {/* Main card */}
           <section className="flex-1 min-w-0">
@@ -331,13 +240,13 @@ const BookingHistory = () => {
               <div className="space-y-4">
                 {filteredBookings.map((booking) => (
                   <div
-                    key={booking.id}
+                    key={booking.bookingId}
                     className="border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md transition-shadow"
                   >
                     {/* Tour Code & Status */}
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
                       <p className="text-xs md:text-sm font-medium text-gray-500 truncate">
-                        #{booking.tourCode} -{" "}
+                        #{booking.bookingId.substring(0, 4).toUpperCase()} -{" "}
                         {formatBookingDateTime(booking.bookingDate)}
                       </p>
                       <span
@@ -417,7 +326,7 @@ const BookingHistory = () => {
                         {booking.status === "processing" && (
                           <button 
                             className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
-                            onClick={() => handleCancelBooking(booking.id)}
+                            onClick={() => handleCancelBooking(booking.bookingId)}
                           >
                             Hủy tour
                           </button>

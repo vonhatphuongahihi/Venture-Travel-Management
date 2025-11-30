@@ -38,7 +38,7 @@ export class AdminDashboardService {
       });
 
       // Get total bookings (pending + confirmed)
-      const totalBookings = await prisma.bookings.count({
+      const totalBookings = await prisma.booking.count({
         where: {
           status: {
             in: ['pending', 'confirmed']
@@ -81,23 +81,23 @@ export class AdminDashboardService {
         const endDate = new Date(currentYear, month, 0, 23, 59, 59);
 
         // Get revenue for the month
-        const revenue = await prisma.bookings.aggregate({
+        const revenue = await prisma.booking.aggregate({
           where: {
-            created_at: {
+            createdAt: {
               gte: startDate,
               lte: endDate
             },
             status: 'confirmed'
           },
           _sum: {
-            total_price: true
+            totalPrice: true
           }
         });
 
         // Get booking count for the month (pending + confirmed)
-        const bookings = await prisma.bookings.count({
+        const bookings = await prisma.booking.count({
           where: {
-            created_at: {
+            createdAt: {
               gte: startDate,
               lte: endDate
             },
@@ -114,7 +114,7 @@ export class AdminDashboardService {
 
         monthlyData.push({
           month: monthNames[month - 1],
-          revenue: (revenue._sum.total_price || 0) / 1000000, // Convert to millions
+          revenue: (revenue._sum.totalPrice || 0) / 1000000, // Convert to millions
           bookings: bookings
         });
       }

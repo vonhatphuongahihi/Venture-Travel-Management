@@ -12,6 +12,7 @@ export const getBookings = async (req: Request, res: Response) => {
         users: true,
         ticketTypes: true,
         bookingDetails: {
+
           include: {
             ticketPrice: true
           }
@@ -35,9 +36,11 @@ export const getBooking = async (req: Request, res: Response) => {
         users: true,
         ticketTypes: true,
         bookingDetails: {
+
           include: {
             ticketPrice: true
           }
+
         }
       },
     });
@@ -53,6 +56,7 @@ export const getBooking = async (req: Request, res: Response) => {
 export const createBooking = async (req: Request, res: Response) => {
   try {
     const b = req.body;
+
 
     if (!b.user_id || !b.ticket_type_id || !b.pickup_address || !b.departure_date ||
         !b.name || !b.phone || !b.email || !b.total_price || !b.priceCategories) {
@@ -153,9 +157,9 @@ export const createBooking = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, message: err.message });
     }
     res.status(500).json({ success: false, message: err.message });
+
   }
 };
-
 
 // --- UPDATE booking ---
 export const updateBooking = async (req: Request, res: Response) => {
@@ -165,6 +169,7 @@ export const updateBooking = async (req: Request, res: Response) => {
     const booking = await prisma.booking.update({
       where: { bookingId: id },
       data,
+
       include: {
         users: true,
         ticketTypes: true,
@@ -174,6 +179,7 @@ export const updateBooking = async (req: Request, res: Response) => {
           }
         }
       },
+
     });
     res.json({ success: true, data: booking });
   } catch (err: any) {
@@ -191,6 +197,7 @@ export const deleteBooking = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 // --- CANCEL booking ---
 export const cancelBooking = async (req: AuthenticatedRequest, res: Response) => {
@@ -344,3 +351,4 @@ export const getTours = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+

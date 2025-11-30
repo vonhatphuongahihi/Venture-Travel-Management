@@ -50,13 +50,13 @@ export class AdminReportService {
     const endOfLastMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 0);
 
     // Tổng số vé của tháng hiện tại (tính từ booking_details)
-    const currentMonthTicketsResult = await prisma.booking_details.aggregate({
+    const currentMonthTicketsResult = await prisma.bookingDetail.aggregate({
       _sum: {
         quantity: true
       },
       where: {
-        bookings: {
-          created_at: {
+        booking: {
+          createdAt: {
             gte: startOfCurrentMonth
           },
           status: 'confirmed'
@@ -65,9 +65,9 @@ export class AdminReportService {
     });
 
     // Tổng đặt chỗ của tháng hiện tại
-    const currentMonthBookings = await prisma.bookings.count({
+    const currentMonthBookings = await prisma.booking.count({
       where: {
-        created_at: {
+        createdAt: {
           gte: startOfCurrentMonth
         },
         status: 'confirmed'
@@ -75,12 +75,12 @@ export class AdminReportService {
     });
 
     // Tổng doanh thu của tháng hiện tại
-    const currentMonthRevenueResult = await prisma.bookings.aggregate({
+    const currentMonthRevenueResult = await prisma.booking.aggregate({
       _sum: {
-        total_price: true
+        totalPrice: true
       },
       where: {
-        created_at: {
+        createdAt: {
           gte: startOfCurrentMonth
         },
         status: 'confirmed'
@@ -88,13 +88,13 @@ export class AdminReportService {
     });
 
     // Thống kê số vé tháng trước
-    const lastMonthTicketsResult = await prisma.booking_details.aggregate({
+    const lastMonthTicketsResult = await prisma.bookingDetail.aggregate({
       _sum: {
         quantity: true
       },
       where: {
-        bookings: {
-          created_at: {
+        booking: {
+          createdAt: {
             gte: startOfLastMonth,
             lte: endOfLastMonth
           },
@@ -104,9 +104,9 @@ export class AdminReportService {
     });
 
     // Thống kê đặt chỗ tháng trước
-    const lastMonthBookings = await prisma.bookings.count({
+    const lastMonthBookings = await prisma.booking.count({
       where: {
-        created_at: {
+        createdAt: {
           gte: startOfLastMonth,
           lte: endOfLastMonth
         },
@@ -115,12 +115,12 @@ export class AdminReportService {
     });
 
     // Thống kê doanh thu tháng trước
-    const lastMonthRevenueResult = await prisma.bookings.aggregate({
+    const lastMonthRevenueResult = await prisma.booking.aggregate({
       _sum: {
-        total_price: true
+        totalPrice: true
       },
       where: {
-        created_at: {
+        createdAt: {
           gte: startOfLastMonth,
           lte: endOfLastMonth
         },
@@ -131,8 +131,8 @@ export class AdminReportService {
     // Tính tỷ lệ tăng trưởng
     const currentMonthTickets = currentMonthTicketsResult._sum.quantity || 0;
     const lastMonthTickets = lastMonthTicketsResult._sum.quantity || 0;
-    const currentMonthRevenue = currentMonthRevenueResult._sum.total_price || 0;
-    const lastMonthRevenue = lastMonthRevenueResult._sum.total_price || 0;
+    const currentMonthRevenue = currentMonthRevenueResult._sum.totalPrice || 0;
+    const lastMonthRevenue = lastMonthRevenueResult._sum.totalPrice || 0;
 
     const ticketGrowth = lastMonthTickets > 0 ? ((currentMonthTickets - lastMonthTickets) / lastMonthTickets) * 100 : 0;
     const bookingGrowth = lastMonthBookings > 0 ? ((currentMonthBookings - lastMonthBookings) / lastMonthBookings) * 100 : 0;
@@ -170,9 +170,9 @@ export class AdminReportService {
       const startOfNextMonth = new Date(date.getFullYear(), date.getMonth() + 1, 1);
       startOfNextMonth.setHours(0, 0, 0, 0);
 
-      const bookingCount = await prisma.bookings.count({
+      const bookingCount = await prisma.booking.count({
         where: {
-          created_at: {
+          createdAt: {
             gte: startOfMonth,
             lt: startOfNextMonth
           },
@@ -180,12 +180,12 @@ export class AdminReportService {
         }
       });
 
-      const revenueResult = await prisma.bookings.aggregate({
+      const revenueResult = await prisma.booking.aggregate({
         _sum: {
-          total_price: true
+          totalPrice: true
         },
         where: {
-          created_at: {
+          createdAt: {
             gte: startOfMonth,
             lt: startOfNextMonth
           },
@@ -196,7 +196,7 @@ export class AdminReportService {
       data.push({
         month: monthNames[date.getMonth()],
         bookings: bookingCount,
-        revenue: revenueResult._sum.total_price || 0
+        revenue: revenueResult._sum.totalPrice || 0
       });
     }
 
@@ -205,15 +205,15 @@ export class AdminReportService {
 
   // Thống kê tour theo trạng thái đặt chỗ
   async getTourByStatusData(): Promise<TourByStatusData[]> {
-    const confirmedBookings = await prisma.bookings.count({
+    const confirmedBookings = await prisma.booking.count({
       where: { status: 'confirmed' }
     });
 
-    const pendingBookings = await prisma.bookings.count({
+    const pendingBookings = await prisma.booking.count({
       where: { status: 'pending' }
     });
 
-    const cancelledBookings = await prisma.bookings.count({
+    const cancelledBookings = await prisma.booking.count({
       where: { status: 'cancelled' }
     });
 
@@ -247,25 +247,25 @@ export class AdminReportService {
             }
           }
         },
-        reviews: true
+        tourReviews: true
       }
     });
 
     const tourStats = tours.map(tour => {
       const totalBookings = tour.ticketTypes.reduce((sum, ticketType) => sum + ticketType.bookings.length, 0);
       const totalRevenue = tour.ticketTypes.reduce((sum, ticketType) => 
-        sum + ticketType.bookings.reduce((bookingSum, booking) => bookingSum + booking.total_price, 0), 0
+        sum + ticketType.bookings.reduce((bookingSum, booking) => bookingSum + booking.totalPrice, 0), 0
       );
       
-      const avgRating = tour.reviews.length > 0 ? 
-        tour.reviews.reduce((sum, review) => sum + review.rate, 0) / tour.reviews.length : 0;
+      const avgRating = tour.tourReviews.length > 0 ? 
+        tour.tourReviews.reduce((sum, review) => sum + review.rate, 0) / tour.tourReviews.length : 0;
 
       // Tính tỷ lệ tăng trưởng (giả sử so với tháng trước)
       const currentMonth = new Date();
       const startOfCurrentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
       
       const currentMonthBookings = tour.ticketTypes.reduce((sum, ticketType) => 
-        sum + ticketType.bookings.filter(booking => booking.created_at >= startOfCurrentMonth).length, 0
+        sum + ticketType.bookings.filter(booking => booking.createdAt >= startOfCurrentMonth).length, 0
       );
 
       const lastMonth = new Date();
@@ -275,7 +275,7 @@ export class AdminReportService {
 
       const lastMonthBookings = tour.ticketTypes.reduce((sum, ticketType) => 
         sum + ticketType.bookings.filter(booking => 
-          booking.created_at >= startOfLastMonth && booking.created_at <= endOfLastMonth
+          booking.createdAt >= startOfLastMonth && booking.createdAt <= endOfLastMonth
         ).length, 0
       );
 
@@ -341,7 +341,7 @@ export class AdminReportService {
       const revenue = attraction.tourStops.reduce((sum, stop) => {
         return sum + stop.tour.ticketTypes.reduce((ticketSum, ticketType) => {
           return ticketSum + ticketType.bookings.reduce((bookingSum, booking) => {
-            return bookingSum + booking.total_price;
+            return bookingSum + booking.totalPrice;
           }, 0);
         }, 0);
       }, 0);

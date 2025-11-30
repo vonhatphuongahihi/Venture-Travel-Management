@@ -580,13 +580,19 @@ export class TourService {
 
         const attractions = await this.prisma.attraction.findMany({
             where,
-            include: {
+            select: {
+                attractionId: true,
+                name: true,
+                address: true,
+                description: true,
+
                 province: {
                     select: {
                         provinceId: true,
                         name: true,
                     },
                 },
+
                 point: {
                     select: {
                         pointId: true,

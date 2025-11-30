@@ -5,6 +5,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const tourService = new TourService(prisma, process.env.MAPBOX_ACCESS_TOKEN);
 
+
 async function main() {
     const tourData1: CreateTourRequest = {
         name: "Tour riêng nửa ngày tại Thành phố Hồ Chí Minh",

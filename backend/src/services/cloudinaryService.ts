@@ -78,6 +78,42 @@ export class CloudinaryService {
         );
     }
 
+    async uploadTourImage(
+        fileBuffer: Buffer,
+        fileName: string,
+        options?: {
+            width?: number;
+            height?: number;
+            crop?: 'fill' | 'fit' | 'scale' | 'limit';
+            quality?: string;
+            format?: string;
+        }
+    ): Promise<UploadApiResponse> {
+        try {
+            const {
+                width = 1600,
+                height = 900,
+                crop = 'fill',
+                quality = 'auto:good',
+                format = 'webp'
+            } = options || {};
+
+            return this.uploadImage(
+                fileBuffer,
+                fileName,
+                'venture-travel/tours', // Thư mục riêng cho tour
+                {
+                    width,
+                    height,
+                    crop,
+                    quality,
+                    format
+                }
+            );
+        } catch (error) {
+            throw new Error(`Failed to upload tour image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
     // Delete image from Cloudinary
     async deleteImage(publicId: string): Promise<any> {
         try {

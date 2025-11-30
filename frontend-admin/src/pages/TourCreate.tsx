@@ -6,7 +6,7 @@ import FormTextArea from "@/components/tour-create/FormTextArea";
 import ImageUploader from "@/components/tour-create/ImageUploader";
 import { SearchableSelect } from "@/components/tour-create/SearchableSelect";
 import TextEditor from "@/components/tour-create/TextEditor";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { Plus, X } from "lucide-react";
 import {
     Select,
@@ -19,12 +19,16 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import TicketFormModal from "@/components/tour-create/TicketFormModal";
+import { useCreateTour, useGetTourFormMetadata } from "@/services/tours/tourHook";
+import { Spinner } from "@/components/ui/spinner";
+import type { Attraction, CreateTourRequest } from "@/types/tour";
+import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
 
 const MAPBOX_TOKEN =
     "pk.eyJ1Ijoibmd1eWVuMDk4MyIsImEiOiJjbWZoaDU5MWYwYnY0Mmlwd28zZm5ha2Z5In0.YXBPUe4baagMkZD2NpbRGA";
 
 type TourStop = {
-    attrationId: string;
+    attractionId: string;
     notes: string;
     details: string;
 };
@@ -39,13 +43,15 @@ type TourFormValues = {
     languages: string[];
     categories: string[];
     highlights?: string;
-    inclusions: string[];
-    exclusions: string[];
+    inclusions: string;
+    exclusions: string;
     expectations: string;
     cancellationPolicy: string;
     additionalInfomation: string;
     pickupPoint: string;
     pickupDetails: string;
+    pickupAreaRadius: number;
+    endPoint: string;
     tourStops: TourStop[];
 };
 
@@ -96,23 +102,23 @@ type Option<T = any> = {
 };
 
 const tourCategoryOptionList = [
-    { label: "Tour Thiên nhiên", value: "100" },
-    { label: "Tour Ngắm cảnh", value: "101" },
-    { label: "Nghệ thuật & Văn hoá", value: "102" },
-    { label: "Tour dưới nước", value: "103" },
-    { label: "Tour trên đất liền", value: "104" },
-    { label: "Tour ẩm thực", value: "105" },
-    { label: "Tour theo chủ đề", value: "106" },
-    { label: "Tour nửa ngày", value: "107" },
-    { label: "Khám phá đảo", value: "108" },
-    { label: "Tour bằng xe buýt", value: "109" },
+    { label: "Tour Thiên nhiên", value: "Tour Thiên nhiên" },
+    { label: "Tour Ngắm cảnh", value: "Tour Ngắm cảnh" },
+    { label: "Nghệ thuật & Văn hoá", value: "Nghệ thuật & Văn hoá" },
+    { label: "Tour dưới nước", value: "Tour dưới nước" },
+    { label: "Tour trên đất liền", value: "Tour trên đất liền" },
+    { label: "Tour ẩm thực", value: "Tour ẩm thực" },
+    { label: "Tour theo chủ đề", value: "Tour theo chủ đề" },
+    { label: "Tour nửa ngày", value: "Tour nửa ngày" },
+    { label: "Khám phá đảo", value: "Khám phá đảo" },
+    { label: "Tour bằng xe buýt", value: "Tour bằng xe buýt" },
 ];
 
 const languagesOptionList = [
-    { label: "Tiếng Việt", value: "200" },
-    { label: "Tiếng Anh", value: "201" },
-    { label: "Tiếng Nhật", value: "202" },
-    { label: "Tiếng Trung", value: "203" },
+    { label: "Tiếng Việt", value: "Tiếng Việt" },
+    { label: "Tiếng Anh", value: "Tiếng Anh" },
+    { label: "Tiếng Nhật", value: "Tiếng Nhật" },
+    { label: "Tiếng Trung", value: "Tiếng Trung" },
 ];
 
 const freePickupScopes = ["500", "1000", "1500"];
@@ -123,13 +129,15 @@ const TourCreate = () => {
         handleSubmit,
         formState: { errors },
         control,
+        setValue,
+        getValues,
     } = useForm<TourFormValues>({
         defaultValues: {
             cancellationPolicy: "",
             expectations: "",
             tourStops: [
                 {
-                    attrationId: "",
+                    attractionId: "",
                     notes: "",
                     details: "",
                 },
@@ -148,9 +156,23 @@ const TourCreate = () => {
 
     const [tourData, setTourData] = useState<TourFormValues | null>(null);
 
+    const [selectedPickUpAddress, setSelectedPickUpAddress] =
+        useState<Option<MapboxGeocodingFeature> | null>(null);
+
+    const {
+        data: metadata,
+        isLoading: loadingMetadata,
+        error: metadataError,
+    } = useGetTourFormMetadata();
+
+    // Create tour hook
+    const createTour = useCreateTour();
+
     const onSubmitTour = (data: TourFormValues) => {
         setStep(2);
         setTourData(data);
+        console.log(data);
+        console.log(selectedPickUpAddress);
     };
 
     const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -201,10 +223,41 @@ const TourCreate = () => {
         setEditingTicket(null);
         setEditingIndex(null);
     };
-    const TourCreateStep1 = () => {
-        const [selectedAddress, setSelectedAddress] =
-            useState<Option<MapboxGeocodingFeature> | null>(null);
 
+    // console.log(metadata);
+
+    const finishTour = () => {
+        console.log(tourData);
+        console.log(tickets);
+
+        // if (tourData && tickets) {
+        //     const payload: CreateTourRequest = {
+        //         name: tourData.name,
+        //         about: tourData.about,
+        //             ageRange: tourData.ageRange,
+        //             maxGroupSize: tourData.maxGroupSize,
+        //             duration: tourData.duration,
+        //             languages: tourData.languages,
+        //             categories: tourData.categories,
+        //             highlights: tourData.highlights?.split("\n"),
+        //             inclusions: tourData.inclusions.split("\n"),
+        //             exclusions: tourData.exclusions.split("\n"),
+        //             expectations: tourData.expectations,
+        //             cancellationPolicy: tourData.cancellationPolicy,
+        //             pickupPoint: tourData.pickupPoint,
+        //             pickupDetails: tourData.pickupDetails,
+        //             pickupAreaRadius: tourData.pickupAreaRadius,
+        //             endPoint: tourData.endPoint,
+        //             startDate: new Date("2025-01-01"),
+        //             endDate: new Date("2025-12-31"),
+        //             images: [],
+        //             tourStops: tourData.tourStops,
+        //             ticketTypes: tickets
+        //     };
+        // }
+    };
+
+    const TourCreateStep1 = () => {
         // Hàm gọi Mapbox Geocoding API v6
         const fetchMapboxPlaces = async (query: string): Promise<MapboxGeocodingFeature[]> => {
             if (!query || query.trim().length < 3) return [];
@@ -256,15 +309,22 @@ const TourCreate = () => {
             );
         };
 
-        const handleSelect = (option: Option<MapboxGeocodingFeature>) => {
-            setSelectedAddress(option);
-            console.log("Selected:", {
-                name: option.label,
-                coordinates: option.data?.geometry.coordinates, // [lng, lat]
-                fullAddress: option.data?.properties.full_address,
-            });
-        };
+        // const handleSelect = (option: Option<MapboxGeocodingFeature>) => {
+        //     setSelectedPickUpAddress(option);
+        //     console.log("Selected:", {
+        //         name: option.label,
+        //         coordinates: option.data?.geometry.coordinates, // [lng, lat]
+        //         fullAddress: option.data?.properties.full_address,
+        //     });
+        // };
 
+        if (loadingMetadata) {
+            return (
+                <div className="flex min-h-[70vh] items-center justify-center">
+                    <Spinner className="size-10 text-primary"></Spinner>
+                </div>
+            );
+        }
         return (
             <div>
                 <div className="flex items-center justify-between">
@@ -456,14 +516,31 @@ const TourCreate = () => {
                                         Điểm tập trung khả dụng
                                         <span className="text-red-500 ml-1">*</span>
                                     </label>
-                                    <SearchableSelect<MapboxGeocodingFeature>
-                                        placeholder="Nhập địa chỉ (ít nhất 3 ký tự)..."
-                                        fetchOptions={fetchMapboxPlaces}
-                                        mapOption={mapMapboxToOption}
-                                        renderOption={renderMapboxOption}
-                                        onSelect={handleSelect}
-                                        error={undefined}
-                                    ></SearchableSelect>
+                                    <Controller
+                                        control={control}
+                                        name={`pickupPoint`}
+                                        // rules={{ required: "Điểm đến là bắt buộc" }}
+                                        render={({ field: formField, fieldState: { error } }) => {
+                                            return (
+                                                <SearchableSelect<MapboxGeocodingFeature>
+                                                    placeholder="Tìm kiếm địa điểm"
+                                                    fetchOptions={fetchMapboxPlaces}
+                                                    mapOption={mapMapboxToOption}
+                                                    renderOption={renderMapboxOption}
+                                                    value={formField.value}
+                                                    onChange={(value) => {
+                                                        formField.onChange(value);
+                                                    }}
+                                                    onSelect={(option) => {
+                                                        // ✅ Lưu cả name
+                                                        setSelectedPickUpAddress(option);
+                                                        setValue(`pickupPoint`, option.label);
+                                                    }}
+                                                    error={error?.message}
+                                                />
+                                            );
+                                        }}
+                                    />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-5">
@@ -472,21 +549,40 @@ const TourCreate = () => {
                                         </p>
                                         <div>
                                             <label className={`block mb-2 font-medium`}></label>
-                                            <Select defaultValue={freePickupScopes[1]}>
-                                                <SelectTrigger
-                                                    className={` w-[100px]
+                                            <Controller
+                                                control={control}
+                                                name={"pickupAreaRadius"}
+                                                defaultValue={parseInt(freePickupScopes[1])}
+                                                render={({ field }) => (
+                                                    <div>
+                                                        <Select
+                                                            value={field.value.toString()}
+                                                            onValueChange={(value) => {
+                                                                const finalValue = parseInt(value);
+                                                                field.onChange(finalValue);
+                                                            }}
+                                                            defaultValue={freePickupScopes[1]}
+                                                        >
+                                                            <SelectTrigger
+                                                                className={` w-[100px]
                                             border rounded border-gray-300 py-2 text-base outline-none`}
-                                                >
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {freePickupScopes.map((scope) => (
-                                                        <SelectItem key={scope} value={scope}>
-                                                            {scope}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                                            >
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {freePickupScopes.map((scope) => (
+                                                                    <SelectItem
+                                                                        key={scope}
+                                                                        value={scope}
+                                                                    >
+                                                                        {scope}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                )}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -508,7 +604,30 @@ const TourCreate = () => {
                                             (để trống nếu trả khách tại nơi đón)
                                         </span>
                                     </p>
-                                    <SearchableSelect error={undefined}></SearchableSelect>
+                                    <Controller
+                                        control={control}
+                                        name={`endPoint`}
+                                        render={({ field: formField, fieldState: { error } }) => {
+                                            return (
+                                                <SearchableSelect<MapboxGeocodingFeature>
+                                                    placeholder="Tìm kiếm địa điểm"
+                                                    fetchOptions={fetchMapboxPlaces}
+                                                    mapOption={mapMapboxToOption}
+                                                    renderOption={renderMapboxOption}
+                                                    value={formField.value}
+                                                    onChange={(value) => {
+                                                        formField.onChange(value);
+                                                    }}
+                                                    onSelect={(option) => {
+                                                        // ✅ Lưu cả name
+                                                        setSelectedPickUpAddress(option);
+                                                        setValue(`endPoint`, option.label);
+                                                    }}
+                                                    error={error?.message}
+                                                />
+                                            );
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -534,9 +653,13 @@ const TourCreate = () => {
                                                     >
                                                         Điểm đến
                                                     </label>
-                                                    <SearchableSelect
-                                                        error={undefined}
-                                                    ></SearchableSelect>
+                                                    <AttractionSelect
+                                                        control={control}
+                                                        name={`tourStops.${index}.attractionId`}
+                                                        index={index}
+                                                        attractions={metadata?.attractions}
+                                                        getValues={getValues}
+                                                    ></AttractionSelect>
                                                 </div>
                                                 <FormInput
                                                     label="Chú thích"
@@ -575,7 +698,7 @@ const TourCreate = () => {
                                     type="button"
                                     className="bg-primary text-white px-2 gap-2 py-1 rounded flex items-center"
                                     onClick={() =>
-                                        append({ attrationId: "", notes: "", details: "" })
+                                        append({ attractionId: "", notes: "", details: "" })
                                     }
                                 >
                                     <Plus className="w-[16px]"></Plus>
@@ -686,6 +809,7 @@ const TourCreate = () => {
                 </div>
                 <TicketFormModal
                     key={formKey}
+                    priceCategories={metadata?.priceCategories}
                     open={isTicketModalOpen}
                     onClose={() => {
                         setIsTicketModalOpen(false);
@@ -703,7 +827,10 @@ const TourCreate = () => {
                     >
                         Quay lại
                     </button>
-                    <button className="bg-primary text-base text-white px-4 py-2 rounded">
+                    <button
+                        onClick={finishTour}
+                        className="bg-primary text-base text-white px-4 py-2 rounded"
+                    >
                         Tạo tour
                     </button>
                 </div>

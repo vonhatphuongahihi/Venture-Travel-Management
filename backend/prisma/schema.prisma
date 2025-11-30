@@ -100,7 +100,7 @@ model Tour {
   highlights            String[]
   inclusions            String[]
   exclusions            String[]
-  favorite_tours        favorite_tours[]
+  favoriteTours         favorite_tours[]
   ticketTypes           TicketType[]
   tourReviews           TourReview[]
   tourStops             TourStop[]

@@ -12,6 +12,8 @@ import reviewRoutes from "./reviewRoutes";
 import routeRoutes from "./routeRoutes";
 import tourRoutes from "./tourRoutes";
 import uploadRoutes from "./uploadRoutes";
+import adminAttractionRoutes from "./adminAttractionRoutes";
+import adminTourRoutes from "./adminTourRoutes"
 import userRoutes from "./userRoutes";
 import bookingRoutes from "./bookingRoutes";
 
@@ -29,6 +31,7 @@ router.use('/tours', tourRoutes);
 router.use('/attractions', attractionRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/admin/attractions', adminAttractionRoutes);
+router.use('/admin/tours', adminTourRoutes)
 router.use('/admin/reports', adminReportRoutes);
 router.use("/bookings", bookingRoutes);
 router.use('/routes', routeRoutes);

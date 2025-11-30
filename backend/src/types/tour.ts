@@ -26,7 +26,6 @@ export interface CreateTicketTypeRequest {
 }
 
 export interface CreateTourRequest {
-  provinceId: string;
   name: string;
   about: string;
   ageRange: string;

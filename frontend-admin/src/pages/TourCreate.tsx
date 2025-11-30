@@ -6,7 +6,7 @@ import FormTextArea from "@/components/tour-create/FormTextArea";
 import ImageUploader from "@/components/tour-create/ImageUploader";
 import { SearchableSelect } from "@/components/tour-create/SearchableSelect";
 import TextEditor from "@/components/tour-create/TextEditor";
-import { useForm, useFieldArray, set } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { Plus, X } from "lucide-react";
 import {
     Select,
@@ -19,6 +19,10 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import TicketFormModal from "@/components/tour-create/TicketFormModal";
+
+const MAPBOX_TOKEN =
+    "pk.eyJ1Ijoibmd1eWVuMDk4MyIsImEiOiJjbWZoaDU5MWYwYnY0Mmlwd28zZm5ha2Z5In0.YXBPUe4baagMkZD2NpbRGA";
+
 type TourStop = {
     attrationId: string;
     notes: string;
@@ -61,28 +65,35 @@ type TicketData = {
     prices: PriceCategory[];
 };
 
-const provinceOptions = [
-    {
-        label: "Thành phố Hồ Chí Minh",
-        value: "001",
-    },
-    {
-        label: "Hà Nội",
-        value: "002",
-    },
-    {
-        label: "Đà Nẵng",
-        value: "003",
-    },
-    {
-        label: "Ninh Bình",
-        value: "004",
-    },
-    {
-        label: "Cà Mau",
-        value: "005",
-    },
-];
+type MapboxGeocodingFeature = {
+    id: string;
+    type: "Feature";
+    geometry: {
+        type: "Point";
+        coordinates: [number, number]; // [longitude, latitude]
+    };
+    properties: {
+        name: string;
+        full_address?: string;
+        place_formatted?: string;
+        coordinates?: {
+            longitude: number;
+            latitude: number;
+        };
+        context?: {
+            country?: { name: string; country_code: string };
+            region?: { name: string; region_code: string };
+            place?: { name: string };
+            locality?: { name: string };
+        };
+    };
+};
+
+type Option<T = any> = {
+    label: string;
+    value: string | number;
+    data?: T; // dữ liệu gốc
+};
 
 const tourCategoryOptionList = [
     { label: "Tour Thiên nhiên", value: "100" },
@@ -105,6 +116,7 @@ const languagesOptionList = [
 ];
 
 const freePickupScopes = ["500", "1000", "1500"];
+
 const TourCreate = () => {
     const {
         register,
@@ -190,6 +202,69 @@ const TourCreate = () => {
         setEditingIndex(null);
     };
     const TourCreateStep1 = () => {
+        const [selectedAddress, setSelectedAddress] =
+            useState<Option<MapboxGeocodingFeature> | null>(null);
+
+        // Hàm gọi Mapbox Geocoding API v6
+        const fetchMapboxPlaces = async (query: string): Promise<MapboxGeocodingFeature[]> => {
+            if (!query || query.trim().length < 3) return [];
+
+            try {
+                const response = await fetch(
+                    `https://api.mapbox.com/search/geocode/v6/forward?` +
+                        new URLSearchParams({
+                            q: query,
+                            access_token: MAPBOX_TOKEN,
+                            country: "vn",
+                        })
+                );
+
+                if (!response.ok) {
+                    throw new Error("Mapbox API v6 error");
+                }
+
+                const data = await response.json();
+                return data.features || [];
+            } catch (error) {
+                console.error("Error fetching Mapbox places:", error);
+                return [];
+            }
+        };
+
+        // Map từ MapboxFeatureV6 sang Option
+        const mapMapboxToOption = (
+            feature: MapboxGeocodingFeature
+        ): Option<MapboxGeocodingFeature> => ({
+            label:
+                feature.properties.full_address ||
+                feature.properties.place_formatted ||
+                feature.properties.name,
+            value: feature.id,
+            data: feature,
+        });
+
+        // Custom render option
+        const renderMapboxOption = (option: Option<MapboxGeocodingFeature>) => {
+            const props = option.data?.properties;
+            return (
+                <div className="flex flex-col">
+                    <span className="font-medium">{props?.name}</span>
+                    {props?.place_formatted && (
+                        <span className="text-sm text-gray-500">{props.place_formatted}</span>
+                    )}
+                </div>
+            );
+        };
+
+        const handleSelect = (option: Option<MapboxGeocodingFeature>) => {
+            setSelectedAddress(option);
+            console.log("Selected:", {
+                name: option.label,
+                coordinates: option.data?.geometry.coordinates, // [lng, lat]
+                fullAddress: option.data?.properties.full_address,
+            });
+        };
+
         return (
             <div>
                 <div className="flex items-center justify-between">
@@ -228,17 +303,6 @@ const TourCreate = () => {
                                         placeholder={"Tên tour"}
                                         className="flex-1"
                                     ></FormInput>
-                                    <FormSelect
-                                        label="Tỉnh/thành phố"
-                                        name={"provinceId"}
-                                        control={control}
-                                        placeholder={"Chọn thành phố"}
-                                        // validationRules={{
-                                        //     required: "Thành phố là bắt buộc",
-                                        // }}
-                                        options={provinceOptions}
-                                        className="flex-1 flex flex-col"
-                                    ></FormSelect>
                                 </div>
                                 <FormTextArea
                                     label="Tổng quan"
@@ -392,7 +456,14 @@ const TourCreate = () => {
                                         Điểm tập trung khả dụng
                                         <span className="text-red-500 ml-1">*</span>
                                     </label>
-                                    <SearchableSelect error={undefined}></SearchableSelect>
+                                    <SearchableSelect<MapboxGeocodingFeature>
+                                        placeholder="Nhập địa chỉ (ít nhất 3 ký tự)..."
+                                        fetchOptions={fetchMapboxPlaces}
+                                        mapOption={mapMapboxToOption}
+                                        renderOption={renderMapboxOption}
+                                        onSelect={handleSelect}
+                                        error={undefined}
+                                    ></SearchableSelect>
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-5">

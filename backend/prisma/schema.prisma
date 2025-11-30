@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,240 +8,321 @@ datasource db {
 }
 
 model User {
-  userId             String        @id @default(uuid()) @map("user_id")
-  name               String
-  email              String        @unique
-  password           String?
-  phone              String?
-  address            String?
-  profilePhoto       String?       @map("profile_photo")
-  dateOfBirth        DateTime?     @map("date_of_birth")
-  gender             String?
-  role               Role          @default(USER)
-  isActive           Boolean       @default(true) @map("is_active")
-  isVerified         Boolean       @default(false) @map("is_verified")
-  verificationToken  String?       @map("verification_token")
-  verificationExpires DateTime?    @map("verification_expires")
-  resetToken         String?       @unique @map("reset_token")
-  resetExpires       DateTime?     @map("reset_expires")
-  lastLogin          DateTime?     @map("last_login")
-  createdAt          DateTime      @default(now()) @map("created_at")
-  updatedAt          DateTime      @updatedAt @map("updated_at")
-
-  // Google OAuth fields
-  googleId           String?       @unique @map("google_id")
-  authProvider       AuthProvider  @default(LOCAL) @map("auth_provider")
+  userId               String                 @id @default(uuid()) @map("user_id")
+  name                 String
+  email                String                 @unique
+  password             String?
+  phone                String?
+  address              String?
+  profilePhoto         String?                @map("profile_photo")
+  dateOfBirth          DateTime?              @map("date_of_birth")
+  gender               String?
+  role                 Role                   @default(USER)
+  isActive             Boolean                @default(true) @map("is_active")
+  isVerified           Boolean                @default(false) @map("is_verified")
+  verificationToken    String?                @map("verification_token")
+  verificationExpires  DateTime?              @map("verification_expires")
+  resetToken           String?                @unique @map("reset_token")
+  resetExpires         DateTime?              @map("reset_expires")
+  lastLogin            DateTime?              @map("last_login")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+  googleId             String?                @unique @map("google_id")
+  authProvider         AuthProvider           @default(LOCAL) @map("auth_provider")
+  attractionReviews    AttractionReview[]
+  bookings             Booking[]
+  favorite_attractions favorite_attractions[]
+  favorite_tours       favorite_tours[]
+  tourReviews          TourReview[]
 
   @@map("users")
 }
 
 model Province {
-  provinceId  String      @id @map("province_id")
+  provinceId  String       @id @map("province_id")
   name        String
   images      String[]
-  region      String      // Bắc, Trung, Nam
-  createdAt   DateTime    @default(now()) @map("created_at")
-  updatedAt   DateTime    @updatedAt @map("updated_at")
-
-  // Relations
+  region      String
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  description String       @default("")
   attractions Attraction[]
-  tours       Tour[]
 
   @@map("provinces")
 }
 
 model Attraction {
-  attractionId  String    @id @map("attraction_id")
-  name          String
-  images        String[]
-  address       String
-  description   String
-  geom          String   
-  provinceId    String    @map("province_id")
-  category      String    // Beach, Historical, Cultural, etc.
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  province      Province  @relation(fields: [provinceId], references: [provinceId])
-  tourStops     TourStop[]
-  point         Point     @relation(fields: [geom], references: [pointId])
+  attractionId         String                 @id @map("attraction_id")
+  name                 String
+  images               String[]
+  address              String
+  description          String
+  geom                 String
+  provinceId           String                 @map("province_id")
+  category             String
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+  attractionReviews    AttractionReview[]
+  point                Point                  @relation(fields: [geom], references: [pointId])
+  province             Province               @relation(fields: [provinceId], references: [provinceId])
+  favorite_attractions favorite_attractions[]
+  tourStops            TourStop[]
 
   @@map("attractions")
 }
 
 model Tour {
-  tourId                  String        @id @default(uuid()) @map("tour_id")
-  provinceId              String        @map("province_id")
-  name                    String
-  images                  String[]
-  about                   String
-  ageRange                String        @map("age_range")
-  maxGroupSize            Int           @map("max_group_size")
-  duration                String
-  languages               String[]
-  categories              String[]
-  highlights              String[]
-  inclusions              String[]
-  exclusions              String[]
-  expectations            String
-  pickupPoint             String        @map("pickup_point")
-  pickupPointGeom         String       @map("pickup_point_geom") 
-  pickupDetails           String       @map("pickup_details")
-  pickupAreaGeom          String       @map("pickup_area") 
-  endPoint                String?       @map("end_point")
-  endPointGeom            String?       @map("end_point_geom") 
-  additionalInformation   String?       @map("additional_information")
-  cancellationPolicy      String        @map("cancellation_policy")
-  startDate               DateTime?      @map("start_date")
-  endDate                 DateTime?      @map("end_date")
-  isActive                Boolean       @default(true) @map("is_active")
-  createdAt               DateTime      @default(now()) @map("created_at")
-  updatedAt               DateTime      @updatedAt @map("updated_at")
-
-  // Relations
-  province                Province      @relation(fields: [provinceId], references: [provinceId])
-  pickup                  Point         @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
-  end                     Point?        @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
-  pickupArea              Polygon       @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
-  tourStops               TourStop[]
-  ticketTypes             TicketType[]
+  tourId                String           @id @default(uuid()) @map("tour_id")
+  name                  String
+  images                String[]
+  about                 String
+  ageRange              String           @map("age_range")
+  maxGroupSize          Int              @map("max_group_size")
+  duration              String
+  languages             String[]
+  categories            String[]
+  expectations          String
+  pickupPoint           String           @map("pickup_point")
+  pickupPointGeom       String           @map("pickup_point_geom")
+  pickupDetails         String           @map("pickup_details")
+  pickupAreaGeom        String           @map("pickup_area")
+  endPoint              String?          @map("end_point")
+  endPointGeom          String?          @map("end_point_geom")
+  additionalInformation String?          @map("additional_information")
+  cancellationPolicy    String           @map("cancellation_policy")
+  startDate             DateTime?        @map("start_date")
+  endDate               DateTime?        @map("end_date")
+  isActive              Boolean          @default(true) @map("is_active")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+  highlights            String[]
+  inclusions            String[]
+  exclusions            String[]
+  favorite_tours        favorite_tours[]
+  ticketTypes           TicketType[]
+  tourReviews           TourReview[]
+  tourStops             TourStop[]
+  end                   Point?           @relation("TourEndPoint", fields: [endPointGeom], references: [pointId], onDelete: Cascade)
+  pickupArea            Polygon          @relation(fields: [pickupAreaGeom], references: [polygonId], onDelete: Cascade)
+  pickup                Point            @relation("TourPickupPoint", fields: [pickupPointGeom], references: [pointId], onDelete: Cascade)
 
   @@map("tours")
 }
 
 model TourStop {
-  stopId          String      @id @default(uuid()) @map("stop_id")
-  tourId          String      @map("tour_id")
-  attractionId    String      @map("attraction_id")
-  stopOrder       Int         @map("stop_order")
-  notes           String?
-  details         String?
-  createdAt       DateTime    @default(now()) @map("created_at")
-
-  // Relations
-  tour            Tour        @relation(fields: [tourId], references: [tourId])
-  attraction      Attraction  @relation(fields: [attractionId], references: [attractionId])
+  stopId       String     @id @default(uuid()) @map("stop_id")
+  tourId       String     @map("tour_id")
+  attractionId String     @map("attraction_id")
+  stopOrder    Int        @map("stop_order")
+  notes        String?
+  details      String?
+  createdAt    DateTime   @default(now()) @map("created_at")
+  attraction   Attraction @relation(fields: [attractionId], references: [attractionId])
+  tour         Tour       @relation(fields: [tourId], references: [tourId])
 
   @@map("tour_stops")
 }
 
 model TicketType {
-  ticketTypeId    String        @id @default(uuid()) @map("ticket_type_id")
-  tourId          String        @map("tour_id")
-  name            String
-  notes           String?
-  quantity        Int
-  createdAt       DateTime      @default(now()) @map("created_at")
-
-  // Relations
-  tour            Tour          @relation(fields: [tourId], references: [tourId])
-  ticketPrices    TicketPrice[]
+  ticketTypeId String        @id @default(uuid()) @map("ticket_type_id")
+  tourId       String        @map("tour_id")
+  name         String
+  notes        String?
+  quantity     Int
+  createdAt    DateTime      @default(now()) @map("created_at")
+  bookings     Booking[]
+  ticketPrices TicketPrice[]
+  tour         Tour          @relation(fields: [tourId], references: [tourId])
 
   @@map("ticket_types")
 }
 
 model PriceCategory {
-  categoryId      String        @id @default(uuid()) @map("category_id")
-  name            String
-  description     String?
-  createdAt       DateTime      @default(now()) @map("created_at")
-
-  // Relations
-  ticketPrices    TicketPrice[]
+  categoryId   String        @id @default(uuid()) @map("category_id")
+  name         String
+  description  String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  ticketPrices TicketPrice[]
 
   @@map("price_categories")
 }
 
 model TicketPrice {
-  ticketPriceId   String        @id @default(uuid()) @map("ticket_price_id")
-  ticketTypeId    String        @map("ticket_type_id")
-  categoryId      String        @map("category_id")
-  notes           String?
-  price           Float         // numeric
-  quantity        Int
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-
-  // Relations
-  ticketType      TicketType    @relation(fields: [ticketTypeId], references: [ticketTypeId])
-  priceCategory   PriceCategory @relation(fields: [categoryId], references: [categoryId])
+  ticketPriceId  String          @id @default(uuid()) @map("ticket_price_id")
+  ticketTypeId   String          @map("ticket_type_id")
+  categoryId     String          @map("category_id")
+  notes          String?
+  price          Float
+  quantity       Int
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  bookingDetails BookingDetail[]
+  priceCategory  PriceCategory   @relation(fields: [categoryId], references: [categoryId])
+  ticketType     TicketType      @relation(fields: [ticketTypeId], references: [ticketTypeId])
 
   @@map("ticket_prices")
 }
 
 model Point {
-  pointId       String    @id @default(uuid()) @map("point_id")
-  latitude      Float
-  longitude     Float
-
-  // Relation
-  attractions     Attraction[]
-  pickupTours     Tour[]        @relation("TourPickupPoint")
-  endPointTours   Tour[]      @relation("TourEndPoint")
-  nodes           Node[]
-  arcPoints       ArcPoint[]
-  polygonPoints    PolygonPoint[]
+  pointId        String         @id @default(uuid()) @map("point_id")
+  latitude       Float
+  longitude      Float
+  arcPoints      ArcPoint[]
+  attractions    Attraction[]
+  nodes          Node?
+  polygon_points PolygonPoint[]
+  endPointTours  Tour[]         @relation("TourEndPoint")
+  pickupTours    Tour[]         @relation("TourPickupPoint")
 
   @@map("points")
 }
 
 model Node {
-  nodeId     String   @id @default(uuid()) @map("node_id")
-  pointId    String   @unique @map("point_id")
-  point      Point    @relation(fields: [pointId], references: [pointId])
-
-  // Relation
-  startArcs Arc[] @relation("ArcStart")
-  endArcs   Arc[] @relation("ArcEnd")
+  nodeId    String @id @default(uuid()) @map("node_id")
+  pointId   String @unique @map("point_id")
+  endArcs   Arc[]  @relation("ArcEnd")
+  startArcs Arc[]  @relation("ArcStart")
+  point     Point  @relation(fields: [pointId], references: [pointId])
 
   @@map("nodes")
 }
 
 model Arc {
-  arcId       String  @id @default(uuid()) @map("arc_id")
-  startNodeId String  @map("start_node_id")
-  endNodeId   String  @map("end_node_id")
-
-  startNode   Node   @relation("ArcStart", fields: [startNodeId], references: [nodeId])
-  endNode     Node   @relation("ArcEnd", fields: [endNodeId], references: [nodeId])
-
+  arcId       String     @id @default(uuid()) @map("arc_id")
+  startNodeId String     @map("start_node_id")
+  endNodeId   String     @map("end_node_id")
   arcPoints   ArcPoint[]
+  endNode     Node       @relation("ArcEnd", fields: [endNodeId], references: [nodeId])
+  startNode   Node       @relation("ArcStart", fields: [startNodeId], references: [nodeId])
 
   @@map("arcs")
 }
 
 model ArcPoint {
-  arcId   String @map("arc_id")
-  pointId String @map("point_id")
-
-  arc     Arc   @relation(fields: [arcId], references: [arcId])
-  point   Point @relation(fields: [pointId], references: [pointId])
+  arcId    String @map("arc_id")
+  pointId  String @map("point_id")
+  sequence Int?
+  arc      Arc    @relation(fields: [arcId], references: [arcId])
+  point    Point  @relation(fields: [pointId], references: [pointId])
 
   @@id([arcId, pointId])
-
   @@map("arc_points")
 }
 
 model Polygon {
-  polygonId       String  @id @default(uuid()) @map("polygon_id")
-
-  polygonPoints    PolygonPoint[]
-  tourPickUpAreas   Tour[]
+  polygonId       String         @id @default(uuid()) @map("polygon_id")
+  polygon_points  PolygonPoint[]
+  tourPickUpAreas Tour[]
 
   @@map("polygons")
 }
 
 model PolygonPoint {
-  polygonId  String @map("polygonId")
-  pointId String @map("pointId")
-
-  polygon    Polygon   @relation(fields: [polygonId], references: [polygonId])
-  point   Point  @relation(fields: [pointId], references: [pointId])
+  pointId   String  @map("point_id")
+  polygonId String  @map("polygon_id")
+  sequence  Int?
+  points    Point   @relation(fields: [pointId], references: [pointId])
+  polygons  Polygon @relation(fields: [polygonId], references: [polygonId])
 
   @@id([polygonId, pointId])
-
   @@map("polygon_points")
+}
+
+model TourReview {
+  reviewId  String   @id @default(uuid()) @map("review_id")
+  userId    String   @map("user_id")
+  tourId    String   @map("tour_id")
+  rate      Int
+  content   String
+  images    String[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  likes     String[] @default([])
+  tour      Tour     @relation(fields: [tourId], references: [tourId], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([tourId])
+  @@index([userId])
+  @@map("tour_reviews")
+}
+
+model AttractionReview {
+  reviewId     String     @id @default(uuid()) @map("review_id")
+  userId       String     @map("user_id")
+  attractionId String     @map("attraction_id")
+  rate         Int
+  content      String
+  images       String[]
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  likes        String[]   @default([])
+  attraction   Attraction @relation(fields: [attractionId], references: [attractionId], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([attractionId])
+  @@index([userId])
+  @@map("attraction_reviews")
+}
+
+model Booking {
+  bookingId       String          @id @default(uuid()) @map("booking_id")
+  userId          String          @map("user_id")
+  ticketTypeId    String          @map("ticket_type_id")
+  pickupAddress   String          @map("pickup_address")
+  departureDate   DateTime        @map("departure_date") @db.Timestamp(6)
+  name            String
+  phone           String
+  email           String
+  status          String
+  paymentType     String          @map("payment_type")
+  totalPrice      Float           @map("total_price")
+  specialRequests String?         @map("special_requests")
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+  bookingDetails  BookingDetail[]
+  ticketTypes     TicketType      @relation(fields: [ticketTypeId], references: [ticketTypeId])
+  users           User            @relation(fields: [userId], references: [userId])
+
+  @@map("bookings")
+}
+
+model BookingDetail {
+  bookingDetailId String      @id @default(uuid()) @map("booking_detail_id")
+  bookingId       String      @map("booking_id")
+  ticketPriceId   String      @map("ticket_price_id")
+  quantity        Int
+  totalPrice      Float       @map("total_price")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  booking         Booking     @relation(fields: [bookingId], references: [bookingId])
+  ticketPrice     TicketPrice @relation(fields: [ticketPriceId], references: [ticketPriceId])
+
+  @@map("booking_details")
+}
+
+model favorite_attractions {
+  favorite_id   String     @id
+  user_id       String
+  attraction_id String
+  created_at    DateTime   @default(now()) @db.Timestamp(6)
+  attractions   Attraction @relation(fields: [attraction_id], references: [attractionId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_attraction")
+  users         User       @relation(fields: [user_id], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_attractions_user")
+
+  @@unique([user_id, attraction_id], map: "unique_user_attraction")
+  @@index([attraction_id], map: "idx_favorite_attractions_attraction_id")
+  @@index([user_id], map: "idx_favorite_attractions_user_id")
+}
+
+model favorite_tours {
+  favorite_id String   @id
+  user_id     String
+  tour_id     String
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  tours       Tour     @relation(fields: [tour_id], references: [tourId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_tour")
+  users       User     @relation(fields: [user_id], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "fk_favorite_tours_user")
+
+  @@unique([user_id, tour_id], map: "unique_user_tour")
+  @@index([tour_id], map: "idx_favorite_tours_tour_id")
+  @@index([user_id], map: "idx_favorite_tours_user_id")
 }
 
 enum Role {

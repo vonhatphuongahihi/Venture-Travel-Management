@@ -1,9 +1,10 @@
 import { TourService } from "@/services/tourService";
 import { CreateTourRequest } from "@/types/tour";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const tourService = new TourService(prisma, process.env.MAPBOX_ACCESS_TOKEN);
+
 
 async function main() {
     const tourData1: CreateTourRequest = {

@@ -10,7 +10,7 @@ import tourRoutes from "./tourRoutes";
 import attractionRoutes from "./attractionRoutes";
 import uploadRoutes from "./uploadRoutes";
 import adminAttractionRoutes from "./adminAttractionRoutes";
-
+import adminTourRoutes from "./adminTourRoutes"
 import bookingRoutes from "./bookingRoutes";
 
 import routeRoutes from "./routeRoutes";
@@ -28,7 +28,7 @@ router.use('/tours', tourRoutes);
 router.use('/attractions', attractionRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/admin/attractions', adminAttractionRoutes);
-
+router.use('/admin/tours', adminTourRoutes)
 router.use("/bookings", bookingRoutes);
 
 router.use('/routes', routeRoutes);

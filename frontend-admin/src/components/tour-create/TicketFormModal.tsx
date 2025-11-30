@@ -22,12 +22,19 @@ type TicketData = {
     prices: PriceCategory[];
 };
 
+type PriceCategoryOption = {
+    name: string;
+    categoryId: string;
+    description?: string;
+};
+
 type TicketFormModalProps = {
+    priceCategories: PriceCategoryOption[] | undefined;
     open: boolean;
     onClose: () => void;
     onAddTicket?: (ticket: TicketData) => void;
     onUpdateTicket?: (ticket: TicketData) => void;
-    onCancelEdit: () => void,
+    onCancelEdit: () => void;
     editingTicket?: TicketData | null;
 };
 
@@ -38,12 +45,13 @@ const CATEGORY_OPTIONS = [
 ];
 
 const TicketFormModal = ({
+    priceCategories,
     open,
     onClose,
     onAddTicket,
     onUpdateTicket,
     editingTicket,
-    onCancelEdit
+    onCancelEdit,
 }: TicketFormModalProps) => {
     const {
         register,
@@ -65,7 +73,11 @@ const TicketFormModal = ({
         name: "prices",
     });
 
-    const handleToggleCategory = (cat: { name: string; categoryId: string; description?: string }) => {
+    const handleToggleCategory = (cat: {
+        name: string;
+        categoryId: string;
+        description?: string;
+    }) => {
         const existingIndex = fields.findIndex((field) => field.categoryId === cat.categoryId);
         if (existingIndex !== -1) {
             remove(existingIndex);
@@ -160,7 +172,7 @@ const TicketFormModal = ({
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[300px] p-0" align="start">
                                     <div>
-                                        {CATEGORY_OPTIONS.map((cate) => {
+                                        {priceCategories?.map((cate) => {
                                             return (
                                                 <div
                                                     key={cate.categoryId}
@@ -171,7 +183,9 @@ const TicketFormModal = ({
                                                         <span className="font-semibold">
                                                             {cate.name}
                                                         </span>
-                                                        <span className="text-sm">({cate.description})</span>
+                                                        <span className="text-sm">
+                                                            ({cate.description})
+                                                        </span>
                                                     </div>
                                                     {fields
                                                         .map((p) => p.categoryId)
@@ -243,10 +257,13 @@ const TicketFormModal = ({
 
                     {/* Nút hành động */}
                     <div className="flex justify-end space-x-2 pt-3">
-                        <button onClick={()=> {
-                            onCancelEdit()
-                            onClose()
-                        }} className="px-2 py-1 border rounded">
+                        <button
+                            onClick={() => {
+                                onCancelEdit();
+                                onClose();
+                            }}
+                            className="px-2 py-1 border rounded"
+                        >
                             Hủy
                         </button>
                         <button type="submit" className="px-2 py-1 bg-primary text-white rounded">

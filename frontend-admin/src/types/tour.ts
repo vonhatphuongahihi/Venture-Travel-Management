@@ -1,5 +1,3 @@
-import { axiosClient } from "@/configs/axiosClient";
-
 export interface PointCoordinates {
     latitude: number;
     longitude: number;
@@ -30,11 +28,8 @@ export interface TicketType {
 export interface Attraction {
     attractionId: string;
     name: string;
-    images: string[];
     address: string;
     description: string;
-    category: string;
-    openTime?: any;
     province: {
         provinceId: string;
         name: string;
@@ -98,32 +93,8 @@ export interface CreateTourRequest {
     ticketTypes: TicketType[];
 }
 
-class TourService {
-    private readonly basePath = "/tours";
-
-    /**
-     * Lấy metadata cho form tạo tour (attractions, price categories, provinces, categories)
-     */
-    async getTourFormMetadata(provinceId?: string): Promise<TourFormMetadata> {
-        const params = provinceId ? { provinceId } : {};
-
-        const response = await axiosClient.get<ApiResponse<TourFormMetadata>>(
-            `${this.basePath}/metadata`,
-            { params }
-        );
-
-        return response.data.data;
-    }
-
-    /**
-     * Tạo tour mới
-     */
-    async createTour(data: CreateTourRequest): Promise<any> {
-        const response = await axiosClient.post<ApiResponse<any>>(this.basePath, data);
-
-        return response.data.data;
-    }
-
+export interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
 }
-
-export const tourService = new TourService();

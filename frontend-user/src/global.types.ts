@@ -15,7 +15,7 @@ export interface Tour {
 }
 
 export interface Attraction {
-  id: number;
+  id: string;
   name: string;
   description: string;
   category: string;
@@ -39,7 +39,7 @@ export interface Attraction {
 }
 
 export interface Province {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   image: string;

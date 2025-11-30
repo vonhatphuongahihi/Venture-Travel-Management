@@ -73,3 +73,61 @@ export const authenticateToken = async (
         });
     }
 };
+
+// Optional authentication - doesn't fail if no token, but populates req.user if valid token exists
+export const optionalAuthenticateToken = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+        if (!token) {
+            // No token provided - continue without user
+            next();
+            return;
+        }
+
+        try {
+            const decoded = JWTUtils.verifyToken(token) as {
+                userId: string;
+                email: string;
+                role: string;
+            };
+
+            // Find user in database
+            const user = await prisma.user.findUnique({
+                where: { userId: decoded.userId },
+                select: {
+                    userId: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    address: true,
+                    profilePhoto: true,
+                    dateOfBirth: true,
+                    gender: true,
+                    role: true,
+                    isActive: true,
+                    lastLogin: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            });
+
+            if (user && user.isActive) {
+                req.user = user as Express.User;
+            }
+            // If user not found or not active, continue without user
+        } catch (tokenError) {
+            // Invalid token - continue without user (don't fail)
+        }
+
+        next();
+    } catch (error) {
+        // Any error - continue without user
+        next();
+    }
+};

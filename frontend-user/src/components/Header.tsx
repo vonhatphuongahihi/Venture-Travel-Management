@@ -1,11 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Menu, Plane, Search, User } from "lucide-react";
-import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
-import ProvinceDropdown from "./province/ProvinceDropdown";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Menu, Plane, User } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
+import ProvinceDropdown from "./province/ProvinceDropdown";
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,7 +16,6 @@ const Header = () => {
         <header className="w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center justify-between">
                 {/* Logo */}
-
                 <div className="flex items-center space-x-2">
                     <div className="relative">
                         <Link to="/tour">
@@ -27,48 +26,36 @@ const Header = () => {
                         <Plane className="h-4 w-4 text-primary" />
                     </div>
                 </div>
+
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex items-center space-x-16">
                     <Link
                         to="/tour"
-                        className={`text-sm font-medium transition-colors ${
-                            location.pathname === "/tour"
-                                ? "text-primary font-semibold"
-                                : "hover:text-primary"
-                        }`}
+                        className={`text-sm font-medium transition-colors ${location.pathname === "/tour"
+                            ? "text-primary font-semibold"
+                            : "hover:text-primary"
+                            }`}
                     >
                         TOUR
                     </Link>
                     <ProvinceDropdown />
                     <Link
                         to="/map"
-                        className={`text-sm font-medium transition-colors ${
-                            location.pathname === "/map"
-                                ? "text-primary font-semibold"
-                                : "hover:text-primary"
-                        }`}
+                        className={`text-sm font-medium transition-colors ${location.pathname === "/map"
+                            ? "text-primary font-semibold"
+                            : "hover:text-primary"
+                            }`}
                     >
                         BẢN ĐỒ
                     </Link>
                     <Link
                         to="/explore-360"
-                        className={`text-sm font-medium transition-colors ${
-                            location.pathname === "/explore-360"
-                                ? "text-primary font-semibold"
-                                : "hover:text-primary"
-                        }`}
+                        className={`text-sm font-medium transition-colors ${location.pathname === "/explore-360"
+                            ? "text-primary font-semibold"
+                            : "hover:text-primary"
+                            }`}
                     >
                         KHÁM PHÁ 360°
-                    </Link>
-                    <Link
-                        to="/about"
-                        className={`text-sm font-medium transition-colors ${
-                            location.pathname === "/about"
-                                ? "text-primary font-semibold"
-                                : "hover:text-primary"
-                        }`}
-                    >
-                        VỀ CHÚNG TÔI
                     </Link>
                     <Link
                         to="/contact"
@@ -76,15 +63,9 @@ const Header = () => {
                     >
                         LIÊN HỆ
                     </Link>
-                    <Link
-                        to="/book-tour"
-                        className="text-sm font-medium hover:text-primary transition-colors"
-                    >
-                        ĐĂNG KÝ TOUR
-                    </Link>
                 </nav>
 
-                {/* Login */}
+                {/* Login / Profile Button (Desktop) */}
                 <div className="flex items-center space-x-4">
                     {!isAuthenticated ? (
                         <Link to="/login">
@@ -129,11 +110,10 @@ const Header = () => {
                     <nav className="container py-4 space-y-5">
                         <Link
                             to="/tour"
-                            className={`block text-sm font-medium transition-colors ${
-                                location.pathname === "/tour"
-                                    ? "text-primary font-semibold"
-                                    : "hover:text-primary"
-                            }`}
+                            className={`block text-sm font-medium transition-colors ${location.pathname === "/tour"
+                                ? "text-primary font-semibold"
+                                : "hover:text-primary"
+                                }`}
                             onClick={() => setIsMenuOpen(false)}
                         >
                             TOUR
@@ -162,14 +142,40 @@ const Header = () => {
                         >
                             LIÊN HỆ
                         </Link>
+
+                        {/* --- PHẦN ĐÃ CHỈNH SỬA --- */}
                         <div className="pt-3 border-t border-border">
-                            <Link to="/login">
-                                <Button variant="tour" size="sm" className="w-full">
-                                    <User className="h-4 w-4" />
-                                    Đăng nhập
-                                </Button>
-                            </Link>
+                            {!isAuthenticated ? (
+                                <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                                    <Button variant="tour" size="sm" className="w-full">
+                                        <User className="h-4 w-4" />
+                                        Đăng nhập
+                                    </Button>
+                                </Link>
+                            ) : (
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors"
+                                >
+                                    <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
+                                        {user?.profilePhoto ? (
+                                            <img
+                                                src={user.profilePhoto}
+                                                alt={user.name || "Profile"}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <User className="h-4 w-4 text-primary" />
+                                        )}
+                                    </div>
+                                    <span className="text-sm font-semibold text-foreground">
+                                        {user?.name || "Tài khoản của tôi"}
+                                    </span>
+                                </Link>
+                            )}
                         </div>
+                        {/* -------------------------- */}
                     </nav>
                 </div>
             )}

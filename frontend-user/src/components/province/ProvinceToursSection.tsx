@@ -13,12 +13,20 @@ interface ProvinceToursSectionProps {
   tours: Tour[];
   sortBy?: string;
   setSortBy?: (value: string) => void;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  totalTours?: number;
 }
 
 const ProvinceToursSection = ({
   tours,
   sortBy,
   setSortBy,
+  onLoadMore,
+  hasMore,
+  isLoadingMore,
+  totalTours = 0,
 }: ProvinceToursSectionProps) => {
   return (
     <section className="pt-5">
@@ -26,7 +34,7 @@ const ProvinceToursSection = ({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <p className="text-gray-500 text-sm">
-            Tìm thấy {tours.length} kết quả
+            Tìm thấy {totalTours} kết quả
           </p>
         </div>
 
@@ -40,7 +48,6 @@ const ProvinceToursSection = ({
               <SelectItem value="price-asc">Giá (từ thấp đến cao)</SelectItem>
               <SelectItem value="price-desc">Giá (từ cao đến thấp)</SelectItem>
               <SelectItem value="rating-desc">Đánh giá cao nhất</SelectItem>
-              <SelectItem value="duration-asc">Thời gian ngắn nhất</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -54,16 +61,20 @@ const ProvinceToursSection = ({
       </div>
 
       {/* Load More */}
-      <div
-        className={`text-center mt-12 transition-all duration-1000 delay-600`}
-      >
-        <Button
-          size="lg"
-          className="px-8 bg-[#80CEEA] text-white hover:bg-[#5ebbdd]"
+      {hasMore && (
+        <div
+          className={`text-center mt-12 transition-all duration-1000 delay-600`}
         >
-          Xem thêm
-        </Button>
-      </div>
+          <Button
+            size="lg"
+            className="px-8 bg-[#80CEEA] text-white hover:bg-[#5ebbdd]"
+            onClick={onLoadMore}
+            disabled={isLoadingMore}
+          >
+            {isLoadingMore ? "Đang tải..." : "Xem thêm"}
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

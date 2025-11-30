@@ -1,40 +1,30 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
 import AuthAPI from "@/services/authAPI";
+import type { ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import type { User } from "@/types/api";
 
-interface User {
-    userId: string;
-    name: string;
-    email: string;
-    phone?: string;
-    address?: string;
-    profilePhoto?: string;
-    dateOfBirth?: string;
-    gender?: string;
-    role: string;
-    isActive: boolean;
-    isVerified: boolean;
-    lastLogin?: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-interface AuthContextType {
+// Define AuthContextType
+export interface AuthContextType {
     user: User | null;
     token: string | null;
     isLoading: boolean;
+    isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
     updateUser: (userData: User) => void;
-    isAuthenticated: boolean;
 }
 
+// Re-export User type for convenience
+export type { User } from "@/types/api";
+
+// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Export useAuth hook
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
+        throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
 };
@@ -62,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
                 setIsLoading(false);
                 return;
-            } catch (error) {
+            } catch {
                 localStorage.removeItem("user");
             }
         }
@@ -124,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             } else {
                 return { success: false, message: response.message };
             }
-        } catch (error) {
+        } catch {
             return { success: false, message: "Đăng nhập thất bại. Vui lòng thử lại." };
         } finally {
             setIsLoading(false);

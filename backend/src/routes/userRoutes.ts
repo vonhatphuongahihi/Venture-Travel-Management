@@ -5,6 +5,7 @@ import {
   getUsersQuerySchema,
   updateProfileSchema,
   updateUserStatusSchema,
+  toggleFavoriteTourSchema,
   validateQuery,
   validateRequest,
 } from "@/middleware/validation";
@@ -27,6 +28,14 @@ router.put(
   uploadSingle("avatar"),
   UserController.updateAvatar
 );
+router.post(
+  "/favorites/toggle",
+  authenticateToken,
+  validateRequest(toggleFavoriteTourSchema),
+  UserController.toggleFavoriteTour
+);
+router.get("/favorites", authenticateToken, UserController.getFavoriteTours);
+
 router.patch(
   "/:id/status",
   validateRequest(updateUserStatusSchema),

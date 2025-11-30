@@ -36,7 +36,7 @@ class UserAPI {
   static async updateProfile(token: string, profileData: UpdateProfileRequest): Promise<AuthResponse> {
     try {
       console.log('Sending to API:', profileData);
-      
+
       const response = await fetch(`${API_BASE_URL}/users/profile`, {
         method: 'PUT',
         headers: {
@@ -91,6 +91,65 @@ class UserAPI {
       return response.json();
     } catch (error) {
       console.error('Update avatar API error:', error);
+      return {
+        success: false,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+      };
+    }
+  }
+
+  // Toggle favorite tour
+  static async toggleFavoriteTour(token: string, tourId: string): Promise<AuthResponse & { data?: { isFavorite: boolean; favoriteTours: string[] } }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/favorites/toggle`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ tourId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Toggle favorite tour API error:', error);
+      return {
+        success: false,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+      };
+    }
+  }
+
+  // Get favorite tours
+  static async getFavoriteTours(token: string): Promise<ProfileResponse & { data?: any[] }> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/favorites`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Get favorite tours API error:', error);
       return {
         success: false,
         message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',

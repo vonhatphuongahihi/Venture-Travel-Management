@@ -46,6 +46,8 @@ model Province {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
   description String       @default("")
+  long        Float?
+  lat         Float?
   attractions Attraction[]
 
   @@map("provinces")

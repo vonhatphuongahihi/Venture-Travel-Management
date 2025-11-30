@@ -13,6 +13,7 @@ function TermOfUse() {
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   useEffect(() => {
     const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
       setIsPageLoaded(true);
     }, 100);
     return () => clearTimeout(timer);

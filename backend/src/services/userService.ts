@@ -219,6 +219,99 @@ export class UserService {
     }
   }
 
+  // Toggle favorite tour (add or remove)
+  static async toggleFavoriteTour(userId: string, tourId: string) {
+    try {
+      // Check if tour exists
+      const tour = await prisma.tour.findUnique({
+        where: { tourId: tourId },
+      });
+
+      if (!tour) {
+        return ResponseUtils.error("Tour không tồn tại");
+      }
+
+      // Check if already in favorites
+      const existingFavorite = await prisma.favoriteTour.findUnique({
+        where: {
+          userId_tourId: {
+            userId: userId,
+            tourId: tourId,
+          },
+        },
+      });
+
+      if (existingFavorite) {
+        // Remove from favorites
+        await prisma.favoriteTour.delete({
+          where: {
+            favoriteId: existingFavorite.favoriteId,
+          },
+        });
+
+        return ResponseUtils.success("Đã xóa khỏi danh sách yêu thích", {
+          isFavorite: false,
+        });
+      } else {
+        // Add to favorites
+        await prisma.favoriteTour.create({
+          data: {
+            userId: userId,
+            tourId: tourId,
+          },
+        });
+
+        return ResponseUtils.success("Đã thêm vào danh sách yêu thích", {
+          isFavorite: true,
+        });
+      }
+    } catch (error) {
+      return ResponseUtils.error(
+        "Thất bại khi cập nhật tour yêu thích",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
+    }
+  }
+
+  // Get favorite tours with details
+  static async getFavoriteTours(userId: string) {
+    try {
+      // Get user's favorite tours from junction table
+      const favoriteTours = await prisma.favoriteTour.findMany({
+        where: { userId: userId },
+        include: {
+          tour: {
+            select: {
+              tourId: true,
+              name: true,
+              images: true,
+              about: true,
+              duration: true,
+              categories: true,
+              createdAt: true,
+              isActive: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      // Filter only active tours and map to tour data
+      const activeTours = favoriteTours
+        .filter(fav => fav.tour.isActive)
+        .map(fav => fav.tour);
+
+      return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", activeTours);
+    } catch (error) {
+      return ResponseUtils.error(
+        "Lấy danh sách tour yêu thích thất bại",
+        error instanceof Error ? error.message : "Lỗi không xác định"
+      );
+    }
+  }
+
   // Get users
   static async getUsers(filterParams: GetUsersRequest) {
     try {
@@ -228,19 +321,19 @@ export class UserService {
         where: {
           OR: search
             ? [
-                {
-                  name: {
-                    contains: search.trim().toLowerCase(),
-                    mode: "insensitive",
-                  },
+              {
+                name: {
+                  contains: search.trim().toLowerCase(),
+                  mode: "insensitive",
                 },
-                {
-                  email: {
-                    contains: search.trim().toLowerCase(),
-                    mode: "insensitive",
-                  },
+              },
+              {
+                email: {
+                  contains: search.trim().toLowerCase(),
+                  mode: "insensitive",
                 },
-              ]
+              },
+            ]
             : undefined,
           isActive: isActive !== undefined ? isActive : undefined,
         },

@@ -193,4 +193,71 @@ export class UserController {
         );
     }
   }
+
+  // Toggle favorite tour
+  static async toggleFavoriteTour(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      const { tourId } = req.body;
+
+      if (!tourId) {
+        res.status(400).json(ResponseUtils.error("Tour ID is required"));
+        return;
+      }
+
+      const result = await UserService.toggleFavoriteTour(req.user.userId, tourId);
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to toggle favorite tour",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  // Get favorite tours
+  static async getFavoriteTours(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      const result = await UserService.getFavoriteTours(req.user.userId);
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to get favorite tours",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
 }

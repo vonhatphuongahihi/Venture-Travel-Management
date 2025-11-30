@@ -32,126 +32,149 @@ export const PaymentForm = ({ onSubmit }: PaymentFormProps) => {
   };
 
   return (
-    <div>
-      <h1 className="text-[40px] font-bold text-black mb-8">Thanh toán</h1>
-      <p className="text-[#575757] text-[24px] mb-12 max-w-[773px]">
-        Để bắt đầu đăng ký, vui lòng nhập thông tin thẻ của bạn để thực hiện thanh toán.
-        Bạn sẽ được chuyển hướng đến trang xác thực của ngân hàng.
-      </p>
-
-      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        {/* Card Name */}
-        <div>
-          <label className="text-[#575757] text-[20px] mb-2 block">
-            Tên chủ thẻ
-          </label>
-          <Input
-            value={formData.cardName}
-            onChange={(e) => handleChange('cardName', e.target.value)}
-            className={`h-[66px] bg-[#EEEEEE] border-b-2 border-[#54C6EE] text-[23px] ${
-              errors.cardName ? 'border-red-500' : ''
-            }`}
-            placeholder="Nhập tên trên thẻ"
-          />
-          {errors.cardName && (
-            <p className="text-red-500 text-sm mt-1">{errors.cardName}</p>
-          )}
+    <div className="relative">
+      {/* Decorative background element */}
+      <div className="absolute -top-4 -left-4 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10" />
+      
+      <div className="relative bg-card/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 shadow-lg border border-border/50">
+        <div className="mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-3">
+            Thanh toán
+          </h1>
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+            Để bắt đầu đăng ký, vui lòng nhập thông tin thẻ của bạn để thực hiện thanh toán.
+            Bạn sẽ được chuyển hướng đến trang xác thực của ngân hàng.
+          </p>
         </div>
 
-        {/* Card Number */}
-        <div>
-          <label className="text-[#575757] text-[20px] mb-2 block">
-            Số thẻ
-          </label>
-          <div className="relative">
-            <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input
-              value={formData.cardNumber}
-              onChange={(e) => handleChange('cardNumber', e.target.value)}
-              className={`h-[65px] bg-[#EEEEEE] border-b-2 border-[#54C6EE] text-[23px] pl-12 ${
-                errors.cardNumber ? 'border-red-500' : ''
-              }`}
-              placeholder="0000 0000 0000 0000"
-            />
-          </div>
-          {errors.cardNumber && (
-            <p className="text-red-500 text-sm mt-1">{errors.cardNumber}</p>
-          )}
-        </div>
-
-        {/* Expiry & CVC */}
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <label className="text-[#575757] text-[20px] mb-2 block">
-              Hết hạn
+        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+          {/* Card Name */}
+          <div className="space-y-2">
+            <label className="text-foreground text-sm font-semibold flex items-center gap-2">
+              Tên chủ thẻ
             </label>
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="relative group">
               <Input
-                value={formData.expiry}
-                onChange={(e) => handleChange('expiry', e.target.value)}
-                className={`h-[67px] bg-[#EEEEEE] border-b-2 border-[#54C6EE] text-[23px] pl-12 ${
-                  errors.expiry ? 'border-red-500' : ''
-                }`}
-                placeholder="MM / YY"
+                value={formData.cardName}
+                onChange={(e) => handleChange('cardName', e.target.value)}
+                className={`h-12 bg-muted/50 border-2 transition-all duration-200 text-base ${
+                  errors.cardName 
+                    ? 'border-destructive focus:border-destructive' 
+                    : 'border-transparent focus:border-primary hover:bg-muted'
+                } focus:ring-2 focus:ring-primary/20 rounded-lg`}
+                placeholder="Nhập tên trên thẻ"
               />
             </div>
-            {errors.expiry && (
-              <p className="text-red-500 text-sm mt-1">{errors.expiry}</p>
+            {errors.cardName && (
+              <p className="text-destructive text-xs mt-1 flex items-center gap-1">{errors.cardName}</p>
             )}
           </div>
-          <div>
-            <label className="text-[#575757] text-[20px] mb-2 block">CVC</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                value={formData.cvc}
-                onChange={(e) => handleChange('cvc', e.target.value)}
-                className={`h-[67px] bg-[#EEEEEE] border-b-2 border-[#54C6EE] text-[23px] pl-12 ${
-                  errors.cvc ? 'border-red-500' : ''
-                }`}
-                placeholder="123"
-                maxLength={3}
-              />
-            </div>
-            {errors.cvc && (
-              <p className="text-red-500 text-sm mt-1">{errors.cvc}</p>
-            )}
-          </div>
-        </div>
 
-        {/* Promo Code */}
-        <div>
-          <label className="text-[#575757] text-[20px] mb-2 block">
-            Mã giảm giá
-          </label>
-          <div className="relative">
-            <Input
-              value={formData.promoCode}
-              onChange={(e) => handleChange('promoCode', e.target.value)}
-              className="h-[65px] bg-[#EEEEEE] border-b-2 border-[#54C6EE] text-[20px] pr-24"
-              placeholder="Nhập mã giảm giá"
-            />
-            <button
+          {/* Card Number */}
+          <div className="space-y-2">
+            <label className="text-foreground text-sm font-semibold flex items-center gap-2">
+              Số thẻ
+            </label>
+            <div className="relative group">
+              <CreditCard className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 transition-colors group-focus-within:text-primary" />
+              <Input
+                value={formData.cardNumber}
+                onChange={(e) => handleChange('cardNumber', e.target.value)}
+                className={`h-12 bg-muted/50 border-2 transition-all duration-200 text-base pl-12 ${
+                  errors.cardNumber 
+                    ? 'border-destructive focus:border-destructive' 
+                    : 'border-transparent focus:border-primary hover:bg-muted'
+                } focus:ring-2 focus:ring-primary/20 rounded-lg`}
+                placeholder="0000 0000 0000 0000"
+              />
+            </div>
+            {errors.cardNumber && (
+              <p className="text-destructive text-xs mt-1 flex items-center gap-1">{errors.cardNumber}</p>
+            )}
+          </div>
+
+          {/* Expiry & CVC */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-foreground text-sm font-semibold flex items-center gap-2">
+                Hết hạn
+              </label>
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 transition-colors group-focus-within:text-primary" />
+                <Input
+                  value={formData.expiry}
+                  onChange={(e) => handleChange('expiry', e.target.value)}
+                  className={`h-12 bg-muted/50 border-2 transition-all duration-200 text-base pl-12 ${
+                    errors.expiry 
+                      ? 'border-destructive focus:border-destructive' 
+                      : 'border-transparent focus:border-primary hover:bg-muted'
+                  } focus:ring-2 focus:ring-primary/20 rounded-lg`}
+                  placeholder="MM / YY"
+                />
+              </div>
+              {errors.expiry && (
+                <p className="text-destructive text-xs mt-1">{errors.expiry}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-foreground text-sm font-semibold flex items-center gap-2">
+                CVC
+              </label>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5 transition-colors group-focus-within:text-primary" />
+                <Input
+                  value={formData.cvc}
+                  onChange={(e) => handleChange('cvc', e.target.value)}
+                  className={`h-12 bg-muted/50 border-2 transition-all duration-200 text-base pl-12 ${
+                    errors.cvc 
+                      ? 'border-destructive focus:border-destructive' 
+                      : 'border-transparent focus:border-primary hover:bg-muted'
+                  } focus:ring-2 focus:ring-primary/20 rounded-lg`}
+                  placeholder="123"
+                  maxLength={3}
+                />
+              </div>
+              {errors.cvc && (
+                <p className="text-destructive text-xs mt-1">{errors.cvc}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Promo Code */}
+          <div className="space-y-2">
+            <label className="text-foreground text-sm font-semibold flex items-center gap-2">
+              Mã giảm giá
+            </label>
+            <div className="relative group">
+              <Input
+                value={formData.promoCode}
+                onChange={(e) => handleChange('promoCode', e.target.value)}
+                className="h-12 bg-muted/50 border-2 border-transparent focus:border-primary hover:bg-muted focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-base pr-24 rounded-lg"
+                placeholder="Nhập mã giảm giá"
+              />
+              <button
+                type="button"
+                onClick={handleApplyPromo}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary font-semibold rounded-md transition-all duration-200 text-sm"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <Button
               type="button"
-              onClick={handleApplyPromo}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black text-[20px] font-bold hover:text-[#54C6EE]"
+              onClick={handlePayment}
+              disabled={isSubmitting}
+              className="w-full h-12 md:h-14 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white text-base md:text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Apply
-            </button>
+              {isSubmitting ? 'Đang xử lý...' : 'Thanh toán'}
+            </Button>
           </div>
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="button"
-          onClick={handlePayment}
-          disabled={isSubmitting}
-          className="w-[242px] h-[66px] bg-[#54C6EE] hover:bg-[#54C6EE]/90 text-black text-[24px] font-bold rounded-lg"
-        >
-          {isSubmitting ? 'Đang xử lý...' : 'Thanh toán'}
-        </Button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

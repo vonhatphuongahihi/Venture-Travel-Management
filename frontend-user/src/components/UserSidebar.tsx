@@ -83,7 +83,7 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isSidebarOpen, setIsSid
           </Link>
           
           <Link
-            to="#"
+            to="/settings"
             className={`flex items-center gap-3 text-sm py-3 px-4 rounded-lg transition-all duration-200 ${
               activeLink === "settings" 
                 ? "bg-primary text-white" 

@@ -8,6 +8,7 @@ import UserAPI from "@/services/userAPI";
 import { Camera, Eye, EyeOff, ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import UserSidebar from "@/components/UserSidebar";
 
 const Profile = () => {
   const { user, token, logout, updateUser } = useAuth();
@@ -244,50 +245,7 @@ const Profile = () => {
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
             
             {/* Sidebar */}
-            <aside className="w-full md:w-64 shrink-0 bg-white/80 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 h-fit overflow-hidden">
-              
-              {/* Header của Sidebar: Luôn hiện trên mobile, bấm vào để toggle */}
-              <div 
-                className="p-4 flex items-center justify-between cursor-pointer md:cursor-default"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <div className="flex items-center gap-3">
-                  <img src={user?.profilePhoto || avatarImg} alt="avatar" className="h-12 w-12 rounded-full object-cover" />
-                  <div className="overflow-hidden">
-                    <div className="text-m font-medium truncate">{user?.name || 'Người dùng'}</div>
-                    <div className="text-xs text-slate-600">Thành viên</div>
-                  </div>
-                </div>
-
-                {/* Icon chỉ hiện trên mobile */}
-                <div className="md:hidden text-slate-400">
-                  {isSidebarOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                </div>
-              </div>
-
-              {/* Phần nội dung menu: Ẩn trên mobile nếu chưa mở (hidden), luôn hiện trên desktop (md:block) */}
-              <div className={`px-4 pb-4 md:block ${isSidebarOpen ? 'block' : 'hidden'}`}>
-                <nav className="space-y-2 mt-2 md:mt-4">
-                  <Link to="#" className="block text-sm md:text-m py-2 px-3 rounded-md border text-primary border-primary/50 bg-primary/5">Hồ sơ của tôi</Link>
-                  <Link to="#" className="block text-sm md:text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Thông báo</Link>
-                  <Link to="/booking-history" className="block text-sm md:text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Lịch sử đặt tour</Link>
-                  <Link to="/favorite-tours" className="block text-sm md:text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Tour yêu thích</Link>
-                  <Link to="#" className="block text-sm md:text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10">Cài đặt</Link>
-                </nav>
-
-                <div className="mt-6 border-t border-border pt-4">
-                  <Link to="/terms"  className="block w-full text-sm md:text-m text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Điều khoản sử dụng</Link>
-                  <Link to="/policy"  className="block w-full text-sm md:text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Chính sách bảo mật</Link>
-                  <Link to="/about"  className="block w-full text-sm md:text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10">Về VENTURE</Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-sm md:text-l text-center py-2 px-3 rounded-md mt-6 md:mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
-                  >
-                    Đăng xuất
-                  </button>
-                </div>
-              </div>
-            </aside>
+            <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="profile" />
 
             {/* Main card */}
             <section className="flex-1 min-w-0">
@@ -370,24 +328,6 @@ const Profile = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Mật khẩu:</label>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          className="w-full rounded-md border border-primary/50 px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
-                          defaultValue="password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((s) => !s)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary"
-                        >
-                          {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
                       <label className="block text-sm text-slate-600 mb-1">Ngày sinh:</label>
                       <input
                         name="dateOfBirth"
@@ -400,29 +340,32 @@ const Profile = () => {
 
                     <div>
                       <label className="block text-sm text-slate-600 mb-1">Giới tính:</label>
-                      <select
-                        name="gender"
-                        value={formData.gender}
-                        onChange={handleInputChange}
-                        className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
-                      >
-                        <option value="">Chọn giới tính</option>
-                        <option value="male">Nam</option>
-                        <option value="female">Nữ</option>
-                        <option value="other">Khác</option>
-                      </select>
+                      <div className="relative">
+                        <select
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="w-full rounded-md border border-primary/50 px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base appearance-none"
+                        >
+                          <option value="">Chọn giới tính</option>
+                          <option value="male">Nam</option>
+                          <option value="female">Nữ</option>
+                          <option value="other">Khác</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none h-4 w-4" />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 md:mt-6">
-                    <label className="block text-sm text-slate-600 mb-1">Địa chỉ:</label>
-                    <input
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      placeholder="Nhập địa chỉ đầy đủ"
-                      className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
-                    />
+                    <div>
+                      <label className="block text-sm text-slate-600 mb-1">Địa chỉ:</label>
+                      <input
+                        name="address"
+                        value={formData.address}
+                        onChange={handleInputChange}
+                        placeholder="Nhập địa chỉ đầy đủ"
+                        className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
+                      />
+                    </div>
                   </div>
 
                   <div className="mt-6 md:mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-8">

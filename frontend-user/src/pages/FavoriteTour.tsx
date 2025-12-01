@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import UserSidebar from "@/components/UserSidebar";
 import TourCard from "@/components/tour/TourCard";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAPI from "@/services/userAPI";
@@ -22,12 +23,15 @@ interface FavoriteTourItem {
 }
 
 const FavoriteTourPage = () => {
-    const { user, token } = useAuth();
+    const { user, token, logout } = useAuth();
     const { showToast } = useToast();
     const navigate = useNavigate();
     const [favoriteTours, setFavoriteTours] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    
+    // State quản lý đóng mở sidebar trên mobile
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (!user || !token) {
@@ -112,39 +116,52 @@ const FavoriteTourPage = () => {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        showToast('Đã đăng xuất thành công', 'success');
+        navigate('/login');
+    };
+
     if (!user || !token) {
         return null; // Will redirect in useEffect
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 flex flex-col">
+        <div className="min-h-screen bg-background">
             <Header />
+            <div className="text-center mt-8 md:mt-12 mb-8 md:mb-12 px-4">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
+                    Tour <span className="text-gradient">Yêu Thích</span>
+                </h2>
+            </div>
 
-            <main className="flex-1 container mx-auto px-4 py-10 md:py-14">
-                {/* Header Section */}
-                <div className="mb-10 md:mb-14">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                        <div>
-                            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                Tour Yêu Thích
-                            </h1>
-                            <p className="text-gray-600 text-lg max-w-3xl">
-                                Nơi lưu giữ những chuyến đi bạn đã đánh dấu. Quay lại bất cứ lúc nào để đặt tour chỉ với một cú nhấp.
-                            </p>
-                        </div>
-                        <div className="flex flex-col gap-3 bg-white rounded-2xl shadow-xl shadow-primary/10 px-6 py-4 border border-primary/10 max-w-xs">
-                            <span className="text-xs uppercase tracking-widest text-gray-400">Đang lưu</span>
-                            <div className="text-3xl font-bold text-primary">{favoriteTours.length}</div>
-                            <p className="text-sm text-gray-500">tour bạn yêu thích</p>
-                            <Button
-                                className="w-full bg-primary hover:bg-primary/90 text-white"
-                                onClick={() => navigate('/tour')}
-                            >
-                                Khám phá tour mới
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+            <main className="container mx-auto px-4 py-6 md:py-12">
+                {/* RESPONSIVE: flex-col trên mobile, flex-row trên desktop (lg) */}
+                <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+                  
+                  {/* Sidebar */}
+                  <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="favorite-tours" />
+
+                  {/* Main card */}
+                  <section className="flex-1 min-w-0">
+                    <div className="bg-white/90 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-4 md:p-8">
+                      <h2 className="text-lg font-medium mb-3">Tour yêu thích</h2>
+                      <p className="text-sm text-slate-600 mb-6">
+                        Xem tất cả các tour bạn đã lưu
+                      </p>
+
+                      {/* Stats Card */}
+                      <div className="mb-6 flex flex-col gap-3 bg-white rounded-2xl shadow-xl shadow-primary/10 px-6 py-4 border border-primary/10 max-w-xs">
+                        <span className="text-xs uppercase tracking-widest text-gray-400">Đang lưu</span>
+                        <div className="text-3xl font-bold text-primary">{favoriteTours.length}</div>
+                        <p className="text-sm text-gray-500">tour bạn yêu thích</p>
+                        <Button
+                          className="w-full bg-primary hover:bg-primary/90 text-white"
+                          onClick={() => navigate('/tour')}
+                        >
+                          Khám phá tour mới
+                        </Button>
+                      </div>
 
                 {/* Loading State */}
                 {loading && (
@@ -258,6 +275,9 @@ const FavoriteTourPage = () => {
                         </div>
                     </>
                 )}
+                    </div>
+                  </section>
+                </div>
             </main>
 
             <Footer />

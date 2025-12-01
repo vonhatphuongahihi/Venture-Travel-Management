@@ -1,7 +1,9 @@
 import { MapPin, Phone, Mail, Facebook, Instagram, Youtube, Plane } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="bg-[#E5F8FF] text-primary">
       <div className="container py-12">
@@ -18,8 +20,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-sm text-primary text-justify">
-              Công ty du lịch hàng đầu Việt Nam với hơn 10 năm kinh nghiệm.
-              Chúng tôi cam kết mang đến những trải nghiệm du lịch tuyệt vời nhất.
+              {t("footer.companyDescription")}
             </p>
             <div className="flex space-x-3">
               <div className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors">
@@ -35,14 +36,14 @@ const Footer = () => {
           </div>
 
           <div className="space-y-4 ml-4">
-            <h3 className="font-semibold text-lg text-primary">Liên kết nhanh</h3>
+            <h3 className="font-semibold text-lg text-primary">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   to="/tour"
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
-                  Tours du lịch
+                  {t("footer.tours")}
                 </Link>
               </li>
               <li>
@@ -50,7 +51,7 @@ const Footer = () => {
                   to="/destination"
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
-                  Điểm đến
+                  {t("footer.destinations")}
                 </Link>
               </li>
               <li>
@@ -58,7 +59,7 @@ const Footer = () => {
                   to="/map"
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
-                  Bản đồ
+                  {t("footer.map")}
                 </Link>
               </li>
               <li>
@@ -66,7 +67,7 @@ const Footer = () => {
                   to="/explore-360"
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
-                  Khám phá 360°
+                  {t("footer.explore360")}
                 </Link>
               </li>
               <li>
@@ -74,26 +75,26 @@ const Footer = () => {
                   to="/contact"
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
-                  Liên hệ
+                  {t("footer.contact")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="space-y-4 ml-6">
-            <h3 className="font-semibold text-lg text-primary">Dịch vụ</h3>
+            <h3 className="font-semibold text-lg text-primary">{t("footer.services")}</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">Tour trọn gói</a></li>
-              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">Đặt Tour</a></li>
+              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">{t("footer.packageTour")}</a></li>
+              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">{t("footer.bookTour")}</a></li>
             </ul>
           </div>
 
           <div className="space-y-4 ml-8">
-            <h3 className="font-semibold text-lg text-primary">Liên hệ</h3>
+            <h3 className="font-semibold text-lg text-primary">{t("footer.contactTitle")}</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-primary/60" />
-                <span className="text-primary">123 Nguyễn Huệ, Q1, TP.HCM</span>
+                <span className="text-primary">{t("footer.address")}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-primary/60" />
@@ -108,26 +109,26 @@ const Footer = () => {
         </div>
         <div className="border-t border-primary/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-primary/80 text-sm">
-            © 2025 Venture. Bản quyền thuộc về chúng tôi.
+            {t("footer.copyright")}
           </p>
           <div className="flex space-x-6 text-sm">
             <Link
               to="/terms"
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
-              Điều khoản
+              {t("footer.terms")}
             </Link>
             <Link
               to="/policy"
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
-              Chính sách
+              {t("footer.policy")}
             </Link>
             <Link
               to="/support"
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
-              Hỗ trợ
+              {t("footer.support")}
             </Link>
           </div>
         </div>

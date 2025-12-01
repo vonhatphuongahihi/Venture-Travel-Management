@@ -9,12 +9,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tour } from "@/global.types";
+import { useTranslation } from "react-i18next";
 
 interface AttractionToursSectionProps {
   tours: Tour[];
 }
 
 function AttractionToursSection({ tours }: AttractionToursSectionProps) {
+  const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<string>("price-asc");
   const [visibleCount, setVisibleCount] = useState(6);
 
@@ -53,21 +55,21 @@ function AttractionToursSection({ tours }: AttractionToursSectionProps) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <p className="text-gray-500 text-sm">
-            Tìm thấy {tours.length} kết quả
+            {t("attractionTours.foundResults", { count: tours.length })}
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-700">Sắp xếp theo</span>
+          <span className="text-sm text-gray-700">{t("attractionTours.sortBy")}</span>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price-asc">Giá (từ thấp đến cao)</SelectItem>
-              <SelectItem value="price-desc">Giá (từ cao đến thấp)</SelectItem>
-              <SelectItem value="rating-desc">Đánh giá cao nhất</SelectItem>
-              <SelectItem value="duration-asc">Thời gian ngắn nhất</SelectItem>
+              <SelectItem value="price-asc">{t("attractionTours.priceLowToHigh")}</SelectItem>
+              <SelectItem value="price-desc">{t("attractionTours.priceHighToLow")}</SelectItem>
+              <SelectItem value="rating-desc">{t("attractionTours.highestRated")}</SelectItem>
+              <SelectItem value="duration-asc">{t("attractionTours.shortestDuration")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -101,8 +103,9 @@ function AttractionToursSection({ tours }: AttractionToursSectionProps) {
           <Button
             size="lg"
             className="px-8 bg-[#80CEEA] text-white hover:bg-[#5ebbdd]"
+            onClick={handleLoadMore}
           >
-            Xem thêm
+            {t("attractionTours.viewMore")}
           </Button>
         </div>
       )}
@@ -126,10 +129,10 @@ function AttractionToursSection({ tours }: AttractionToursSectionProps) {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Chưa có tour nào
+            {t("attractionTours.noTours")}
           </h3>
           <p className="text-gray-500">
-            Hiện tại chưa có tour nào cho địa điểm này. Vui lòng quay lại sau.
+            {t("attractionTours.noToursDescription")}
           </p>
         </div>
       )}

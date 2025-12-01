@@ -15,12 +15,14 @@ import { useToast } from "@/contexts/ToastContext";
 import PickupAddressSelector from "@/components/booking/PickupAddressSelector";
 import { bookingService } from "@/services/booking.service";
 import { PriceCategories } from "@/types/tourDetailType";
+import { useTranslation } from "react-i18next";
 
 interface PriceCategoryWithQuantity extends PriceCategories {
   quantity: number;
 }
 
 export default function BookTourNew() {
+  const { t } = useTranslation();
   const { state } = useLocation();
   const tour = state?.tour;
   const ticketPrices = state?.ticketPrices;
@@ -42,8 +44,8 @@ export default function BookTourNew() {
   };
 
   const handleBook = async () => {
-    if (fullname === "" || email === "" || phone === "" || pickUpPoint === ""){
-      showToast("Vui lòng nhập đầy đủ thông tin" , "error")
+    if (fullname === "" || email === "" || phone === "" || pickUpPoint === "") {
+      showToast(t("bookTour.fillAllFields"), "error")
       return;
     }
 
@@ -70,7 +72,7 @@ export default function BookTourNew() {
 
       const response = await bookingService.createBooking(bookingData);
 
-      showToast("Đặt tour thành công!", "success");
+      showToast(t("bookTour.bookingSuccess"), "success");
 
       navigate("/booking-history", {
         state: { newBooking: response },
@@ -80,7 +82,7 @@ export default function BookTourNew() {
     } catch (error: unknown) {
       console.error("Booking error:", error);
       const axiosError = error as { response?: { data?: { message?: string } } };
-      const errorMessage = axiosError.response?.data?.message || "Có lỗi xảy ra khi đặt tour. Vui lòng thử lại.";
+      const errorMessage = axiosError.response?.data?.message || t("bookTour.bookingError");
       showToast(errorMessage, "error");
     } finally {
       setIsBooking(false);
@@ -93,36 +95,36 @@ export default function BookTourNew() {
       <div className="max-w-6xl mx-auto my-10 pt-10 pb-6 shadow-[0px_4px_48px_12px_rgba(0,0,0,0.09)] bg-card px-10 border border-border">
         <div className="flex gap-4 justify-between">
           <Card className="p-4 w-full lg:w-1/2">
-            <CardTitle>Đặt vé</CardTitle>
+            <CardTitle>{t("bookTour.bookTicket")}</CardTitle>
             <div className="flex flex-col mt-4 space-y-4">
               <Label>
-                Họ và tên <span className="text-red-500">*</span>
+                {t("bookTour.fullName")} <span className="text-red-500">*</span>
                 <Input
                   required
                   type="text"
-                  placeholder="Họ và tên"
+                  placeholder={t("bookTour.fullName")}
                   value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
                   className="mt-2"
                 />
               </Label>
               <Label>
-                Email <span className="text-red-500">*</span>
+                {t("bookTour.email")} <span className="text-red-500">*</span>
                 <Input
                   required
                   type="text"
-                  placeholder="Email"
+                  placeholder={t("bookTour.email")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="mt-2"
                 />
               </Label>
               <Label>
-                Số điện thoại <span className="text-red-500">*</span>
+                {t("bookTour.phone")} <span className="text-red-500">*</span>
                 <Input
                   required
                   type="text"
-                  placeholder="Số điện thoại"
+                  placeholder={t("bookTour.phone")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="mt-2"
@@ -137,11 +139,11 @@ export default function BookTourNew() {
                 />
               ) : (
                 <Label>
-                  Chọn điểm đón <span className="text-red-500">*</span>
+                  {t("bookTour.selectPickupPoint")} <span className="text-red-500">*</span>
                   <Input
                     required
                     type="text"
-                    placeholder="Nhập địa chỉ đón khách"
+                    placeholder={t("bookTour.enterPickupAddress")}
                     value={pickUpPoint}
                     onChange={(e) => setPickup(e.target.value)}
                     className="mt-2"
@@ -149,9 +151,9 @@ export default function BookTourNew() {
                 </Label>
               )}
               <Label>
-                Ghi chú
+                {t("bookTour.note")}
                 <Textarea
-                  placeholder="Ghi chú"
+                  placeholder={t("bookTour.note")}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   className="h-[60px] resize-none mt-2"
@@ -170,7 +172,7 @@ export default function BookTourNew() {
             <div className={`flex items-center gap-4 w-full px-4 py-2 border`}>
               <div className="flex gap-2 items-center">
                 <Calendar />
-                <p className="font-semibold text-lg">Ngày khởi hành:</p>
+                <p className="font-semibold text-lg">{t("bookTour.departureDate")}:</p>
               </div>
 
               <p className="text-sm">
@@ -180,7 +182,7 @@ export default function BookTourNew() {
             <div className={`flex flex-col w-full px-4 py-2 border`}>
               <div className="flex gap-2 items-center">
                 <Ticket />
-                <p className="font-semibold text-lg">Thông tin vé:</p>
+                <p className="font-semibold text-lg">{t("bookTour.ticketInfo")}:</p>
               </div>
               <p className="text-base font-semibold">
                 {userTicket.currentType.name}
@@ -216,7 +218,7 @@ export default function BookTourNew() {
             </div>
             <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20">
               <div className="flex items-center justify-between">
-                <span className="text-gray-700 font-semibold">Tổng cộng:</span>
+                <span className="text-gray-700 font-semibold">{t("bookTour.total")}:</span>
                 <span className="text-2xl font-bold text-primary">
                   {totalPrice.toLocaleString("vi-VN")} ₫
                 </span>
@@ -231,7 +233,7 @@ export default function BookTourNew() {
             ) : (
               <DollarSign />
             )}
-            <p>{isBooking ? "Đang xử lý..." : "Thanh toán"}</p>
+            <p>{isBooking ? t("bookTour.processing") : t("bookTour.payment")}</p>
           </Button>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useProvinces } from "@/contexts/ProvinceContext";
 import type { Province } from "@/global.types";
+import { useTranslation } from "react-i18next";
 
 interface MobileProvinceDropdownProps {
   onItemClick?: () => void;
@@ -11,6 +12,7 @@ interface MobileProvinceDropdownProps {
 const MobileProvinceDropdown = ({
   onItemClick,
 }: MobileProvinceDropdownProps) => {
+  const { t } = useTranslation();
   const { provinces, loading } = useProvinces();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -30,11 +32,10 @@ const MobileProvinceDropdown = ({
         onClick={handleToggle}
         className="w-full flex items-center justify-between text-sm font-medium transition-colors hover:text-primary"
       >
-        <span>ĐIỂM ĐẾN</span>
+        <span>{t("provinceDropdown.destinations")}</span>
         <ChevronDown
-          className={`h-3 w-3 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -44,32 +45,32 @@ const MobileProvinceDropdown = ({
           <div className="grid grid-cols-2 gap-2">
             {loading ? (
               <div className="col-span-2 text-center py-4 text-gray-500 text-sm">
-                Đang tải...
+                {t("provinceDropdown.loading")}
               </div>
             ) : (
               provinces.map((province: Province) => (
-              <Link
-                key={province.id}
-                to={`/province/${province.slug}`}
-                onClick={handleProvinceClick}
-                className="flex items-center p-2 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0 border border-gray-200">
-                  <img
-                    src={province.image}
-                    alt={province.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "/placeholder.svg";
-                    }}
-                  />
-                </div>
-                <span className="text-xs text-gray-700 leading-tight truncate">
-                  {province.name}
-                </span>
-              </Link>
-            ))
+                <Link
+                  key={province.id}
+                  to={`/province/${province.slug}`}
+                  onClick={handleProvinceClick}
+                  className="flex items-center p-2 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0 border border-gray-200">
+                    <img
+                      src={province.image}
+                      alt={province.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder.svg";
+                      }}
+                    />
+                  </div>
+                  <span className="text-xs text-gray-700 leading-tight truncate">
+                    {province.name}
+                  </span>
+                </Link>
+              ))
             )}
           </div>
         </div>

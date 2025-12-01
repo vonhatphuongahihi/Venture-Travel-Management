@@ -6,8 +6,10 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import MobileProvinceDropdown from "./province/MobileProvinceDropdown";
 import ProvinceDropdown from "./province/ProvinceDropdown";
+import { useTranslation } from "react-i18next";
 
 const Header = () => {
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
     const { user, isAuthenticated } = useAuth();
@@ -36,7 +38,7 @@ const Header = () => {
                             : "hover:text-primary"
                             }`}
                     >
-                        TOUR
+                        {t("header.tour")}
                     </Link>
                     <ProvinceDropdown />
                     <Link
@@ -46,7 +48,7 @@ const Header = () => {
                             : "hover:text-primary"
                             }`}
                     >
-                        BẢN ĐỒ
+                        {t("header.map")}
                     </Link>
                     <Link
                         to="/explore-360"
@@ -55,13 +57,13 @@ const Header = () => {
                             : "hover:text-primary"
                             }`}
                     >
-                        KHÁM PHÁ 360°
+                        {t("header.explore360")}
                     </Link>
                     <Link
                         to="/contact"
                         className="text-sm font-medium hover:text-primary transition-colors"
                     >
-                        LIÊN HỆ
+                        {t("header.contact")}
                     </Link>
                 </nav>
 
@@ -71,14 +73,14 @@ const Header = () => {
                         <Link to="/login">
                             <Button variant="tour" size="sm" className="hidden sm:flex">
                                 <User className="h-4 w-4" />
-                                Đăng nhập
+                                {t("header.login")}
                             </Button>
                         </Link>
                     ) : (
                         <Link to="/profile" className="hidden sm:inline-flex">
                             <button
                                 className="h-8 w-8 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center shadow-sm overflow-hidden hover:border-primary/40 transition-all"
-                                aria-label="Hồ sơ"
+                                aria-label={t("header.profile")}
                             >
                                 {user?.profilePhoto ? (
                                     <img
@@ -116,7 +118,7 @@ const Header = () => {
                                 }`}
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            TOUR
+                            {t("header.tour")}
                         </Link>
 
                         <MobileProvinceDropdown onItemClick={() => setIsMenuOpen(false)} />
@@ -126,21 +128,21 @@ const Header = () => {
                             className="block text-sm font-medium hover:text-primary transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            BẢN ĐỒ
+                            {t("header.map")}
                         </Link>
                         <Link
                             to="/explore-360"
                             className="block text-sm font-medium hover:text-primary transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            KHÁM PHÁ 360°
+                            {t("header.explore360")}
                         </Link>
                         <Link
                             to="/contact"
                             className="block text-sm font-medium hover:text-primary transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
-                            LIÊN HỆ
+                            {t("header.contact")}
                         </Link>
 
                         {/* --- PHẦN ĐÃ CHỈNH SỬA --- */}
@@ -149,7 +151,7 @@ const Header = () => {
                                 <Link to="/login" onClick={() => setIsMenuOpen(false)}>
                                     <Button variant="tour" size="sm" className="w-full">
                                         <User className="h-4 w-4" />
-                                        Đăng nhập
+                                        {t("header.login")}
                                     </Button>
                                 </Link>
                             ) : (
@@ -170,7 +172,7 @@ const Header = () => {
                                         )}
                                     </div>
                                     <span className="text-sm font-semibold text-foreground">
-                                        {user?.name || "Tài khoản của tôi"}
+                                        {user?.name || t("header.myAccount")}
                                     </span>
                                 </Link>
                             )}

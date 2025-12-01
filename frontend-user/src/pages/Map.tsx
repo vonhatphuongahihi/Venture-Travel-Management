@@ -17,6 +17,7 @@ import { tourService } from "@/services/tour.service";
 import AttractionAPI from "@/services/attractionAPI";
 import RouteAPI from "@/services/routeAPI";
 import ProvinceAPI from "@/services/provinceAPI";
+import { useTranslation } from "react-i18next";
 
 type Layer = "tour" | "destination";
 type Area = "all" | "north" | "centre" | "south";
@@ -25,6 +26,7 @@ type FilterData = Record<Layer, number>;
 type FilterState = Record<Area, FilterData>;
 
 const Map = () => {
+  const { t } = useTranslation();
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -192,10 +194,10 @@ const Map = () => {
           }`}
       >
         <h2 className="text-2xl md:text-3xl font-bold">
-          BẢN ĐỒ DU LỊCH TƯƠNG TÁC
+          {t("map.title")}
         </h2>
         <p className="text-[#7b8b9d] text-lg mt-4">
-          Khám phá các tour và điểm đến trên bản đồ Việt Nam.
+          {t("map.description")}
         </p>
       </div>
       {/*Main*/}
@@ -208,7 +210,7 @@ const Map = () => {
           <div className="w-[300px] bg-white outline outline-1 outline-[#26B8ED] rounded-xl p-5 space-y-2">
             <div className="flex gap-4">
               <Layers className="w-4 h-4 mt-[4px] text-primary" />
-              <p className="font-bold font-['Inter']">Lớp bản đồ</p>
+              <p className="font-bold font-['Inter']">{t("map.mapLayers")}</p>
             </div>
             <Button
               className={`${currentLayer == "tour"
@@ -219,7 +221,7 @@ const Map = () => {
             >
               <div className="flex space-x-2 justify-center align-center">
                 <Send className="w-4 h-4 mt-[2px]" />
-                <p className="font-['Inter']">Tours</p>
+                <p className="font-['Inter']">{t("map.tours")}</p>
               </div>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
@@ -236,7 +238,7 @@ const Map = () => {
             >
               <div className="flex space-x-2 justify-center align-center">
                 <MapPin className="w-4 h-4 mt-[2px]" />
-                <p className="font-normal font-['Inter']">Điểm đến</p>
+                <p className="font-normal font-['Inter']">{t("map.destinations")}</p>
               </div>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
@@ -249,7 +251,7 @@ const Map = () => {
           <div className="w-[300px] bg-white outline outline-1 outline-[#26B8ED] rounded-xl p-5 space-y-2">
             <div className="flex gap-4">
               <LandPlot className="w-4 h-4 mt-[4px] text-primary" />
-              <p className="font-bold font-['Inter']">Khu vực</p>
+              <p className="font-bold font-['Inter']">{t("map.region")}</p>
             </div>
             <Button
               className={`${currentArea == "all"
@@ -258,7 +260,7 @@ const Map = () => {
                 } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("all")}
             >
-              <p className="font-['Inter']">Tất cả</p>
+              <p className="font-['Inter']">{t("map.all")}</p>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
                   {filter["all"][currentLayer]}
@@ -272,7 +274,7 @@ const Map = () => {
                 } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("north")}
             >
-              <p className="font-normal font-['Inter']">Miền Bắc</p>
+              <p className="font-normal font-['Inter']">{t("map.north")}</p>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
                   {filter["north"][currentLayer]}
@@ -286,7 +288,7 @@ const Map = () => {
                 } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("centre")}
             >
-              <p className="font-normal font-['Inter']">Miền Trung</p>
+              <p className="font-normal font-['Inter']">{t("map.central")}</p>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
                   {filter["centre"][currentLayer]}
@@ -300,7 +302,7 @@ const Map = () => {
                 } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("south")}
             >
-              <p className="font-normal font-['Inter']">Miền Nam</p>
+              <p className="font-normal font-['Inter']">{t("map.south")}</p>
               <div className="w-[45px] h-[22px] bg-[#f0faff] rounded-full px-2 py-1">
                 <div className="text-center justify-center text-[#1d2530] text-xs font-bold font-['Inter']">
                   {filter["south"][currentLayer]}

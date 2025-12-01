@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useProvince, useProvinceTours } from "@/hooks/useProvince";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 // Import assets
 import heroImage from "@/assets/hero-vietnam.jpg";
@@ -21,6 +22,7 @@ enum ProvincePageTab {
 }
 
 const ProvincePage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
 
@@ -55,7 +57,7 @@ const ProvincePage = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p>Loading...</p>
+        <p>{t("provincePage.loading")}</p>
       </div>
     );
   }
@@ -66,11 +68,11 @@ const ProvincePage = () => {
       <div className="min-h-screen bg-white">
         <Header />
         <div className="container py-20 text-center">
-          <h1 className="text-3xl font-bold mb-4">Tỉnh thành không tồn tại</h1>
+          <h1 className="text-3xl font-bold mb-4">{t("provincePage.notFound")}</h1>
           <p className="text-gray-600 mb-8">
-            Không tìm thấy thông tin về tỉnh thành này.
+            {t("provincePage.notFoundDescription")}
           </p>
-          <Button onClick={() => window.history.back()}>Quay lại</Button>
+          <Button onClick={() => window.history.back()}>{t("provincePage.goBack")}</Button>
         </div>
         <Footer />
       </div>
@@ -105,7 +107,7 @@ const ProvincePage = () => {
             {isClamped && (
               <Sheet>
                 <SheetTrigger asChild>
-                  <button className="text-sm underline">Xem thêm</button>
+                  <button className="text-sm underline">{t("provincePage.readMore")}</button>
                 </SheetTrigger>
                 <SheetContent>
                   <SheetHeader>
@@ -131,12 +133,12 @@ const ProvincePage = () => {
               className={cn(
                 "inline-block",
                 currPage === ProvincePageTab.EXPLORE &&
-                  "border-b-primary border-b-2 font-semibold text-primary"
+                "border-b-primary border-b-2 font-semibold text-primary"
               )}
             >
               <Link to={`/province/${province.slug}`}>
                 <h2 className="text-base py-3 px-1">
-                  Khám phá {province.name}
+                  {t("provincePage.explore")} {province.name}
                 </h2>
               </Link>
             </div>
@@ -145,11 +147,11 @@ const ProvincePage = () => {
               className={cn(
                 "inline-block",
                 currPage === ProvincePageTab.TOURS &&
-                  "border-b-primary border-b-2 font-semibold text-primary"
+                "border-b-primary border-b-2 font-semibold text-primary"
               )}
             >
               <Link to={`/province/${province.slug}/tours-activities`}>
-                <h2 className="text-base py-3 px-1">Những Tour hấp dẫn</h2>
+                <h2 className="text-base py-3 px-1">{t("provincePage.attractiveTours")}</h2>
               </Link>
             </div>
           </div>

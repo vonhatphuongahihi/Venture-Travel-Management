@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import UserSidebar from "@/components/UserSidebar";
@@ -19,6 +20,7 @@ const Settings = () => {
   const { user, token, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   // Sidebar state
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -49,24 +51,24 @@ const Settings = () => {
 
   const handleLogout = () => {
     logout();
-    showToast("Đã đăng xuất thành công", "success");
+    showToast(t("settings.logout.success"), "success");
     navigate("/login");
   };
 
   // Change Password Handler
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword) {
-      showToast("Vui lòng nhập đầy đủ thông tin", "error");
+      showToast(t("settings.changePassword.fillAllFields"), "error");
       return;
     }
 
     if (newPassword.length < 8) {
-      showToast("Mật khẩu mới phải có ít nhất 8 ký tự", "error");
+      showToast(t("settings.changePassword.minLength"), "error");
       return;
     }
 
     if (!token) {
-      showToast("Vui lòng đăng nhập lại", "error");
+      showToast(t("settings.changePassword.loginAgain"), "error");
       return;
     }
 
@@ -76,15 +78,15 @@ const Settings = () => {
       const response = await UserAPI.changePassword(token, currentPassword, newPassword);
 
       if (response.success) {
-        showToast("Đổi mật khẩu thành công!", "success");
+        showToast(t("settings.changePassword.success"), "success");
         setCurrentPassword("");
         setNewPassword("");
       } else {
-        showToast(response.message || "Đổi mật khẩu thất bại", "error");
+        showToast(response.message || t("settings.changePassword.error"), "error");
       }
     } catch (error) {
       console.error("Change password error:", error);
-      showToast("Không thể kết nối đến server. Vui lòng thử lại.", "error");
+      showToast(t("settings.deleteAccount.serverError"), "error");
     } finally {
       setIsChangingPassword(false);
     }
@@ -94,25 +96,24 @@ const Settings = () => {
   const handleChangeLanguage = async () => {
     setIsChangingLanguage(true);
 
-    // Simulate API call (you can add real API later)
+    // Change language using i18n
     setTimeout(() => {
       localStorage.setItem("language", language);
-      showToast("Đổi ngôn ngữ thành công!", "success");
+      i18n.changeLanguage(language);
+      showToast(t("settings.language.success"), "success");
       setIsChangingLanguage(false);
-      // Reload page to apply language change
-      window.location.reload();
     }, 500);
   };
 
   // Delete Account Handler
   const handleDeleteAccount = async () => {
     if (!deleteUsername || deleteUsername !== user?.name) {
-      showToast("Tên người dùng không khớp", "error");
+      showToast(t("settings.deleteAccount.usernameMismatch"), "error");
       return;
     }
 
     if (!token) {
-      showToast("Vui lòng đăng nhập lại", "error");
+      showToast(t("settings.deleteAccount.loginAgain"), "error");
       return;
     }
 
@@ -122,15 +123,15 @@ const Settings = () => {
       const response = await UserAPI.deleteAccount(token, user.userId);
 
       if (response.success) {
-        showToast("Tài khoản đã được xóa thành công", "success");
+        showToast(t("settings.deleteAccount.success"), "success");
         logout();
         navigate("/login");
       } else {
-        showToast(response.message || "Xóa tài khoản thất bại", "error");
+        showToast(response.message || t("settings.deleteAccount.error"), "error");
       }
     } catch (error) {
       console.error("Delete account error:", error);
-      showToast("Không thể kết nối đến server. Vui lòng thử lại.", "error");
+      showToast(t("settings.deleteAccount.serverError"), "error");
     } finally {
       setIsDeletingAccount(false);
       setDeleteUsername("");
@@ -142,7 +143,7 @@ const Settings = () => {
       <Header />
       <div className="text-center mt-8 md:mt-12 mb-8 md:mb-12 px-4">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-          Cài Đặt <span className="text-gradient">Tài Khoản</span>
+          <span className="text-gradient">{t("settings.title")}</span>
         </h2>
       </div>
 
@@ -162,13 +163,13 @@ const Settings = () => {
             <div className="space-y-6">
               {/* Change Password Card */}
               <Card className="p-6 h-fit">
-                <CardTitle className="mb-4 text-lg">Đổi mật khẩu</CardTitle>
+                <CardTitle className="mb-4 text-lg">{t("settings.changePassword.title")}</CardTitle>
 
                 {/* Image - smaller size */}
                 <div className="flex justify-center mb-6">
                   <img
                     src={doiMatKhauImg}
-                    alt="Đổi mật khẩu"
+                    alt={t("settings.changePassword.title")}
                     className="w-full max-w-[200px] h-auto object-contain"
                   />
                 </div>
@@ -177,13 +178,13 @@ const Settings = () => {
                 <div className="max-w-2xl mx-auto space-y-4">
                   <div>
                     <Label htmlFor="currentPassword" className="text-left block">
-                      Mật khẩu hiện tại <span className="text-red-500">*</span>
+                      {t("settings.changePassword.currentPassword")} <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative mt-2">
                       <Input
                         id="currentPassword"
                         type={showCurrentPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu hiện tại"
+                        placeholder={t("settings.changePassword.currentPasswordPlaceholder")}
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         className="pr-10"
@@ -204,13 +205,13 @@ const Settings = () => {
 
                   <div>
                     <Label htmlFor="newPassword" className="text-left block">
-                      Mật khẩu mới <span className="text-red-500">*</span>
+                      {t("settings.changePassword.newPassword")} <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative mt-2">
                       <Input
                         id="newPassword"
                         type={showNewPassword ? "text" : "password"}
-                        placeholder="Nhập mật khẩu mới (tối thiểu 8 ký tự)"
+                        placeholder={t("settings.changePassword.newPasswordPlaceholder")}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         className="pr-10"
@@ -228,7 +229,7 @@ const Settings = () => {
                       </button>
                     </div>
                     <p className="text-xs text-gray-500 mt-1 text-left">
-                      Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số
+                      {t("settings.changePassword.passwordHint")}
                     </p>
                   </div>
 
@@ -239,7 +240,7 @@ const Settings = () => {
                       disabled={isChangingPassword || !currentPassword || !newPassword}
                       className="w-auto px-8"
                     >
-                      {isChangingPassword ? "Đang xử lý..." : "Xác nhận"}
+                      {isChangingPassword ? t("settings.changePassword.processing") : t("settings.changePassword.confirm")}
                     </Button>
                   </div>
                 </div>
@@ -247,7 +248,7 @@ const Settings = () => {
 
               {/* Language Settings Card */}
               <Card className="p-6 h-fit">
-                <CardTitle className="mb-6 text-lg">Cài đặt ngôn ngữ</CardTitle>
+                <CardTitle className="mb-6 text-lg">{t("settings.language.title")}</CardTitle>
 
                 {/* Form - narrower container */}
                 <div className="max-w-2xl mx-auto space-y-6">
@@ -263,7 +264,7 @@ const Settings = () => {
                       />
                       <div className="flex items-center gap-2">
                         <img src={vietnamFlag} alt="Vietnam Flag" className="w-6 h-6 rounded-sm" />
-                        <span className="font-medium">Tiếng Việt</span>
+                        <span className="font-medium">{t("settings.language.vietnamese")}</span>
                       </div>
                     </label>
 
@@ -278,7 +279,7 @@ const Settings = () => {
                       />
                       <div className="flex items-center gap-2">
                         <img src={ukFlag} alt="UK Flag" className="w-6 h-6 rounded-sm" />
-                        <span className="font-medium">English</span>
+                        <span className="font-medium">{t("settings.language.english")}</span>
                       </div>
                     </label>
                   </div>
@@ -290,7 +291,7 @@ const Settings = () => {
                       disabled={isChangingLanguage}
                       className="w-auto px-8"
                     >
-                      {isChangingLanguage ? "Đang xử lý..." : "Xác nhận"}
+                      {isChangingLanguage ? t("settings.language.processing") : t("settings.language.confirm")}
                     </Button>
                   </div>
                 </div>
@@ -298,18 +299,18 @@ const Settings = () => {
 
               {/* Delete Account Card */}
               <Card className="p-6 h-fit">
-                <CardTitle className="mb-4 text-lg">Xoá tài khoản</CardTitle>
+                <CardTitle className="mb-4 text-lg">{t("settings.deleteAccount.title")}</CardTitle>
 
                 {/* Form - narrower container */}
                 <div className="max-w-2xl mx-auto space-y-6">
                   <p className="text-sm text-red-700">
-                    Bạn có chắc chắn muốn xoá tài khoản này? Hành động này không thể hoàn tác.
+                    {t("settings.deleteAccount.warning")}
                   </p>
 
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
                       <Label htmlFor="deleteUsername" className="whitespace-nowrap min-w-fit">
-                        Nhập tên người dùng
+                        {t("settings.deleteAccount.enterUsername")}
                       </Label>
                       <Input
                         id="deleteUsername"
@@ -327,7 +328,7 @@ const Settings = () => {
                         disabled={isDeletingAccount || deleteUsername !== user?.name}
                         className="w-auto px-8 bg-cyan-400 hover:bg-cyan-500 text-white"
                       >
-                        {isDeletingAccount ? "Đang xử lý..." : "Xoá tài khoản"}
+                        {isDeletingAccount ? t("settings.deleteAccount.processing") : t("settings.deleteAccount.delete")}
                       </Button>
                     </div>
                   </div>

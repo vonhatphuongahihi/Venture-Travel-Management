@@ -55,7 +55,7 @@ export class AttractionController {
                                 tourId: true,
                             },
                         },
-                        reviews: {
+                        attractionReviews: {
                             select: {
                                 rate: true,
                             },
@@ -76,7 +76,7 @@ export class AttractionController {
                 const tourCount = new Set(attraction.tourStops.map((stop: any) => stop.tourId)).size;
 
                 // Calculate average rating
-                const avgRating = attraction.reviews.length > 0
+                const avgRating = attraction.attractionReviews.length > 0
                     ? attraction.reviews.reduce((sum: number, review: any) => sum + review.rate, 0) / attraction.reviews.length
                     : 0;
 
@@ -92,7 +92,7 @@ export class AttractionController {
                     provinceName: attraction.province.name,
                     tourCount,
                     rating: Math.round(avgRating * 10) / 10,
-                    reviewCount: attraction.reviews.length,
+                    reviewCount: attraction.attractionReviews.length,
                     coordinates: attraction.point ? {
                         lat: attraction.point.latitude,
                         lon: attraction.point.longitude,
@@ -213,7 +213,7 @@ export class AttractionController {
                             },
                         },
                     },
-                    reviews: {
+                    attractionReviews: {
                         include: {
                             user: {
                                 select: {
@@ -238,8 +238,8 @@ export class AttractionController {
             }
 
             // Calculate average rating
-            const avgRating = attraction.reviews.length > 0
-                ? attraction.reviews.reduce((sum: number, review: any) => sum + review.rate, 0) / attraction.reviews.length
+            const avgRating = attraction.attractionReviews.length > 0
+                ? attraction.attractionReviews.reduce((sum: number, review: any) => sum + review.rate, 0) / attraction.attractionReviews.length
                 : 0;
 
             // Get unique tours
@@ -265,9 +265,9 @@ export class AttractionController {
                 },
                 tourCount: tours.length,
                 rating: Math.round(avgRating * 10) / 10,
-                reviewCount: attraction.reviews.length,
+                reviewCount: attraction.attractionReviews.length,
                 tours: tours,
-                reviews: attraction.reviews.map((review: any) => ({
+                attractionReviews: attraction.attractionReviews.map((review: any) => ({
                     reviewId: review.reviewId,
                     user: {
                         id: review.user.userId,

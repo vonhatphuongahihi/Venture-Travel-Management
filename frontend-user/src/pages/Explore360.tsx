@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Play, Megaphone, Target, PenTool, Star, Instagram, Facebook, Phone } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import '../components/tour/herosection.css';
+import { useTranslation } from "react-i18next";
 
 // Import images
 import tour1 from "@/assets/explore-360/tour-1.jpg";
@@ -17,6 +18,7 @@ import banner2 from "@/assets/explore-360/banner-2.jpg";
 import banner3 from "@/assets/explore-360/banner-3.jpg";
 
 const Explore360 = () => {
+    const { t } = useTranslation();
     const [hoveredSite, setHoveredSite] = useState<string | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
@@ -30,58 +32,58 @@ const Explore360 = () => {
         {
             id: 0,
             image: banner1,
-            title: "Khám phá 360° Việt Nam",
-            description: "Trải nghiệm thực tế ảo những điểm đến tuyệt vời nhất, từ vịnh biển hùng vĩ đến núi rừng huyền bí."
+            title: t("explore360.slides.slide1.title"),
+            description: t("explore360.slides.slide1.description")
         },
         {
             id: 1,
             image: banner2,
-            title: "Du lịch thực tế ảo",
-            description: "Khám phá các địa danh nổi tiếng của Việt Nam qua công nghệ 360° tiên tiến, cảm nhận như đang ở đó."
+            title: t("explore360.slides.slide2.title"),
+            description: t("explore360.slides.slide2.description")
         },
         {
             id: 2,
             image: banner3,
-            title: "Trải nghiệm không giới hạn",
-            description: "Từ di sản thế giới UNESCO đến những góc phố cổ kính, khám phá mọi nơi chỉ với một cú click."
+            title: t("explore360.slides.slide3.title"),
+            description: t("explore360.slides.slide3.description")
         }
     ];
 
     const sites = [
         {
-            name: "Huế",
+            name: t("explore360.sites.hue.name"),
             image: tour1,
-            description: "Cố đô hoàng gia với thành cổ và lăng tẩm của các vị vua",
+            description: t("explore360.sites.hue.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/Hue2021/index.htm"
         },
         {
-            name: "Hạ Long",
+            name: t("explore360.sites.halong.name"),
             image: tour2,
-            description: "Di sản thế giới UNESCO với hàng nghìn đảo đá vôi",
+            description: t("explore360.sites.halong.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/HaLong/index.htm"
         },
         {
-            name: "Hội An",
+            name: t("explore360.sites.hoian.name"),
             image: tour3,
-            description: "Phố cổ nổi tiếng với đèn lồng và kiến trúc truyền thống",
+            description: t("explore360.sites.hoian.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/HoiAn/index.htm"
         },
         {
-            name: "Hà Nội",
+            name: t("explore360.sites.hanoi.name"),
             image: tour4,
-            description: "Thủ đô Việt Nam với di sản văn hóa và lịch sử phong phú",
+            description: t("explore360.sites.hanoi.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/HaNoi/index.htm"
         },
         {
-            name: "Phong Nha",
+            name: t("explore360.sites.phongnha.name"),
             image: tour5,
-            description: "Quê hương của những hang động kỳ vĩ và vườn quốc gia",
+            description: t("explore360.sites.phongnha.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/PhongNha/index.htm"
         },
         {
-            name: "Mỹ Sơn",
+            name: t("explore360.sites.myson.name"),
             image: tour6,
-            description: "Quần thể đền tháp Hindu cổ từ nền văn minh Champa",
+            description: t("explore360.sites.myson.description"),
             link: "https://vietnam.travel/sites/default/files/360Tour/MySon/index.htm"
         }
     ];
@@ -145,18 +147,18 @@ const Explore360 = () => {
     const features = [
         {
             icon: Megaphone,
-            title: "Trải nghiệm trực quan",
-            description: "Người dùng có thể quan sát địa điểm như đang ở đó, nhìn xung quanh mọi góc, thay vì chỉ xem hình tĩnh hay video."
+            title: t("explore360.features.feature1.title"),
+            description: t("explore360.features.feature1.description")
         },
         {
             icon: Target,
-            title: "Khám phá đa dạng và toàn diện",
-            description: "Giúp trải nghiệm cả không gian, cảnh quan, kiến trúc và các điểm đặc sắc của địa điểm, từ đó lên kế hoạch chuyến đi dễ dàng hơn."
+            title: t("explore360.features.feature2.title"),
+            description: t("explore360.features.feature2.description")
         },
         {
             icon: PenTool,
-            title: "Tăng sự hài lòng",
-            description: "Khách hàng dễ hình dung trải nghiệm thực tế, chọn điểm đến phù hợp và quyết định đặt tour nhanh chóng."
+            title: t("explore360.features.feature3.title"),
+            description: t("explore360.features.feature3.description")
         }
     ];
 
@@ -251,13 +253,13 @@ const Explore360 = () => {
                     <div className={`text-center mb-12 transition-all duration-1000 ${isMainVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         <div className="inline-flex items-center gap-2 bg-[#dff6ff] text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
                             <Star className="h-4 w-4" />
-                            Đặc biệt
+                            {t("explore360.badge")}
                         </div>
                         <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                            KHÁM PHÁ 360°
+                            {t("explore360.mainTitle")}
                         </h2>
                         <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                            Khám phá 360° những kỳ quan thiên nhiên và điểm văn hóa hấp dẫn nhất của đất nước ngay tại đây.
+                            {t("explore360.mainDescription")}
                         </p>
                     </div>
 
@@ -302,7 +304,7 @@ const Explore360 = () => {
 
                     <div className={`text-center transition-all duration-1000 delay-400 ${isMainVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl">
-                            Xem thêm
+                            {t("explore360.viewMore")}
                         </Button>
                     </div>
                 </div>
@@ -313,10 +315,10 @@ const Explore360 = () => {
                 <div className="container">
                     <div className={`text-center mb-12 transition-all duration-1000 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                         <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                            TẠI SAO LẠI CHỌN KHÁM PHÁ 360°
+                            {t("explore360.whyTitle")}
                         </h2>
                         <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-                            Công nghệ thực tế ảo 360° mang đến trải nghiệm du lịch hoàn toàn mới, giúp bạn khám phá Việt Nam một cách chân thực và sống động nhất.
+                            {t("explore360.whyDescription")}
                         </p>
                     </div>
 
@@ -337,30 +339,30 @@ const Explore360 = () => {
                     <div className={`bg-gradient-to-r from-primary/5 to-primary/10 rounded-2xl p-8 md:p-12 mb-16 transition-all duration-1000 delay-400 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
                         <div className={`text-center mb-8 transition-all duration-1000 delay-300 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                             <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                                CÁCH THỨC HOẠT ĐỘNG
+                                {t("explore360.howItWorksTitle")}
                             </h2>
                             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                                Quy trình đơn giản để bắt đầu khám phá thế giới 360° của chúng tôi
+                                {t("explore360.howItWorksDescription")}
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className={`text-center transition-all duration-1000 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold transition-all duration-500 hover:scale-110">1</div>
-                                <h4 className="font-bold mb-2">Chọn địa điểm</h4>
-                                <p className="text-sm text-muted-foreground">Lựa chọn điểm đến bạn muốn khám phá từ danh sách đa dạng</p>
+                                <h4 className="font-bold mb-2">{t("explore360.steps.step1.title")}</h4>
+                                <p className="text-sm text-muted-foreground">{t("explore360.steps.step1.description")}</p>
                             </div>
 
                             <div className={`text-center transition-all duration-1000 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold transition-all duration-500 hover:scale-110">2</div>
-                                <h4 className="font-bold mb-2">Khám phá 360°</h4>
-                                <p className="text-sm text-muted-foreground">Trải nghiệm thực tế ảo với khả năng xoay và phóng to mọi góc độ</p>
+                                <h4 className="font-bold mb-2">{t("explore360.steps.step2.title")}</h4>
+                                <p className="text-sm text-muted-foreground">{t("explore360.steps.step2.description")}</p>
                             </div>
 
                             <div className={`text-center transition-all duration-1000 ${isFeaturesVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                                 <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold transition-all duration-500 hover:scale-110">3</div>
-                                <h4 className="font-bold mb-2">Đặt tour thực</h4>
-                                <p className="text-sm text-muted-foreground">Quyết định đặt tour thực tế sau khi đã khám phá qua 360°</p>
+                                <h4 className="font-bold mb-2">{t("explore360.steps.step3.title")}</h4>
+                                <p className="text-sm text-muted-foreground">{t("explore360.steps.step3.description")}</p>
                             </div>
                         </div>
                     </div>

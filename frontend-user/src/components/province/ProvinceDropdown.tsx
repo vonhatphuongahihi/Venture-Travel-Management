@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { useProvinces } from "@/contexts/ProvinceContext";
 import type { Province } from "@/global.types";
+import { useTranslation } from "react-i18next";
 
 interface ProvinceDropdownProps {
   className?: string;
@@ -16,6 +17,7 @@ const ProvinceDropdown = ({
   isMobile = false,
   onItemClick,
 }: ProvinceDropdownProps) => {
+  const { t } = useTranslation();
   const { provinces, loading } = useProvinces();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
@@ -135,15 +137,13 @@ const ProvinceDropdown = ({
       <button
         ref={triggerRef}
         onClick={handleClick}
-        className={`flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary ${
-          isMobile ? "w-full justify-between" : ""
-        }`}
-      >
-        <span>ĐIỂM ĐẾN</span>
-        <ChevronDown
-          className={`h-3 w-3 transition-transform ${
-            isOpen ? "rotate-180" : ""
+        className={`flex items-center space-x-1 text-sm font-medium transition-colors hover:text-primary ${isMobile ? "w-full justify-between" : ""
           }`}
+      >
+        <span>{t("provinceDropdown.destinations")}</span>
+        <ChevronDown
+          className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
@@ -163,39 +163,38 @@ const ProvinceDropdown = ({
             onMouseLeave={handleDropdownMouseLeave}
           >
             <div
-              className={`grid ${
-                isMobile ? "grid-cols-2 gap-3" : "grid-cols-4 gap-4"
-              }`}
+              className={`grid ${isMobile ? "grid-cols-2 gap-3" : "grid-cols-4 gap-4"
+                }`}
             >
               {loading ? (
                 <div className="col-span-full text-center py-4 text-gray-500">
-                  Đang tải...
+                  {t("provinceDropdown.loading")}
                 </div>
               ) : (
                 provinces.map((province: Province) => (
-                <Link
-                  key={province.id}
-                  to={`/province/${province.slug}`}
-                  onClick={handleProvinceClick}
-                  className="group flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md"
-                >
-                  <div className="w-14 h-14 rounded-full overflow-hidden mb-2 border-2 border-transparent group-hover:border-primary transition-all duration-200 group-hover:scale-105">
-                    <img
-                      src={province.image}
-                      alt={province.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback image if province image doesn't exist
-                        const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder.svg";
-                      }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-center text-gray-700 group-hover:text-primary transition-colors leading-tight">
-                    {province.name}
-                  </span>
-                </Link>
-              ))
+                  <Link
+                    key={province.id}
+                    to={`/province/${province.slug}`}
+                    onClick={handleProvinceClick}
+                    className="group flex flex-col items-center p-3 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md"
+                  >
+                    <div className="w-14 h-14 rounded-full overflow-hidden mb-2 border-2 border-transparent group-hover:border-primary transition-all duration-200 group-hover:scale-105">
+                      <img
+                        src={province.image}
+                        alt={province.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fallback image if province image doesn't exist
+                          const target = e.target as HTMLImageElement;
+                          target.src = "/placeholder.svg";
+                        }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium text-center text-gray-700 group-hover:text-primary transition-colors leading-tight">
+                      {province.name}
+                    </span>
+                  </Link>
+                ))
               )}
             </div>
           </div>,

@@ -9,8 +9,10 @@ import { Camera, Eye, EyeOff, ChevronDown, ChevronUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import UserSidebar from "@/components/UserSidebar";
+import { useTranslation } from "react-i18next";
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { user, token, logout, updateUser } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const Profile = () => {
 
   const handleLogout = () => {
     logout();
-    showToast('Đã đăng xuất thành công', 'success');
+    showToast(t('settings.logout.success'), 'success');
     navigate('/login');
   };
 
@@ -68,7 +70,7 @@ const Profile = () => {
     setIsProfileLoading(true);
     try {
       const response = await UserAPI.getProfile(token);
-      
+
       if (response.success && response.data) {
         const userData = response.data;
         setFormData({
@@ -79,7 +81,7 @@ const Profile = () => {
           gender: userData.gender || ''
         });
         setAvatarSrc(userData.profilePhoto || avatarImg);
-        return userData; 
+        return userData;
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -101,11 +103,11 @@ const Profile = () => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        showToast('Vui lòng chọn file ảnh', 'error');
+        showToast(t('profile.chooseImage'), 'error');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        showToast('Kích thước file quá lớn. Vui lòng chọn file nhỏ hơn 5MB', 'error');
+        showToast(t('profile.imageTooLarge'), 'error');
         return;
       }
       setSelectedFile(file);
@@ -115,11 +117,11 @@ const Profile = () => {
 
   const validateForm = () => {
     if (!formData.name.trim()) {
-      showToast('Tên người dùng không được để trống', 'error');
+      showToast(t('profile.usernameRequired'), 'error');
       return false;
     }
     if (formData.phone && !/^[+]?[0-9]{10,15}$/.test(formData.phone)) {
-      showToast('Số điện thoại không hợp lệ (phải có 10-15 chữ số)', 'error');
+      showToast(t('profile.phoneInvalid'), 'error');
       return false;
     }
     return true;
@@ -127,7 +129,7 @@ const Profile = () => {
 
   const handleSaveChanges = async () => {
     if (!token) {
-      showToast('Vui lòng đăng nhập lại', 'error');
+      showToast(t('profile.pleaseLoginAgain'), 'error');
       return;
     }
 
@@ -178,11 +180,11 @@ const Profile = () => {
       }
 
       if (profileUpdated && avatarUpdated) {
-        showToast('Cập nhật thông tin và ảnh đại diện thành công!', 'success');
+        showToast(t('profile.bothUpdateSuccess'), 'success');
       } else if (profileUpdated) {
-        showToast('Cập nhật thông tin thành công!', 'success');
+        showToast(t('profile.profileUpdateSuccess'), 'success');
       } else if (avatarUpdated) {
-        showToast('Cập nhật ảnh đại diện thành công!', 'success');
+        showToast(t('profile.avatarUpdateSuccess'), 'success');
       }
 
       const updatedProfile = await loadProfile();
@@ -192,7 +194,7 @@ const Profile = () => {
 
     } catch (error) {
       console.error('Save changes error:', error);
-      showToast('Cập nhật thông tin thất bại', 'error');
+      showToast(t('profile.updateFailed'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -210,7 +212,7 @@ const Profile = () => {
       setAvatarSrc(user.profilePhoto || avatarImg);
     }
     setSelectedFile(null);
-    showToast('Đã hủy thay đổi', 'info');
+    showToast(t('profile.cancelChanges'), 'info');
   };
 
   const hasChanges = () => {
@@ -229,7 +231,7 @@ const Profile = () => {
       <Header />
       <div className="text-center mt-8 md:mt-12 mb-8 md:mb-12 px-4">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-          Thông tin <span className="text-gradient">Tài khoản</span>
+          <span className="text-gradient">{t('profile.title')}</span>
         </h2>
       </div>
 
@@ -237,25 +239,25 @@ const Profile = () => {
         <div className="flex justify-center items-center py-20">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-lg">Đang tải thông tin...</span>
+            <span className="text-lg">{t('profile.loadingProfile')}</span>
           </div>
         </div>
       ) : (
         <main className="container mx-auto px-4 py-6 md:py-12">
           <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-            
+
             {/* Sidebar */}
             <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="profile" />
 
             {/* Main card */}
             <section className="flex-1 min-w-0">
               <div className="bg-white/90 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-4 md:p-8">
-                <h2 className="text-lg font-medium mb-3">Hồ sơ của tôi</h2>
+                <h2 className="text-lg font-medium mb-3">{t('profile.myProfile')}</h2>
                 <p className="text-sm text-slate-600 mb-6">
-                  Quản lý thông tin hồ sơ để bảo mật tài khoản
+                  {t('profile.manageProfile')}
                   {hasChanges() && (
                     <span className="block sm:inline sm:ml-2 text-amber-600 text-xs mt-1 sm:mt-0">
-                      • Có thay đổi chưa lưu
+                      {t('profile.unsavedChanges')}
                     </span>
                   )}
                 </p>
@@ -288,7 +290,7 @@ const Profile = () => {
                         />
                       </div>
                       {selectedFile && (
-                        <p className="text-xs text-primary mt-2 max-w-[200px] truncate mx-auto">Ảnh: {selectedFile.name}</p>
+                        <p className="text-xs text-primary mt-2 max-w-[200px] truncate mx-auto">{t('profile.avatarSelected')} {selectedFile.name}</p>
                       )}
                     </div>
                   </div>
@@ -296,7 +298,7 @@ const Profile = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-slate-600 mb-1">
-                        Tên người dùng: <span className="text-red-500">*</span>
+                        {t('profile.username')} <span className="text-red-500">{t('profile.required')}</span>
                       </label>
                       <input
                         name="name"
@@ -308,7 +310,7 @@ const Profile = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Email:</label>
+                      <label className="block text-sm text-slate-600 mb-1">{t('profile.email')}</label>
                       <input
                         className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition disabled:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 text-sm md:text-base"
                         value={user?.email || ''}
@@ -317,18 +319,18 @@ const Profile = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Số điện thoại:</label>
+                      <label className="block text-sm text-slate-600 mb-1">{t('profile.phone')}</label>
                       <input
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        placeholder="Nhập số điện thoại"
+                        placeholder={t('profile.phonePlaceholder')}
                         className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Ngày sinh:</label>
+                      <label className="block text-sm text-slate-600 mb-1">{t('profile.dateOfBirth')}</label>
                       <input
                         name="dateOfBirth"
                         type="date"
@@ -339,7 +341,7 @@ const Profile = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Giới tính:</label>
+                      <label className="block text-sm text-slate-600 mb-1">{t('profile.gender')}</label>
                       <div className="relative">
                         <select
                           name="gender"
@@ -347,22 +349,22 @@ const Profile = () => {
                           onChange={handleInputChange}
                           className="w-full rounded-md border border-primary/50 px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base appearance-none"
                         >
-                          <option value="">Chọn giới tính</option>
-                          <option value="male">Nam</option>
-                          <option value="female">Nữ</option>
-                          <option value="other">Khác</option>
+                          <option value="">{t('profile.genderSelect')}</option>
+                          <option value="male">{t('profile.genderMale')}</option>
+                          <option value="female">{t('profile.genderFemale')}</option>
+                          <option value="other">{t('profile.genderOther')}</option>
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 pointer-events-none h-4 w-4" />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm text-slate-600 mb-1">Địa chỉ:</label>
+                      <label className="block text-sm text-slate-600 mb-1">{t('profile.address')}</label>
                       <input
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
-                        placeholder="Nhập địa chỉ đầy đủ"
+                        placeholder={t('profile.addressPlaceholder')}
                         className="w-full rounded-md border border-primary/50 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition text-sm md:text-base"
                       />
                     </div>
@@ -377,10 +379,10 @@ const Profile = () => {
                       {isLoading ? (
                         <>
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Đang lưu...
+                          {t('profile.saving')}
                         </>
                       ) : (
-                        'Lưu thay đổi'
+                        t('profile.saveChanges')
                       )}
                     </button>
                     <button
@@ -388,7 +390,7 @@ const Profile = () => {
                       disabled={isLoading || !hasChanges()}
                       className="w-full sm:w-auto border border-primary/50 text-sm text-slate-600 rounded-full px-6 py-2.5 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition"
                     >
-                      Hủy
+                      {t('profile.cancel')}
                     </button>
                   </div>
                 </div>

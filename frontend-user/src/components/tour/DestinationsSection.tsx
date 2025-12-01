@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import AttractionAPI, { TopDestination } from "@/services/attractionAPI";
+import { useTranslation } from "react-i18next";
 
 const DestinationsSection = () => {
+    const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
     const [destinations, setDestinations] = useState<TopDestination[]>([]);
@@ -38,7 +40,7 @@ const DestinationsSection = () => {
                 setDestinations(data);
             } catch (err) {
                 console.error('Error fetching top destinations:', err);
-                setError('Không thể tải danh sách điểm đến');
+                setError(t('destinations.loadError'));
                 setDestinations([]);
             } finally {
                 setLoading(false);
@@ -71,13 +73,13 @@ const DestinationsSection = () => {
                 <div className={`text-center mb-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
                     <div className="inline-flex items-center gap-2 bg-[#dff6ff] text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
                         <Star className="h-4 w-4" />
-                        Đặc biệt
+                        {t('destinations.badge')}
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                        TOP ĐIỂM ĐẾN
+                        {t('destinations.title')}
                     </h2>
                     <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-                        Sapa với núi rừng hùng vĩ, Đà Lạt mộng mơ, các thành phố nhộn nhịp và những di tích lịch sử - văn hóa đặc sắc
+                        {t('destinations.description')}
                     </p>
                 </div>
 
@@ -93,7 +95,7 @@ const DestinationsSection = () => {
                         </div>
                     ) : destinations.length === 0 ? (
                         <div className="text-center py-12 text-muted-foreground">
-                            <p>Chưa có điểm đến nào</p>
+                            <p>{t('destinations.noDestinations')}</p>
                         </div>
                     ) : (
                         <div className="flex justify-center">
@@ -119,7 +121,7 @@ const DestinationsSection = () => {
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                                         <div className="absolute top-4 left-4">
                                             <span className="px-3 py-1 rounded-full bg-white/80 text-primary text-xs font-semibold backdrop-blur">
-                                                {destination.category || 'Điểm đến'}
+                                                {destination.category || t('destinations.destination')}
                                             </span>
                                         </div>
                                         <div className="absolute bottom-6 left-6 text-white drop-shadow-lg">
@@ -127,7 +129,7 @@ const DestinationsSection = () => {
                                                 {destination.name}
                                             </h3>
                                             <p className="text-xs opacity-90">
-                                                {destination.tourCount} Tours
+                                                {destination.tourCount} {t('destinations.tours')}
                                             </p>
                                         </div>
                                     </div>

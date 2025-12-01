@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { Plane } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const SplashScreen = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [showContent, setShowContent] = useState(false);
 
@@ -54,7 +56,7 @@ const SplashScreen = () => {
                         }`}
                 >
                     <p className="text-xl md:text-2xl font-inter font-bold text-[#26B8ED]/80 tracking-wider text-center uppercase leading-relaxed">
-                        ĐỒNG HÀNH CÙNG BẠN ĐẾN MỌI MIỀN TỔ QUỐC VIỆT NAM
+                        {t('splash.slogan')}
                     </p>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { BookingProvider } from "./contexts/BookingContext";
 import SplashScreen from "./components/SplashScreen";
+import "./i18n/config";
 import AboutUs from "./pages/AboutUs";
 import { AttractionPage } from "./pages/AttractionPage";
 import BookingHistory from "./pages/BookingHistory/BookingHistory";

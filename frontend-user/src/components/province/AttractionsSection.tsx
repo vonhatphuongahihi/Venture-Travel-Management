@@ -10,6 +10,7 @@ import { Attraction, Province } from "@/global.types";
 import React from "react";
 import AttractionCard from "./AttractionCard";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface AttractionsSectionProps {
   province: Province;
@@ -20,6 +21,7 @@ const AttractionsSection = ({
   province,
   attractions,
 }: AttractionsSectionProps) => {
+  const { t } = useTranslation();
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -48,7 +50,7 @@ const AttractionsSection = ({
   return (
     <section>
       <h2 className="text-2xl font-semibold mb-6">
-        Điểm tham quan hàng đầu ở {province.name}
+        {t("attractionsSection.topAttractions")} {province.name}
       </h2>
 
       <Carousel

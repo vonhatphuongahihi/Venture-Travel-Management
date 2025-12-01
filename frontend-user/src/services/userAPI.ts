@@ -156,6 +156,68 @@ class UserAPI {
       };
     }
   }
+
+  // Change password
+  static async changePassword(token: string, oldPassword: string, newPassword: string): Promise<AuthResponse> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          oldPassword,
+          newPassword,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Change password API error:', error);
+      return {
+        success: false,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+      };
+    }
+  }
+
+  // Delete account
+  static async deleteAccount(token: string, userId: string): Promise<AuthResponse> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Delete account API error:', error);
+      return {
+        success: false,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+      };
+    }
+  }
 }
 
 export default UserAPI;

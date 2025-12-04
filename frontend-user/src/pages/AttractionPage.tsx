@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import AttractionHeroSection from "@/components/attraction/AttractionHeroSection.tsx";
 import AttractionReviewsSection from "@/components/attraction/AttractionReviewsSection.tsx";
 import AttractionToursSection from "@/components/attraction/AttractionToursSection.tsx";
+import NearbyDestinationsSection from "@/components/attraction/NearbyDestinationsSection";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,54 +12,18 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { mockAttractions } from "@/data/attractions";
-import { mockReviews } from "@/data/reviews";
-import { mockTours } from "@/data/tours";
-import { Attraction, Review, Tour } from "@/global.types";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAttraction } from "@/services/attraction/attractionHook";
+import { Attraction, Tour, Review } from "@/global.types";
 
 export function AttractionPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [attraction, setAttraction] = useState<Attraction | null>(null);
-  const [tours, setTours] = useState<Tour[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Simulate API call
-    const fetchAttractionData = async () => {
-      try {
-        setLoading(true);
-        // In real app, fetch from API based on slug
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading
+  const { data: attraction, isLoading, isError } = useAttraction(slug || "");
 
-        const foundAttraction = mockAttractions.find(
-          (attraction) => attraction.slug === slug
-        );
-
-        if (!foundAttraction) {
-          navigate("/404");
-          return;
-        }
-
-        setAttraction(foundAttraction);
-        setTours(mockTours);
-        setReviews(mockReviews);
-      } catch (error) {
-        console.error("Error fetching attraction data:", error);
-        navigate("/404");
-      } finally {
-        setLoading(false);
-        window.scrollTo({ top: 0, behavior: "instant" });
-      }
-    };
-
-    fetchAttractionData();
-  }, [slug, navigate]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
@@ -70,7 +35,7 @@ export function AttractionPage() {
     );
   }
 
-  if (!attraction) {
+  if (isError || !attraction) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
@@ -85,10 +50,10 @@ export function AttractionPage() {
   const breadcrumbItems = [
     { label: "Trang chủ", href: "/" },
     {
-      label: attraction.location.province,
-      href: `/province/${attraction.location.slug}`,
+      label: attraction.province.name,
+      href: `/province/${attraction.provinceId}`,
     },
-    { label: attraction.name, href: `/attraction/${attraction.slug}` },
+    { label: attraction.name, href: `/attraction/${attraction.id}` },
   ];
 
   return (
@@ -127,11 +92,17 @@ export function AttractionPage() {
 
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4">
-          <AttractionToursSection tours={tours} />
+          <AttractionToursSection tours={attraction.tours || []} />
           <AttractionReviewsSection
-            reviews={reviews}
-            averageRating={attraction.reviewInfo.rating}
-            totalReviews={attraction.reviewInfo.count}
+            reviews={attraction.reviews || []}
+            averageRating={attraction.rating || 0}
+            totalReviews={attraction.reviewCount || 0}
+          />
+          <NearbyDestinationsSection
+            provinceId={attraction.provinceId}
+            currentAttractionId={attraction.id}
+            category={attraction.category}
+            provinceCoordinates={attraction.province.point}
           />
         </div>
       </main>

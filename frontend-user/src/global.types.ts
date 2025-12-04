@@ -1,4 +1,4 @@
-export interface Tour {
+export interface ShortTourInfo {
   id: string;
   title: string;
   description: string;
@@ -14,28 +14,104 @@ export interface Tour {
   availableSpots: number;
 }
 
+export interface Tour {
+  tourId: string;
+  name: string;
+  images: string[];
+  about: string;
+  ageRange: string;
+  maxGroupSize: number;
+  duration: string;
+  languages: string[];
+  categories: string[];
+  expectations: string;
+  pickupPoint: string;
+  pickupPointGeom: string;
+  pickupDetails: string;
+  pickupAreaGeom: string;
+  endPoint?: string;
+  endPointGeom?: string;
+  additionalInformation?: string;
+  cancellationPolicy: string;
+  startDate?: string; // ISO date string
+  endDate?: string; // ISO date string
+  isActive: boolean;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  highlights: string[];
+  inclusions: string[];
+  exclusions: string[];
+  // Relations
+  favoriteTours?: FavoriteTour[];
+  ticketTypes?: TicketType[];
+  reviews?: TourReview[];
+  tourStops?: TourStop[];
+}
+
+export interface FavoriteTour {
+  favoriteId: string;
+  userId: string;
+  tourId: string;
+  createdAt: string; // ISO date string
+  tour?: Tour;
+}
+
+export interface TicketType {
+  ticketTypeId: string;
+  tourId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  description?: string;
+  tour?: Tour;
+}
+
+export interface TourReview {
+  reviewId: string;
+  userId: string;
+  tourId: string;
+  rate: number;
+  content: string;
+  images: string[];
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  likes: string[];
+  // Relations
+  tour?: Tour;
+  user?: {
+    userId: string;
+    name: string;
+    avatar?: string;
+  };
+}
+
+export interface TourStop {
+  tourStopId: string;
+  tourId: string;
+  attractionId: string;
+  stopOrder: number;
+  tour?: Tour;
+  attraction?: Attraction;
+}
+
 export interface Attraction {
   id: string;
   name: string;
+  images?: string[]; // Additional images for gallery
+  address?: string;
   description: string;
   category: string;
-  image: string;
-  images?: string[]; // Additional images for gallery
-  location: {
-    province: string;
-    slug: string;
-    address?: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
+  provinceId: string;
+  tourCount: number;
+  rating?: number;
+  reviewCount?: number;
+  coordinates?: {
+    lat: number;
+    lon: number;
   };
-  reviewInfo: {
-    rating: number;
-    count: number;
-  };
-  slug?: string;
-  tours?: Tour[]; // Related tours for this attraction
+  province: Province;
+  tours?: ShortTourInfo[]; // Define proper type if available
+  reviews?: AttractionReview[]; // Define proper type if available
 }
 
 export interface Province {
@@ -51,16 +127,16 @@ export interface Province {
 }
 
 export interface Review {
-  id: number;
+  id: string;
   user: {
-    id: number;
+    id: string;
     name: string;
     avatar: string;
   };
   rating: number;
   content: string;
   date: string; // ISO date string
-  targetId: number; // ID of the tour or attraction being reviewed
+  targetId: string; // ID of the tour or attraction being reviewed
   targetType: "tour" | "attraction";
   tour?: {
     id: string;
@@ -68,4 +144,23 @@ export interface Review {
     image: string;
   };
   images: string[] | null;
+}
+
+export interface AttractionReview {
+  reviewId: string;
+  userId: string;
+  attractionId: string;
+  rate: number;
+  content: string;
+  images: string[];
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  likes: string[];
+  // Relations
+  attraction?: Attraction;
+  user?: {
+    userId: string;
+    name: string;
+    avatar?: string;
+  };
 }

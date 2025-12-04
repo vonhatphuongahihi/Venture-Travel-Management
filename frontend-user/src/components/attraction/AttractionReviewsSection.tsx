@@ -8,13 +8,13 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Review } from "@/global.types";
+import { AttractionReview, Review } from "@/global.types";
 import { Star } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
 
 interface AttractionReviewsSectionProps {
-  reviews: Review[];
+  reviews: AttractionReview[];
   averageRating: number;
   totalReviews: number;
 }
@@ -106,7 +106,7 @@ function AttractionReviewsSection({
               key={index}
               className="flex-none w-[380px] lg:basis-1/3"
             >
-              <ReviewCard review={review} />
+              <ReviewCard review={review} reviewType="attraction" />
             </CarouselItem>
           ))}
         </CarouselContent>

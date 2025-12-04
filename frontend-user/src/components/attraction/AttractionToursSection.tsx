@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tour } from "@/global.types";
+import { ShortTourInfo, Tour } from "@/global.types";
 
 interface AttractionToursSectionProps {
-  tours: Tour[];
+  tours: ShortTourInfo[];
 }
 
 function AttractionToursSection({ tours }: AttractionToursSectionProps) {

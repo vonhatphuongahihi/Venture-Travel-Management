@@ -5,8 +5,10 @@ import heroImage from "@/assets/hero-vietnam.jpg";
 import heroImage1 from "@/assets/hero-vietnam-1.jpg";
 import heroImage2 from "@/assets/hero-vietnam-2.jpg";
 import './herosection.css'
+import { useTranslation } from "react-i18next";
 
 const HeroSection = () => {
+  const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
@@ -32,20 +34,20 @@ const HeroSection = () => {
     {
       id: 0,
       image: heroImage,
-      title: "Việt Nam quê hương ta",
-      description: "Trải nghiệm những chuyến du lịch tuyệt vời với bản đồ tương tác, khám phá các địa điểm hấp dẫn khắp Việt Nam."
+      title: t("hero.slide1.title"),
+      description: t("hero.slide1.description")
     },
     {
       id: 1,
       image: heroImage1,
-      title: "Khám phá thiên nhiên Việt Nam",
-      description: "Từ núi rừng Tây Bắc đến biển đảo Phú Quốc, khám phá vẻ đẹp thiên nhiên đa dạng của đất nước hình chữ S."
+      title: t("hero.slide2.title"),
+      description: t("hero.slide2.description")
     },
     {
       id: 2,
       image: heroImage2,
-      title: "Du ngoạn Sapa mờ sương",
-      description: "Chiêm ngưỡng ruộng bậc thang hùng vĩ, tận hưởng khí hậu se lạnh và tìm hiểu bản sắc văn hóa độc đáo của đồng bào vùng cao Sapa."
+      title: t("hero.slide3.title"),
+      description: t("hero.slide3.description")
     }
   ];
 
@@ -111,13 +113,13 @@ const HeroSection = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
-                placeholder="Tìm kiếm tour theo địa điểm, tên tour..."
+                placeholder={t("hero.searchPlaceholder")}
                 className="w-full pl-12 pr-28 py-4 rounded-xl bg-white/70 text-gray-900 placeholder-gray-500 font-inter focus:outline-none focus:ring-2 focus:ring-white/50"
               />
               <Button
                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-xl font-inter font-medium"
               >
-                Tìm kiếm
+                {t("hero.search")}
               </Button>
             </div>
           </div>
@@ -126,19 +128,19 @@ const HeroSection = () => {
           <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <div className="text-center font-black italic">
               <div className="text-2xl mb-2">120+</div>
-              <div className="text-white/80">Tours du lịch</div>
+              <div className="text-white/80">{t("hero.stats.tours")}</div>
             </div>
             <div className="text-center font-black italic">
               <div className="text-2xl mb-2">200+</div>
-              <div className="text-white/80">Điểm đến</div>
+              <div className="text-white/80">{t("hero.stats.destinations")}</div>
             </div>
             <div className="text-center font-black italic">
               <div className="text-2xl mb-2">1000+</div>
-              <div className="text-white/80">Khách hàng</div>
+              <div className="text-white/80">{t("hero.stats.customers")}</div>
             </div>
             <div className="text-center font-black italic">
               <div className="text-2xl mb-2">63</div>
-              <div className="text-white/80">Tỉnh thành</div>
+              <div className="text-white/80">{t("hero.stats.provinces")}</div>
             </div>
           </div>
         </div>

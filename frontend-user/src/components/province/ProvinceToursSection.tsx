@@ -8,6 +8,7 @@ import {
 import { Tour } from "@/global.types";
 import TourCard from "../tour/TourCard";
 import { Button } from "../ui/button";
+import { useTranslation } from "react-i18next";
 
 interface ProvinceToursSectionProps {
   tours: Tour[];
@@ -28,26 +29,28 @@ const ProvinceToursSection = ({
   isLoadingMore,
   totalTours = 0,
 }: ProvinceToursSectionProps) => {
+  const { t } = useTranslation();
+
   return (
     <section className="pt-5">
       {/* Filter Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
           <p className="text-gray-500 text-sm">
-            Tìm thấy {totalTours} kết quả
+            {t("provinceTours.foundResults", { count: totalTours })}
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-700">Sắp xếp theo</span>
+          <span className="text-sm text-gray-700">{t("provinceTours.sortBy")}</span>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price-asc">Giá (từ thấp đến cao)</SelectItem>
-              <SelectItem value="price-desc">Giá (từ cao đến thấp)</SelectItem>
-              <SelectItem value="rating-desc">Đánh giá cao nhất</SelectItem>
+              <SelectItem value="price-asc">{t("provinceTours.priceLowToHigh")}</SelectItem>
+              <SelectItem value="price-desc">{t("provinceTours.priceHighToLow")}</SelectItem>
+              <SelectItem value="rating-desc">{t("provinceTours.highestRated")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -71,7 +74,7 @@ const ProvinceToursSection = ({
             onClick={onLoadMore}
             disabled={isLoadingMore}
           >
-            {isLoadingMore ? "Đang tải..." : "Xem thêm"}
+            {isLoadingMore ? t("provinceTours.loading") : t("provinceTours.viewMore")}
           </Button>
         </div>
       )}

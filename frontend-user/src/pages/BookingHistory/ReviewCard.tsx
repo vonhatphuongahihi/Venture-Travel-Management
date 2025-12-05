@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Camera, Plus, Star, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ReviewCardProps {
   data: any; // Thay 'any' bằng kiểu dữ liệu thực tế của props nếu có
@@ -20,23 +21,17 @@ interface ReviewCardProps {
 }
 
 const ReviewCard = ({ data, itemId, onReviewChange }: ReviewCardProps) => {
+  const { t } = useTranslation();
   const [tourRating, setTourRating] = useState(5);
   const [hoveredStar, setHoveredStar] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
 
-  const ratingLabels: { [key: number]: string } = {
-    1: "Rất tệ",
-    2: "Tệ",
-    3: "Bình thường",
-    4: "Tốt",
-    5: "Tuyệt vời",
-  };
-
   const getRatingLabel = () => {
     const rating = hoveredStar || tourRating;
-    return rating > 0 ? ratingLabels[rating] : "Chưa đánh giá";
+    if (rating === 0) return t("reviewCard.notRated");
+    return t(`reviewCard.rating${rating}`);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,18 +85,17 @@ const ReviewCard = ({ data, itemId, onReviewChange }: ReviewCardProps) => {
 
       <div>
         <span>
-          Chất lượng {data.type == "destination" ? "điểm đến" : "tour"}:{" "}
+          {t("reviewCard.quality")} {data.type == "destination" ? t("reviewCard.destination") : t("reviewCard.tour")}:{" "}
         </span>
         <div className="flex items-center gap-3 mt-2">
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`w-6 h-6 cursor-pointer transition-colors ${
-                  star <= (hoveredStar || tourRating)
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-gray-300"
-                }`}
+                className={`w-6 h-6 cursor-pointer transition-colors ${star <= (hoveredStar || tourRating)
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-gray-300"
+                  }`}
                 onMouseEnter={() => setHoveredStar(star)}
                 onMouseLeave={() => setHoveredStar(0)}
                 onClick={() => setTourRating(star)}
@@ -115,7 +109,7 @@ const ReviewCard = ({ data, itemId, onReviewChange }: ReviewCardProps) => {
       </div>
 
       <Textarea
-        placeholder="Hãy chia sẻ suy nghĩ của bạn"
+        placeholder={t("reviewCard.placeholder")}
         value={reviewText}
         onChange={(e) => setReviewText(e.target.value)}
       />
@@ -128,7 +122,7 @@ const ReviewCard = ({ data, itemId, onReviewChange }: ReviewCardProps) => {
             className="border-primary border bg-white hover:bg-primary/20 text-primary"
           >
             <Camera />
-            Thêm hình ảnh
+            {t("reviewCard.addImages")}
           </Button>
         ) : (
           <div className="flex flex-wrap gap-3">
@@ -146,7 +140,7 @@ const ReviewCard = ({ data, itemId, onReviewChange }: ReviewCardProps) => {
                   type="button"
                   onClick={() => handleRemoveImage(index)}
                   className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                  aria-label="Xóa ảnh"
+                  aria-label={t("reviewCard.removeImage")}
                 >
                   <X className="w-3 h-3" />
                 </button>

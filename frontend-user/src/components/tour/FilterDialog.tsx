@@ -16,6 +16,7 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { vi } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export interface FilterOptions {
   minPrice?: number;
@@ -36,21 +37,6 @@ interface FilterDialogProps {
   initialFilters?: FilterOptions;
 }
 
-const DURATION_OPTIONS = [
-  { value: "1 ngày", label: "1 ngày" },
-  { value: "2-3 ngày", label: "2-3 ngày" },
-  { value: "4-7 ngày", label: "4-7 ngày" },
-  { value: "8+ ngày", label: "8+ ngày" },
-];
-
-const AGE_RANGE_OPTIONS = [
-  { value: "0-5", label: "Trẻ em (0-5 tuổi)" },
-  { value: "6-12", label: "Thiếu nhi (6-12 tuổi)" },
-  { value: "13-17", label: "Thiếu niên (13-17 tuổi)" },
-  { value: "18+", label: "Người lớn (18+ tuổi)" },
-  { value: "0-50", label: "Mọi lứa tuổi" },
-];
-
 const LANGUAGE_OPTIONS = [
   "Tiếng Việt",
   "English",
@@ -68,12 +54,28 @@ export default function FilterDialog({
   onReset,
   initialFilters = {},
 }: FilterDialogProps) {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState<FilterOptions>(initialFilters);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [priceRange, setPriceRange] = useState<number[]>([
     initialFilters.minPrice || 0,
     initialFilters.maxPrice || 10000000,
   ]);
+
+  const DURATION_OPTIONS = [
+    { value: "1 ngày", label: t("filterDialog.duration.oneDay") },
+    { value: "2-3 ngày", label: t("filterDialog.duration.twoThreeDays") },
+    { value: "4-7 ngày", label: t("filterDialog.duration.fourSevenDays") },
+    { value: "8+ ngày", label: t("filterDialog.duration.eightPlusDays") },
+  ];
+
+  const AGE_RANGE_OPTIONS = [
+    { value: "0-5", label: t("filterDialog.ageRange.children") },
+    { value: "6-12", label: t("filterDialog.ageRange.kids") },
+    { value: "13-17", label: t("filterDialog.ageRange.teens") },
+    { value: "18+", label: t("filterDialog.ageRange.adults") },
+    { value: "0-50", label: t("filterDialog.ageRange.allAges") },
+  ];
 
   const handleApply = () => {
     const appliedFilters: FilterOptions = {
@@ -116,15 +118,15 @@ export default function FilterDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-gradient-to-b from-white to-slate-50">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-[#26B8ED]">
-            Lọc tour
+            {t("filterDialog.title")}
             {activeFilterCount > 0 && (
               <span className="ml-2 text-sm font-normal text-gray-500">
-                ({activeFilterCount} bộ lọc đang áp dụng)
+                ({activeFilterCount} {t("filterDialog.filtersApplied")})
               </span>
             )}
           </DialogTitle>
           <DialogDescription>
-            Chọn các tiêu chí để tìm tour phù hợp với bạn
+            {t("filterDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -133,7 +135,7 @@ export default function FilterDialog({
           <div className="space-y-3 rounded-2xl border border-dashed border-primary/30 bg-white/80 p-5 shadow-sm">
             <Label className="text-base font-semibold flex items-center gap-2">
               <span className="inline-flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              Khoảng giá (VNĐ)
+              {t("filterDialog.priceRange")}
             </Label>
             <div className="space-y-4">
               <Slider
@@ -155,7 +157,7 @@ export default function FilterDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="minPrice" className="text-sm">
-                    Giá tối thiểu
+                    {t("filterDialog.minPrice")}
                   </Label>
                   <Input
                     id="minPrice"
@@ -170,7 +172,7 @@ export default function FilterDialog({
                 </div>
                 <div>
                   <Label htmlFor="maxPrice" className="text-sm">
-                    Giá tối đa
+                    {t("filterDialog.maxPrice")}
                   </Label>
                   <Input
                     id="maxPrice"
@@ -189,7 +191,7 @@ export default function FilterDialog({
 
           {/* Duration */}
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
-            <Label className="text-base font-semibold">Thời gian tour</Label>
+            <Label className="text-base font-semibold">{t("filterDialog.tourDuration")}</Label>
             <div className="grid grid-cols-2 gap-2">
               {DURATION_OPTIONS.map((option) => (
                 <button
@@ -218,7 +220,7 @@ export default function FilterDialog({
 
           {/* Age Range */}
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
-            <Label className="text-base font-semibold">Độ tuổi phù hợp</Label>
+            <Label className="text-base font-semibold">{t("filterDialog.suitableAge")}</Label>
             <div className="grid grid-cols-2 gap-2">
               {AGE_RANGE_OPTIONS.map((option) => (
                 <button
@@ -245,11 +247,11 @@ export default function FilterDialog({
 
           {/* Group Size */}
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
-            <Label className="text-base font-semibold">Số người</Label>
+            <Label className="text-base font-semibold">{t("filterDialog.groupSize")}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="minGroupSize" className="text-sm">
-                  Số người tối thiểu
+                  {t("filterDialog.minGroupSize")}
                 </Label>
                 <Input
                   id="minGroupSize"
@@ -264,13 +266,13 @@ export default function FilterDialog({
                     }))
                   }
                   min={1}
-                  placeholder="Tối thiểu"
+                  placeholder={t("filterDialog.minimum")}
                   className="mt-1"
                 />
               </div>
               <div>
                 <Label htmlFor="maxGroupSize" className="text-sm">
-                  Số người tối đa
+                  {t("filterDialog.maxGroupSize")}
                 </Label>
                 <Input
                   id="maxGroupSize"
@@ -285,7 +287,7 @@ export default function FilterDialog({
                     }))
                   }
                   min={filters.minGroupSize || 1}
-                  placeholder="Tối đa"
+                  placeholder={t("filterDialog.maximum")}
                   className="mt-1"
                 />
               </div>
@@ -294,7 +296,7 @@ export default function FilterDialog({
 
           {/* Languages */}
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
-            <Label className="text-base font-semibold">Ngôn ngữ</Label>
+            <Label className="text-base font-semibold">{t("filterDialog.language")}</Label>
             <div className="grid grid-cols-2 gap-2">
               {LANGUAGE_OPTIONS.map((language) => (
                 <button
@@ -318,7 +320,7 @@ export default function FilterDialog({
 
           {/* Start Date */}
           <div className="space-y-3 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm">
-            <Label className="text-base font-semibold">Ngày khởi hành</Label>
+            <Label className="text-base font-semibold">{t("filterDialog.startDate")}</Label>
             <div className="relative">
               <Button
                 type="button"
@@ -329,7 +331,7 @@ export default function FilterDialog({
                 <CalendarDays className="mr-2 h-4 w-4" />
                 {filters.startDate
                   ? filters.startDate.toLocaleDateString("vi-VN")
-                  : "Chọn ngày khởi hành"}
+                  : t("filterDialog.selectStartDate")}
               </Button>
               {filters.startDate && (
                 <button
@@ -373,10 +375,10 @@ export default function FilterDialog({
 
         <DialogFooter className="flex gap-2">
           <Button variant="outline" onClick={handleReset}>
-            Đặt lại
+            {t("filterDialog.reset")}
           </Button>
           <Button onClick={handleApply} className="bg-primary hover:bg-primary/90">
-            Áp dụng ({activeFilterCount})
+            {t("filterDialog.apply")} ({activeFilterCount})
           </Button>
         </DialogFooter>
       </DialogContent>

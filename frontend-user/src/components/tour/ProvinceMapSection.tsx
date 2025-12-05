@@ -5,6 +5,7 @@ import AttractionAPI, { Attraction } from "@/services/attraction/attractionAPI";
 import { Button } from "@/components/ui/button";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useTranslation } from "react-i18next";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -19,6 +20,7 @@ interface Province {
 }
 
 const ProvinceMapSection = () => {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -376,21 +378,21 @@ const ProvinceMapSection = () => {
   const regions = [
     {
       id: "north",
-      name: "Miền Bắc",
+      name: t("provinceMap.regions.north"),
       provinces: provinces
         .filter((p) => p.region === "Bắc Bộ")
         .sort((a, b) => a.name.localeCompare(b.name)),
     },
     {
       id: "central",
-      name: "Miền Trung",
+      name: t("provinceMap.regions.central"),
       provinces: provinces
         .filter((p) => p.region === "Trung Bộ")
         .sort((a, b) => a.name.localeCompare(b.name)),
     },
     {
       id: "south",
-      name: "Miền Nam",
+      name: t("provinceMap.regions.south"),
       provinces: provinces
         .filter((p) => p.region === "Nam Bộ")
         .sort((a, b) => a.name.localeCompare(b.name)),
@@ -408,14 +410,13 @@ const ProvinceMapSection = () => {
         >
           <div className="inline-flex items-center gap-2 bg-yellow-200 text-yellow-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Compass className="h-4 w-4" />
-            Khám phá
+            {t("provinceMap.badge")}
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            ĐỊA ĐIỂM DU LỊCH 63 TỈNH THÀNH
+            {t("provinceMap.title")}
           </h2>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-            Trải nghiệm du lịch khắp 63 tỉnh thành Việt Nam, khám phá các địa
-            danh đặc sắc và những nét văn hóa độc đáo của từng vùng miền
+            {t("provinceMap.description")}
           </p>
         </div>
 
@@ -424,7 +425,9 @@ const ProvinceMapSection = () => {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Đang tải dữ liệu...</p>
+              <p className="text-muted-foreground">
+                {t("provinceMap.loading")}
+              </p>
             </div>
           </div>
         ) : (
@@ -447,7 +450,9 @@ const ProvinceMapSection = () => {
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                        <p className="text-gray-600">Đang tải bản đồ...</p>
+                        <p className="text-gray-600">
+                          {t("provinceMap.loadingMap")}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -484,13 +489,15 @@ const ProvinceMapSection = () => {
                         size="sm"
                       >
                         <Navigation className="w-4 h-4 mr-2" />
-                        Hiển thị tất cả
+                        {t("provinceMap.showAll")}
                       </Button>
                     </div>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  {attractions.length} điểm đến trên bản đồ
+                  {t("provinceMap.attractionsCount", {
+                    count: attractions.length,
+                  })}
                 </p>
               </div>
             </div>
@@ -499,13 +506,10 @@ const ProvinceMapSection = () => {
             <div className="space-y-8">
               <div>
                 <h3 className="text-2xl font-bold text-primary mb-4">
-                  Khám phá 3 miền Việt Nam
+                  {t("provinceMap.exploreTitle")}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Việt Nam mở ra như một bức tranh sống động trải dài khắp ba
-                  miền, mỗi miền sở hữu vẻ đẹp riêng biệt. Tất cả cùng dệt nên
-                  một câu chuyện tuyệt đẹp về thiên nhiên, văn hóa và những cuộc
-                  phiêu lưu.
+                  {t("provinceMap.exploreDescription")}
                 </p>
               </div>
 
@@ -536,8 +540,10 @@ const ProvinceMapSection = () => {
                               }`}
                               title={
                                 hasAttractions
-                                  ? `Xem ${province.name} trên bản đồ`
-                                  : "Chưa có điểm đến"
+                                  ? t("provinceMap.viewOnMap", {
+                                      province: province.name,
+                                    })
+                                  : t("provinceMap.noDestinations")
                               }
                             >
                               {province.name}

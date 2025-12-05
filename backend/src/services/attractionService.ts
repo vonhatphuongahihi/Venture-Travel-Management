@@ -57,7 +57,7 @@ export class AttractionService {
               tourId: true,
             },
           },
-          reviews: {
+          attractionReviews: {
             select: {
               rate: true,
             },
@@ -73,19 +73,18 @@ export class AttractionService {
     ]);
 
     // Format response
-    const formattedAttractions = attractions.map((attraction: any) => {
+    const formattedAttractions = attractions.map((attraction) => {
       // Count unique tours
-      const tourCount = new Set(
-        attraction.tourStops.map((stop: any) => stop.tourId)
-      ).size;
+      const tourCount = new Set(attraction.tourStops.map((stop) => stop.tourId))
+        .size;
 
       // Calculate average rating
       const avgRating =
-        attraction.reviews.length > 0
-          ? attraction.reviews.reduce(
+        attraction.attractionReviews.length > 0
+          ? attraction.attractionReviews.reduce(
               (sum: number, review: any) => sum + review.rate,
               0
-            ) / attraction.reviews.length
+            ) / attraction.attractionReviews.length
           : 0;
 
       return {
@@ -103,7 +102,7 @@ export class AttractionService {
         provinceName: attraction.province.name,
         tourCount,
         rating: Math.round(avgRating * 10) / 10,
-        reviewCount: attraction.reviews.length,
+        reviewCount: attraction.attractionReviews.length,
         coordinates: attraction.point
           ? {
               lat: attraction.point.latitude,
@@ -183,7 +182,7 @@ export class AttractionService {
 
   // Get attraction by ID
   static async getAttractionById(id: string) {
-    const attraction: any = await prisma.attraction.findUnique({
+    const attraction = await prisma.attraction.findUnique({
       where: { attractionId: id },
       include: {
         province: true,
@@ -204,7 +203,7 @@ export class AttractionService {
                     },
                   },
                 },
-                reviews: {
+                tourReviews: {
                   select: {
                     rate: true,
                   },
@@ -214,7 +213,7 @@ export class AttractionService {
                     ticketPrices: true,
                     bookings: {
                       include: {
-                        booking_details: {
+                        bookingDetails: {
                           select: {
                             quantity: true,
                           },
@@ -227,7 +226,7 @@ export class AttractionService {
             },
           },
         },
-        reviews: {
+        attractionReviews: {
           include: {
             user: {
               select: {
@@ -252,11 +251,11 @@ export class AttractionService {
 
     // Calculate average rating
     const avgRating =
-      attraction.reviews.length > 0
-        ? attraction.reviews.reduce(
+      attraction.attractionReviews.length > 0
+        ? attraction.attractionReviews.reduce(
             (sum: number, review: any) => sum + review.rate,
             0
-          ) / attraction.reviews.length
+          ) / attraction.attractionReviews.length
         : 0;
 
     // Get unique tours with full details
@@ -272,11 +271,11 @@ export class AttractionService {
 
         // Calculate tour rating
         const tourAvgRating =
-          tour.reviews.length > 0
-            ? tour.reviews.reduce(
+          tour.tourReviews.length > 0
+            ? tour.tourReviews.reduce(
                 (sum: number, review: any) => sum + review.rate,
                 0
-              ) / tour.reviews.length
+              ) / tour.tourReviews.length
             : 0;
 
         // Get location from first tour stop with province
@@ -354,7 +353,7 @@ export class AttractionService {
           duration: tour.duration,
           location,
           rating: Math.round(tourAvgRating * 10) / 10,
-          reviewCount: tour.reviews.length,
+          reviewCount: tour.tourReviews.length,
           category,
           status,
           maxParticipants,
@@ -383,9 +382,9 @@ export class AttractionService {
       },
       tourCount: tours.length,
       rating: Math.round(avgRating * 10) / 10,
-      reviewCount: attraction.reviews.length,
+      reviewCount: attraction.attractionReviews.length,
       tours: tours,
-      reviews: attraction.reviews.map((review: any) => ({
+      attractionReviews: attraction.attractionReviews.map((review: any) => ({
         reviewId: review.reviewId,
         user: {
           id: review.user.userId,

@@ -5,8 +5,10 @@ import { Filter, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { tourService, Tour } from "@/services/tour.service";
 import FilterDialog, { FilterOptions } from "./FilterDialog";
+import { useTranslation } from "react-i18next";
 
 const ToursSection = () => {
+  const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState("all");
   const [isVisible, setIsVisible] = useState(false);
   const [tours, setTours] = useState<Tour[]>([]);
@@ -130,7 +132,7 @@ const ToursSection = () => {
         setTours(filteredTours);
       } catch (err) {
         console.error('Error fetching tours:', err);
-        setError('Không thể tải danh sách tour');
+        setError(t('toursSection.errorLoading'));
         setTours([]);
       } finally {
         setLoading(false);
@@ -138,11 +140,11 @@ const ToursSection = () => {
     };
 
     fetchTours();
-  }, [activeFilter, appliedFilters]);
+  }, [activeFilter, appliedFilters, t]);
 
   // Build filters from categories - use allTours for accurate counting
   const filters = [
-    { id: "all", label: "Tất cả", count: allTours.length },
+    { id: "all", label: t('toursSection.all'), count: allTours.length },
     ...categories.map((category) => ({
       id: category,
       label: category,
@@ -171,14 +173,13 @@ const ToursSection = () => {
         <div className={`text-center mb-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center gap-2 bg-[#dff6ff] text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Star className="h-4 w-4" />
-            Đặc biệt
+            {t('toursSection.special')}
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            TOUR DU LỊCH
+            {t('toursSection.title')}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Khám phá những tour du lịch đa dạng từ biển đảo đến núi rừng,
-            từ văn hóa lịch sử đến thành phố hiện đại
+            {t('toursSection.description')}
           </p>
         </div>
 
@@ -218,7 +219,7 @@ const ToursSection = () => {
               className="relative border-primary/30 hover:bg-primary/10"
             >
               <Filter className="h-4 w-4 mr-2" />
-              Lọc thêm
+              {t('toursSection.filterMore')}
               {Object.keys(appliedFilters).length > 0 && (
                 <span className="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full">
                   {Object.keys(appliedFilters).filter(
@@ -246,7 +247,7 @@ const ToursSection = () => {
             </div>
           ) : filteredTours.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground">
-              <p>Chưa có tour nào</p>
+              <p>{t('toursSection.noTours')}</p>
             </div>
           ) : (
             filteredTours.map((tour) => (
@@ -273,7 +274,7 @@ const ToursSection = () => {
         {/* Load More */}
         <div className={`text-center mt-12 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <Button variant="tour" size="lg" className="px-8 bg-[#80CEEA] text-white hover:bg-[#5ebbdd]">
-            Xem thêm tours
+            {t('toursSection.viewMoreTours')}
           </Button>
         </div>
       </div>

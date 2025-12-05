@@ -1,0 +1,729 @@
+{
+    "common": {
+        "loading": "Đang tải...",
+        "error": "Lỗi",
+        "success": "Thành công",
+        "confirm": "Xác nhận",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "close": "Đóng",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "viewMore": "Xem thêm",
+        "seeDetails": "Xem chi tiết"
+    },
+    "auth": {
+        "login": {
+            "title": "Đăng nhập",
+            "email": "Email",
+            "password": "Mật khẩu",
+            "emailPlaceholder": "Nhập email",
+            "passwordPlaceholder": "Nhập mật khẩu",
+            "rememberMe": "Ghi nhớ đăng nhập",
+            "forgotPassword": "Quên mật khẩu ?",
+            "loginButton": "Đăng nhập",
+            "loggingIn": "Đang đăng nhập...",
+            "orLoginWith": "Hoặc đăng nhập bằng",
+            "continueWithGoogle": "Tiếp tục với Google",
+            "noAccount": "Bạn chưa có tài khoản?",
+            "registerNow": "Đăng ký ngay",
+            "success": "Đăng nhập thành công!",
+            "fillAllFields": "Vui lòng nhập đầy đủ thông tin"
+        },
+        "register": {
+            "title": "Đăng ký",
+            "username": "Tên người dùng",
+            "email": "Email",
+            "password": "Mật khẩu",
+            "confirmPassword": "Nhập lại mật khẩu",
+            "usernamePlaceholder": "Nhập tên người dùng",
+            "emailPlaceholder": "Nhập email",
+            "passwordPlaceholder": "Nhập mật khẩu (ít nhất 8 ký tự)",
+            "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+            "registerButton": "Đăng ký",
+            "registering": "Đang đăng ký...",
+            "orRegisterWith": "Hoặc đăng ký bằng",
+            "continueWithGoogle": "Tiếp tục với Google",
+            "processing": "Đang xử lý...",
+            "hasAccount": "Bạn đã có tài khoản?",
+            "loginLink": "Đăng nhập",
+            "success": "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
+            "fillAllFields": "Vui lòng nhập đầy đủ thông tin",
+            "passwordMismatch": "Mật khẩu xác nhận không khớp",
+            "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+            "passwordRequirements": "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số"
+        }
+    },
+    "profile": {
+        "title": "Thông tin Tài khoản",
+        "myProfile": "Hồ sơ của tôi",
+        "manageProfile": "Quản lý thông tin hồ sơ để bảo mật tài khoản",
+        "unsavedChanges": "• Có thay đổi chưa lưu",
+        "username": "Tên người dùng:",
+        "email": "Email:",
+        "phone": "Số điện thoại:",
+        "phonePlaceholder": "Nhập số điện thoại",
+        "dateOfBirth": "Ngày sinh:",
+        "gender": "Giới tính:",
+        "genderSelect": "Chọn giới tính",
+        "genderMale": "Nam",
+        "genderFemale": "Nữ",
+        "genderOther": "Khác",
+        "address": "Địa chỉ:",
+        "addressPlaceholder": "Nhập địa chỉ đầy đủ",
+        "saveChanges": "Lưu thay đổi",
+        "saving": "Đang lưu...",
+        "cancel": "Hủy",
+        "cancelChanges": "Đã hủy thay đổi",
+        "loadingProfile": "Đang tải thông tin...",
+        "required": "*",
+        "avatarSelected": "Ảnh:",
+        "chooseImage": "Vui lòng chọn file ảnh",
+        "imageTooLarge": "Kích thước file quá lớn. Vui lòng chọn file nhỏ hơn 5MB",
+        "usernameRequired": "Tên người dùng không được để trống",
+        "phoneInvalid": "Số điện thoại không hợp lệ (phải có 10-15 chữ số)",
+        "profileUpdateSuccess": "Cập nhật thông tin thành công!",
+        "avatarUpdateSuccess": "Cập nhật ảnh đại diện thành công!",
+        "bothUpdateSuccess": "Cập nhật thông tin và ảnh đại diện thành công!",
+        "updateFailed": "Cập nhật thông tin thất bại",
+        "pleaseLoginAgain": "Vui lòng đăng nhập lại"
+    },
+    "favoriteTours": {
+        "title": "Tour Yêu Thích",
+        "myFavorites": "Tour yêu thích",
+        "viewAllSaved": "Xem tất cả các tour bạn đã lưu",
+        "saving": "Đang lưu",
+        "favoriteCount": "tour bạn yêu thích",
+        "discoverNew": "Khám phá tour mới",
+        "youAreSaving": "Bạn đang lưu",
+        "latestFirst": "Các tour mới nhất sẽ hiển thị trước",
+        "noFavoritesYet": "Bạn chưa lưu tour nào",
+        "noFavoritesDesc": "Hãy thêm tour yêu thích để tạo nên bộ sưu tập hành trình của riêng bạn. Lưu lại để không bỏ lỡ các ưu đãi đặc biệt!",
+        "startExploring": "Bắt đầu khám phá",
+        "removeFromFavorites": "Xóa khỏi danh sách yêu thích",
+        "pleaseLogin": "Vui lòng đăng nhập để xem tour yêu thích",
+        "failedToLoad": "Không thể tải danh sách tour yêu thích",
+        "retryLoad": "Thử lại",
+        "addedToFavorites": "Đã thêm vào danh sách yêu thích",
+        "removedFromFavorites": "Đã xóa khỏi danh sách yêu thích",
+        "saveFailed": "Thất bại khi lưu tour"
+    },
+    "bookTour": {
+        "title": "Đặt vé",
+        "bookTicket": "Đặt vé",
+        "fullname": "Họ và tên",
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "fullnamePlaceholder": "Họ và tên",
+        "emailPlaceholder": "Email",
+        "phonePlaceholder": "Số điện thoại",
+        "pickupPoint": "Chọn điểm đón",
+        "selectPickupPoint": "Chọn điểm đón",
+        "pickupPlaceholder": "Nhập địa chỉ đón khách",
+        "enterPickupAddress": "Nhập địa chỉ đón khách",
+        "note": "Ghi chú",
+        "notePlaceholder": "Ghi chú",
+        "departureDate": "Ngày khởi hành",
+        "ticketInfo": "Thông tin vé",
+        "total": "Tổng cộng",
+        "payment": "Thanh toán",
+        "processing": "Đang xử lý...",
+        "fillAllFields": "Vui lòng nhập đầy đủ thông tin",
+        "bookSuccess": "Đặt tour thành công!",
+        "bookingSuccess": "Đặt tour thành công!",
+        "bookFailed": "Có lỗi xảy ra khi đặt tour. Vui lòng thử lại.",
+        "bookingError": "Có lỗi xảy ra khi đặt tour. Vui lòng thử lại.",
+        "required": "*"
+    },
+    "tourDetail": {
+        "invalidTourId": "Tour ID không hợp lệ",
+        "tourNotFound": "Không tìm thấy tour",
+        "loadError": "Không thể tải thông tin tour",
+        "loginRequired": "Vui lòng đăng nhập để lưu tour yêu thích",
+        "addedToFavorites": "Đã thêm vào danh sách yêu thích",
+        "removedFromFavorites": "Đã xóa khỏi danh sách yêu thích",
+        "saveError": "Thất bại khi lưu tour",
+        "selectPassengers": "Vui lòng chọn số lượng hành khách",
+        "backToHome": "Về trang chủ",
+        "reviews": "đánh giá",
+        "share": "Chia sẻ",
+        "writeReview": "Đánh giá",
+        "save": "Lưu",
+        "saved": "Đã lưu",
+        "saving": "Đang lưu...",
+        "unsaving": "Đang bỏ lưu...",
+        "tabs": {
+            "overview": "Tổng quan",
+            "details": "Chi tiết",
+            "itinerary": "Hành trình",
+            "reviews": "Đánh giá"
+        },
+        "reviewFilters": {
+            "mostRecent": "Gần đây nhất",
+            "mostLiked": "Được thích nhiều nhất",
+            "highestRated": "Nhiều sao nhất",
+            "lowestRated": "Ít sao nhất"
+        },
+        "aboutTrip": "Về chuyến đi",
+        "age": "Độ tuổi",
+        "yearsOld": "tuổi",
+        "groupLimit": "Giới hạn nhóm",
+        "maxPeople": "Tối đa {{count}} người/nhóm",
+        "duration": "Thời lượng",
+        "tourGuide": "Hướng dẫn viên",
+        "startingFrom": "Chỉ từ",
+        "bookNow": "Đặt chỗ ngay",
+        "selectDateAndQuantity": "Chọn ngày và số lượng",
+        "total": "Tổng cộng",
+        "cancelBefore": "Hủy bất cứ lúc nào trước",
+        "fullRefund": "để được hoàn tiền đầy đủ",
+        "itinerary": "Hành trình",
+        "reviewsTitle": "Đánh giá",
+        "filter": "Bộ lọc",
+        "postedOn": "Đăng vào"
+    },
+    "bookingHistory": {
+        "title": "Lịch Sử Đặt Tour",
+        "myBookings": "Lịch sử đặt tour",
+        "viewAllBookings": "Xem tất cả các tour bạn đã đặt",
+        "totalBookings": "Tổng đặt chỗ",
+        "bookingsCount": "chuyến đi",
+        "discoverNew": "Khám phá tour mới",
+        "all": "Tất cả",
+        "processing": "Đang xử lý",
+        "completed": "Hoàn tất",
+        "cancelled": "Bị hủy",
+        "allBookings": "Tất cả đặt chỗ",
+        "latestFirst": "Các đơn mới nhất sẽ hiển thị trước",
+        "noBookingsYet": "Chưa có lịch sử đặt tour nào.",
+        "noBookingsDesc": "Hãy khám phá và đặt tour đầu tiên của bạn ngay hôm nay!",
+        "startExploring": "Bắt đầu khám phá",
+        "departureDate": "Ngày đi:",
+        "quantity": "Số lượng:",
+        "people": "người",
+        "unitPrice": "Đơn giá:",
+        "total": "Tổng:",
+        "reviewTour": "Đánh giá tour",
+        "rebook": "Đặt lại",
+        "cancelTour": "Hủy tour",
+        "confirmCancel": "Bạn có chắc chắn muốn hủy tour này không?",
+        "cancelSuccess": "Hủy tour thành công",
+        "cancelFailed": "Không thể hủy tour. Vui lòng thử lại.",
+        "bookSuccess": "Đặt tour thành công!",
+        "pleaseLogin": "Vui lòng đăng nhập để xem lịch sử đặt tour",
+        "failedToLoad": "Không thể tải lịch sử đặt tour",
+        "loadingError": "Có lỗi xảy ra khi tải dữ liệu",
+        "retryLoad": "Thử lại"
+    },
+    "sidebar": {
+        "member": "Thành viên",
+        "myProfile": "Hồ sơ của tôi",
+        "bookingHistory": "Lịch sử đặt tour",
+        "favoriteTours": "Tour yêu thích",
+        "settings": "Cài đặt",
+        "termsOfUse": "Điều khoản sử dụng",
+        "privacyPolicy": "Chính sách bảo mật",
+        "aboutVenture": "Về VENTURE",
+        "logout": "Đăng xuất"
+    },
+    "splash": {
+        "slogan": "ĐỒNG HÀNH CÙNG BẠN ĐẾN MỌI MIỀN TỔ QUỐC VIỆT NAM"
+    },
+    "toursSection": {
+        "special": "Đặc biệt",
+        "title": "TOUR DU LỊCH",
+        "description": "Khám phá những tour du lịch đa dạng từ biển đảo đến núi rừng, từ văn hóa lịch sử đến thành phố hiện đại",
+        "all": "Tất cả",
+        "filterMore": "Lọc thêm",
+        "viewMoreTours": "Xem thêm tours",
+        "loading": "Đang tải...",
+        "errorLoading": "Không thể tải danh sách tour",
+        "noTours": "Chưa có tour nào"
+    },
+    "aboutUs": {
+        "title": "Về VENTURE",
+        "subtitle": "Chúng tôi là đối tác tin cậy trong mọi hành trình khám phá của bạn, mang đến những trải nghiệm du lịch đáng nhớ và ý nghĩa.",
+        "mission": {
+            "title": "SỨ MỆNH CỦA CHÚNG TÔI",
+            "paragraph1": "VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, mà còn là hành trình khám phá bản thân và kết nối với những con người, văn hóa mới lạ.",
+            "paragraph2": "Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng."
+        },
+        "competency": {
+            "title": "NĂNG LỰC CỐT LÕI"
+        },
+        "activities": {
+            "title": "CÁCH THỨC HOẠT ĐỘNG"
+        },
+        "values": {
+            "title": "Giá trị",
+            "subtitle": "Những giá trị định hướng mọi hoạt động của VENTURE",
+            "dedication": {
+                "title": "Tận tâm",
+                "description": "Chúng tôi luôn đặt khách hàng lên hàng đầu và phục vụ với trái tim chân thành."
+            },
+            "quality": {
+                "title": "Chất lượng",
+                "description": "Cam kết mang đến những trải nghiệm du lịch chất lượng cao nhất."
+            },
+            "accompany": {
+                "title": "Đồng hành",
+                "description": "Luôn bên cạnh khách hàng trong mọi hành trình khám phá."
+            },
+            "creative": {
+                "title": "Sáng tạo",
+                "description": "Không ngừng đổi mới để tạo ra những tour du lịch độc đáo."
+            }
+        },
+        "team": {
+            "title": "Đội ngũ của chúng tôi"
+        },
+        "cta": {
+            "title": "Sẵn sàng khám phá cùng VENTURE?",
+            "subtitle": "Hãy để chúng tôi đồng hành cùng bạn trong những hành trình khám phá tuyệt vời nhất.",
+            "exploreTours": "Khám phá Tour",
+            "contactConsult": "Liên hệ tư vấn"
+        }
+    },
+    "contact": {
+        "title": "Liên hệ với chúng tôi",
+        "info": {
+            "title": "Thông tin liên hệ",
+            "addressLabel": "Địa chỉ:",
+            "emailLabel": "Email:",
+            "phoneLabel": "Điện thoại:"
+        },
+        "social": {
+            "facebook": "Theo dõi trên Facebook",
+            "instagram": "Theo dõi trên Instagram",
+            "twitter": "Theo dõi trên X",
+            "youtube": "Theo dõi trên Youtube"
+        },
+        "form": {
+            "title": "Gửi tin nhắn cho chúng tôi",
+            "nameLabel": "Tên người dùng",
+            "namePlaceholder": "Nhập tên của bạn",
+            "emailLabel": "Email",
+            "emailPlaceholder": "Nhập địa chỉ email",
+            "messageLabel": "Tin nhắn",
+            "messagePlaceholder": "Nhập tin nhắn của bạn",
+            "submit": "Gửi tin nhắn",
+            "submitting": "Đang gửi tin nhắn..."
+        },
+        "errors": {
+            "nameRequired": "Vui lòng nhập tên.",
+            "emailRequired": "Vui lòng nhập email.",
+            "emailInvalid": "Định dạng email không hợp lệ.",
+            "messageRequired": "Vui lòng nhập tin nhắn."
+        },
+        "toast": {
+            "success": "Gửi tin nhắn thành công!",
+            "error": "Gửi tin nhắn thất bại. Vui lòng thử lại sau."
+        }
+    },
+    "terms": {
+        "heroTitle": "Điều khoản sử dụng",
+        "heroSubtitle": "Chúng tôi cam kết mang đến một môi trường trải nghiệm an toàn và công bằng. Việc bạn sử dụng dịch vụ đồng nghĩa với sự chấp thuận các quy định chung này.",
+        "sectionTitle": "NỘI DUNG CÁC ĐIỀU KHOẢN",
+        "lastUpdated": "Lần cập nhật cuối: {{date}}",
+        "intro": "Trang Điều khoản sử dụng là nơi Venture trình bày các quy định, quyền hạn, nghĩa vụ và trách nhiệm của cả người dùng và Venture khi truy cập và sử dụng dịch vụ. Nội dung của trang này giúp người dùng hiểu rõ cách đăng ký và quản lý tài khoản, cách đặt tour, thanh toán, chính sách hủy, cũng như quyền sở hữu trí tuệ và các giới hạn trách nhiệm pháp lý. Việc đọc và đồng ý với các điều khoản này giúp đảm bảo sự minh bạch, công bằng và an toàn cho cả hai bên, đồng thời tạo cơ sở pháp lý khi phát sinh tranh chấp hoặc vấn đề liên quan đến việc sử dụng dịch vụ. Trang này không chỉ là hướng dẫn pháp lý mà còn là cam kết của Venture về chất lượng và sự tin cậy trong quá trình cung cấp dịch vụ.",
+        "items": {
+            "acceptance": {
+                "title": "Chấp nhận và phạm vi áp dụng",
+                "content": {
+                    "p1": "Bằng việc truy cập, đăng ký, hoặc sử dụng bất kỳ dịch vụ nào do Venture cung cấp, bạn đồng ý tuân thủ các Điều khoản sử dụng này cũng như mọi quy định, hướng dẫn, chính sách bổ sung mà Venture có thể công bố. Điều khoản này áp dụng cho tất cả người dùng, bao gồm nhưng không giới hạn: khách truy cập website, người đăng ký tài khoản, khách hàng đặt tour, và các bên liên quan khác.",
+                    "p2": "Venture có quyền thay đổi, bổ sung hoặc điều chỉnh các Điều khoản sử dụng vào bất kỳ thời điểm nào mà không cần thông báo trước. Mọi thay đổi sẽ có hiệu lực kể từ thời điểm được công bố trên website hoặc ứng dụng của Venture. Việc bạn tiếp tục sử dụng dịch vụ sau khi có các cập nhật được coi là sự chấp thuận đối với các điều khoản đã sửa đổi. Trong trường hợp bạn không đồng ý với bất kỳ thay đổi nào, bạn cần ngừng sử dụng dịch vụ ngay lập tức."
+                }
+            },
+            "account": {
+                "title": "Đăng ký và quản lý tài khoản",
+                "content": {
+                    "p1": "Một số dịch vụ của Venture yêu cầu người dùng tạo tài khoản để truy cập và sử dụng. Khi đăng ký, bạn cam kết cung cấp thông tin chính xác, đầy đủ và cập nhật. Người dùng chịu trách nhiệm bảo mật thông tin đăng nhập, mật khẩu, và các dữ liệu cá nhân liên quan đến tài khoản.",
+                    "p2": "Bạn đồng ý thông báo ngay cho Venture khi phát hiện bất kỳ việc truy cập trái phép hoặc sử dụng tài khoản không hợp pháp. Venture có quyền tạm ngưng, hạn chế, hoặc xóa tài khoản nếu phát hiện vi phạm các Điều khoản, hành vi gian lận, hoặc hoạt động trái pháp luật. Venture không chịu trách nhiệm về bất kỳ thiệt hại nào phát sinh từ việc bạn không bảo mật thông tin đăng nhập hoặc cho phép người khác sử dụng tài khoản của mình."
+                }
+            },
+            "booking": {
+                "title": "Đặt tour, thanh toán và chính sách hủy",
+                "content": {
+                    "p1": "Người dùng có thể đặt tour thông qua website hoặc ứng dụng của Venture theo các bước hướng dẫn. Việc đặt tour chỉ được xác nhận khi thanh toán đầy đủ và Venture gửi thông báo xác nhận. Venture cung cấp nhiều phương thức thanh toán hợp pháp, bao gồm thẻ tín dụng, thẻ ghi nợ, ví điện tử, hoặc các cổng thanh toán đối tác.",
+                    "p2": "Chính sách hủy, hoàn tiền, hoặc thay đổi lịch trình tour sẽ được quy định riêng cho từng loại tour và từng nhà cung cấp dịch vụ liên quan. Venture có quyền từ chối hoàn tiền hoặc áp dụng phí hủy theo điều kiện cụ thể. Người dùng chịu trách nhiệm đọc kỹ các chính sách trước khi đặt tour và thực hiện thanh toán. Venture không chịu trách nhiệm cho các chi phí phát sinh ngoài hợp đồng hoặc các dịch vụ bên thứ ba mà bạn lựa chọn tự ý sử dụng."
+                }
+            },
+            "ip": {
+                "title": "Quyền sở hữu trí tuệ",
+                "content": {
+                    "p1": "Toàn bộ nội dung, hình ảnh, thiết kế, logo, biểu tượng, văn bản, phần mềm, cơ sở dữ liệu và tài liệu trên website, ứng dụng hoặc các nền tảng khác thuộc sở hữu của Venture hoặc được cấp phép hợp pháp. Người dùng không được sao chép, phát tán, chỉnh sửa, công bố, chuyển nhượng hoặc sử dụng bất kỳ tài sản trí tuệ nào của Venture cho mục đích thương mại hoặc phi thương mại mà không có sự đồng ý bằng văn bản của Venture. Mọi hành vi vi phạm quyền sở hữu trí tuệ có thể bị xử lý theo quy định pháp luật hiện hành, bao gồm bồi thường thiệt hại và các biện pháp khởi kiện hình sự hoặc dân sự."
+                }
+            },
+            "liability": {
+                "title": "Miễn trừ và giới hạn bồi thường",
+                "content": {
+                    "p1": "Người dùng đồng ý rằng việc sử dụng dịch vụ của Venture hoàn toàn là trên cơ sở tự nguyện và chịu rủi ro cá nhân. Venture không chịu trách nhiệm về bất kỳ tổn thất, thiệt hại trực tiếp hoặc gián tiếp, chi phí phát sinh, mất mát dữ liệu, gián đoạn kinh doanh, hoặc các hậu quả phát sinh từ việc sử dụng hoặc không thể sử dụng dịch vụ.",
+                    "p2": "Người dùng đồng ý bồi thường và giữ Venture, các nhân viên, đối tác, nhà cung cấp và đại lý của Venture miễn trừ mọi trách nhiệm pháp lý, chi phí, yêu cầu, hoặc thiệt hại phát sinh từ:",
+                    "list": {
+                        "item1": "Việc vi phạm Điều khoản sử dụng",
+                        "item2": "Hành vi trái pháp luật, gian lận hoặc gây hại đến bên thứ ba",
+                        "item3": "Sử dụng dịch vụ không đúng mục đích hoặc trái với pháp luật."
+                    }
+                }
+            },
+            "responsibility": {
+                "title": "Trách nhiệm và giới hạn trách nhiệm của Venture",
+                "content": {
+                    "p1": "Venture cam kết cung cấp dịch vụ một cách minh bạch, hợp pháp và đảm bảo chất lượng ở mức tốt nhất có thể. Tuy nhiên, Venture không đảm bảo rằng dịch vụ sẽ luôn liên tục, không gián đoạn, không lỗi kỹ thuật, hoặc không có sự cố từ bên thứ ba.",
+                    "p2": "Trong phạm vi pháp luật cho phép, Venture không chịu trách nhiệm cho bất kỳ thiệt hại trực tiếp, gián tiếp, ngẫu nhiên, đặc biệt hoặc phát sinh nào liên quan đến việc sử dụng hoặc không thể sử dụng dịch vụ, bao gồm nhưng không giới hạn: mất mát dữ liệu, gián đoạn kinh doanh, tổn thất lợi nhuận hoặc chi phí phát sinh từ việc sử dụng dịch vụ. Người dùng chịu trách nhiệm tự bảo vệ thông tin cá nhân, dữ liệu, và chuẩn bị các biện pháp dự phòng phù hợp."
+                }
+            }
+        }
+    },
+    "privacy": {
+        "heroTitle": "Chính Sách Bảo mật",
+        "heroSubtitle": "Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn, đảm bảo mọi dữ liệu được xử lý một cách an toàn, minh bạch và tôn trọng quyền riêng tư của bạn trong suốt quá trình trải nghiệm dịch vụ.",
+        "sectionTitle": "TUYÊN BỐ VỀ QUYỀN RIÊNG TƯ VÀ COOKIE",
+        "lastUpdated": "Lần cập nhật cuối: {{date}}",
+        "intro": "Venture sở hữu và vận hành một nền tảng trực tuyến cung cấp cho người dùng thông tin, khuyến nghị và dịch vụ liên quan đến du lịch và giải trí, bao gồm các công cụ nghiên cứu và/hoặc đặt phòng khách sạn, nhà nghỉ cho thuê và các chỗ ở khác, điểm tham quan và trải nghiệm, nhà hàng, chuyến bay và du thuyền, cùng các dịch vụ giải trí khác. Thông tin mà bạn và những người khác giao phó cho chúng tôi giúp chúng tôi nâng cao khả năng cung cấp các Dịch vụ phù hợp, được cá nhân hóa và hữu ích hơn. Chúng tôi rất coi trọng sự tin tưởng của bạn và cam kết tôn trọng quyền riêng tư của bạn khi bạn truy cập trang web hoặc sử dụng Dịch vụ của chúng tôi và minh bạch về cách chúng tôi sử dụng thông tin bạn đã giao phó cho chúng tôi. Tuyên bố này mô tả cách chúng tôi thu thập, sử dụng và xử lý thông tin của bạn, cung cấp cho bạn thông tin về các quyền của bạn và cách bạn có thể liên hệ với chúng tôi.",
+        "items": {
+            "collection": {
+                "title": "1. Thông tin được thu thập và xử lý",
+                "content": {
+                    "intro": "Thông tin được xử lý có thể bao gồm:",
+                    "list": {
+                        "item1": "Thông tin liên hệ, bao gồm tên, số điện thoại, mã bưu điện và email",
+                        "item2": "Thông tin thanh toán và thông tin thanh toán khác",
+                        "item3": "Tài liệu hỗ trợ du lịch và lập kế hoạch",
+                        "item4": "Tên người dùng và mật khẩu",
+                        "item5": "Thông tin liên quan đến tư cách thành viên Venture của bạn",
+                        "item6": "Ảnh, đánh giá, bài đăng trên diễn đàn và mạng xã hội, và video bạn có thể đã cung cấp cho chúng tôi",
+                        "item7": "Thông tin định vị địa lý",
+                        "item8": "Thông tin thiết bị",
+                        "item9": "Hoạt động trực tuyến, bao gồm các trang bạn đã truy cập, nội dung đã xem xét và ứng dụng đã xem xét",
+                        "item10": "Thông tin khác về bản thân mà bạn đã tự nguyện tiết lộ",
+                        "item11": "Lịch sử mua hàng và đặt chỗ",
+                        "item12": "Thông tin về du lịch, trải nghiệm, kế hoạch và sở thích ăn uống của bạn",
+                        "item13": "Thông tin liên lạc khi bạn liên hệ với nhóm dịch vụ khách hàng của chúng tôi, bao gồm các cuộc gọi đến và đi",
+                        "item14": "Thông tin bạn đã cung cấp cho các công ty bên thứ ba khác cho mục đích đăng nhập lên mạng xã hội. Điều này bao gồm thông tin công khai, chẳng hạn như tên, độ tuổi cũng như địa chỉ email."
+                    }
+                }
+            },
+            "usage": {
+                "title": "2. Sử dụng và mục đích thông tin",
+                "content": {
+                    "intro": "Chúng tôi sử dụng thông tin của bạn để cung cấp nội dung phù hợp và trải nghiệm cá nhân hóa, bao gồm:",
+                    "list": {
+                        "item1": "Tài khoản & Giao dịch: Đăng ký và quản lý tài khoản, xử lý đặt chỗ và thanh toán, cung cấp các chương trình khuyến mãi.",
+                        "item2": "Cải thiện Dịch vụ: Phân tích dữ liệu để nâng cao dịch vụ và mời bạn tham gia khảo sát hoặc nghiên cứu.",
+                        "item3": "Cá nhân hóa: Đề xuất ưu đãi, điều chỉnh nội dung và quảng cáo dựa trên sở thích của bạn.",
+                        "item4": "Giao tiếp: Liên hệ với bạn hoặc hỗ trợ liên hệ với đối tác, ghi lại tương tác, đăng nội dung của bạn và phản hồi thắc mắc.",
+                        "item5": "Tuân thủ pháp luật: Giải quyết tranh chấp, ngăn chặn gian lận, tuân thủ quy định và bảo vệ quyền lợi."
+                    },
+                    "closing": "Nếu chúng tôi sử dụng quyết định tự động, sẽ có biện pháp bảo vệ và đảm bảo quyền được can thiệp bởi con người."
+                }
+            },
+            "sharing": {
+                "title": "3. Chia sẻ và xử lý thông tin",
+                "content": {
+                    "p1": "Chúng tôi có thể chia sẻ thông tin của bạn với các công ty cùng tập đoàn, nhà cung cấp dịch vụ, đối tác kinh doanh, mạng xã hội, mạng quảng cáo, bên thứ ba đáng tin cậy hoặc cơ quan pháp luật để cung cấp dịch vụ, xử lý thanh toán, cá nhân hóa trải nghiệm, ngăn chặn gian lận, tuân thủ quy định và bảo vệ quyền lợi.",
+                    "p2": "Thông tin có thể được chuyển ra nước ngoài, lưu trữ trong thời gian cần thiết, và được bảo vệ bằng các biện pháp kỹ thuật, quản trị và vật lý (như mã hóa, tường lửa).",
+                    "p3": "Bạn có thể điều chỉnh quyền riêng tư hoặc yêu cầu xóa tài khoản trong phần <b>\"Hồ sơ\"</b>."
+                }
+            }
+        }
+    },
+    "hero": {
+        "slide1": {
+            "title": "Việt Nam quê hương ta",
+            "description": "Trải nghiệm những chuyến du lịch tuyệt vời với bản đồ tương tác, khám phá các địa điểm hấp dẫn khắp Việt Nam."
+        },
+        "slide2": {
+            "title": "Khám phá thiên nhiên Việt Nam",
+            "description": "Từ núi rừng Tây Bắc đến biển đảo Phú Quốc, khám phá vẻ đẹp thiên nhiên đa dạng của đất nước hình chữ S."
+        },
+        "slide3": {
+            "title": "Du ngoạn Sapa mờ sương",
+            "description": "Chiêm ngưỡng ruộng bậc thang hùng vĩ, tận hưởng khí hậu se lạnh và tìm hiểu bản sắc văn hóa độc đáo của đồng bào vùng cao Sapa."
+        },
+        "searchPlaceholder": "Tìm kiếm tour theo địa điểm, tên tour...",
+        "search": "Tìm kiếm",
+        "stats": {
+            "tours": "Tours du lịch",
+            "destinations": "Điểm đến",
+            "customers": "Khách hàng",
+            "provinces": "Tỉnh thành"
+        }
+    },
+    "destinations": {
+        "badge": "Đặc biệt",
+        "title": "TOP ĐIỂM ĐẾN",
+        "description": "Sapa với núi rừng hùng vĩ, Đà Lạt mộng mơ, các thành phố nhộn nhịp và những di tích lịch sử - văn hóa đặc sắc",
+        "loadError": "Không thể tải danh sách điểm đến",
+        "noDestinations": "Chưa có điểm đến nào",
+        "destination": "Điểm đến",
+        "tours": "Tours"
+    },
+    "provinceMap": {
+        "badge": "Khám phá",
+        "title": "ĐỊA ĐIỂM DU LỊCH 63 TỈNH THÀNH",
+        "description": "Trải nghiệm du lịch khắp 63 tỉnh thành Việt Nam, khám phá các địa danh đặc sắc và những nét văn hóa độc đáo của từng vùng miền",
+        "loading": "Đang tải dữ liệu...",
+        "loadingMap": "Đang tải bản đồ...",
+        "showAll": "Hiển thị tất cả",
+        "attractionsCount": "{{count}} điểm đến trên bản đồ",
+        "exploreTitle": "Khám phá 3 miền Việt Nam",
+        "exploreDescription": "Việt Nam mở ra như một bức tranh sống động trải dài khắp ba miền, mỗi miền sở hữu vẻ đẹp riêng biệt. Tất cả cùng dệt nên một câu chuyện tuyệt đẹp về thiên nhiên, văn hóa và những cuộc phiêu lưu.",
+        "regions": {
+            "north": "Miền Bắc",
+            "central": "Miền Trung",
+            "south": "Miền Nam"
+        },
+        "viewOnMap": "Xem {{province}} trên bản đồ",
+        "noDestinations": "Chưa có điểm đến"
+    },
+    "header": {
+        "tour": "TOUR",
+        "map": "BẢN ĐỒ",
+        "explore360": "KHÁM PHÁ 360°",
+        "contact": "LIÊN HỆ",
+        "login": "Đăng nhập",
+        "profile": "Hồ sơ",
+        "myAccount": "Tài khoản của tôi"
+    },
+    "explore360": {
+        "slides": {
+            "slide1": {
+                "title": "Khám phá 360° Việt Nam",
+                "description": "Trải nghiệm thực tế ảo những điểm đến tuyệt vời nhất, từ vịnh biển hùng vĩ đến núi rừng huyền bí."
+            },
+            "slide2": {
+                "title": "Du lịch thực tế ảo",
+                "description": "Khám phá các địa danh nổi tiếng của Việt Nam qua công nghệ 360° tiên tiến, cảm nhận như đang ở đó."
+            },
+            "slide3": {
+                "title": "Trải nghiệm không giới hạn",
+                "description": "Từ di sản thế giới UNESCO đến những góc phố cổ kính, khám phá mọi nơi chỉ với một cú click."
+            }
+        },
+        "badge": "Đặc biệt",
+        "mainTitle": "KHÁM PHÁ 360°",
+        "mainDescription": "Khám phá 360° những kỳ quan thiên nhiên và điểm văn hóa hấp dẫn nhất của đất nước ngay tại đây.",
+        "viewMore": "Xem thêm",
+        "sites": {
+            "hue": {
+                "name": "Huế",
+                "description": "Cố đô hoàng gia với thành cổ và lăng tẩm của các vị vua"
+            },
+            "halong": {
+                "name": "Hạ Long",
+                "description": "Di sản thế giới UNESCO với hàng nghìn đảo đá vôi"
+            },
+            "hoian": {
+                "name": "Hội An",
+                "description": "Phố cổ nổi tiếng với đèn lồng và kiến trúc truyền thống"
+            },
+            "hanoi": {
+                "name": "Hà Nội",
+                "description": "Thủ đô Việt Nam với di sản văn hóa và lịch sử phong phú"
+            },
+            "phongnha": {
+                "name": "Phong Nha",
+                "description": "Quê hương của những hang động kỳ vĩ và vườn quốc gia"
+            },
+            "myson": {
+                "name": "Mỹ Sơn",
+                "description": "Quần thể đền tháp Hindu cổ từ nền văn minh Champa"
+            }
+        },
+        "whyTitle": "TẠI SAO LẠI CHỌN KHÁM PHÁ 360°",
+        "whyDescription": "Công nghệ thực tế ảo 360° mang đến trải nghiệm du lịch hoàn toàn mới, giúp bạn khám phá Việt Nam một cách chân thực và sống động nhất.",
+        "features": {
+            "feature1": {
+                "title": "Trải nghiệm trực quan",
+                "description": "Người dùng có thể quan sát địa điểm như đang ở đó, nhìn xung quanh mọi góc, thay vì chỉ xem hình tĩnh hay video."
+            },
+            "feature2": {
+                "title": "Khám phá đa dạng và toàn diện",
+                "description": "Giúp trải nghiệm cả không gian, cảnh quan, kiến trúc và các điểm đặc sắc của địa điểm, từ đó lên kế hoạch chuyến đi dễ dàng hơn."
+            },
+            "feature3": {
+                "title": "Tăng sự hài lòng",
+                "description": "Khách hàng dễ hình dung trải nghiệm thực tế, chọn điểm đến phù hợp và quyết định đặt tour nhanh chóng."
+            }
+        },
+        "howItWorksTitle": "CÁCH THỨC HOẠT ĐỘNG",
+        "howItWorksDescription": "Quy trình đơn giản để bắt đầu khám phá thế giới 360° của chúng tôi",
+        "steps": {
+            "step1": {
+                "title": "Chọn địa điểm",
+                "description": "Lựa chọn điểm đến bạn muốn khám phá từ danh sách đa dạng"
+            },
+            "step2": {
+                "title": "Khám phá 360°",
+                "description": "Trải nghiệm thực tế ảo với khả năng xoay và phóng to mọi góc độ"
+            },
+            "step3": {
+                "title": "Đặt tour thực",
+                "description": "Quyết định đặt tour thực tế sau khi đã khám phá qua 360°"
+            }
+        }
+    },
+    "footer": {
+        "companyDescription": "Công ty du lịch hàng đầu Việt Nam với hơn 10 năm kinh nghiệm. Chúng tôi cam kết mang đến những trải nghiệm du lịch tuyệt vời nhất.",
+        "quickLinks": "Liên kết nhanh",
+        "tours": "Tours du lịch",
+        "destinations": "Điểm đến",
+        "map": "Bản đồ",
+        "explore360": "Khám phá 360°",
+        "contact": "Liên hệ",
+        "services": "Dịch vụ",
+        "packageTour": "Tour trọn gói",
+        "bookTour": "Đặt Tour",
+        "contactTitle": "Liên hệ",
+        "address": "123 Nguyễn Huệ, Q1, TP.HCM",
+        "copyright": "© 2025 Venture. Bản quyền thuộc về chúng tôi.",
+        "terms": "Điều khoản",
+        "policy": "Chính sách",
+        "support": "Hỗ trợ"
+    },
+    "attractionsSection": {
+        "topAttractions": "Điểm tham quan hàng đầu ở"
+    },
+    "provincePage": {
+        "loading": "Loading...",
+        "notFound": "Tỉnh thành không tồn tại",
+        "notFoundDescription": "Không tìm thấy thông tin về tỉnh thành này.",
+        "goBack": "Quay lại",
+        "readMore": "Xem thêm",
+        "explore": "Khám phá",
+        "attractiveTours": "Những Tour hấp dẫn"
+    },
+    "provinceDropdown": {
+        "destinations": "ĐIỂM ĐẾN",
+        "loading": "Đang tải..."
+    },
+    "map": {
+        "title": "BẢN ĐỒ DU LỊCH TƯƠNG TÁC",
+        "description": "Khám phá các tour và điểm đến trên bản đồ Việt Nam.",
+        "mapLayers": "Lớp bản đồ",
+        "tours": "Tours",
+        "destinations": "Điểm đến",
+        "region": "Khu vực",
+        "all": "Tất cả",
+        "north": "Miền Bắc",
+        "central": "Miền Trung",
+        "south": "Miền Nam"
+    },
+    "reviewCard": {
+        "quality": "Chất lượng",
+        "destination": "điểm đến",
+        "tour": "tour",
+        "notRated": "Chưa đánh giá",
+        "rating1": "Rất tệ",
+        "rating2": "Tệ",
+        "rating3": "Bình thường",
+        "rating4": "Tốt",
+        "rating5": "Tuyệt vời",
+        "placeholder": "Hãy chia sẻ suy nghĩ của bạn",
+        "addImages": "Thêm hình ảnh",
+        "removeImage": "Xóa ảnh"
+    },
+    "tourSlider": {
+        "attractiveToursIn": "Tour hấp dẫn ở",
+        "viewAll": "Xem tất cả",
+        "noTours": "Không có tour nào"
+    },
+    "attractionTours": {
+        "foundResults": "Tìm thấy {{count}} kết quả",
+        "sortBy": "Sắp xếp theo",
+        "priceLowToHigh": "Giá (từ thấp đến cao)",
+        "priceHighToLow": "Giá (từ cao đến thấp)",
+        "highestRated": "Đánh giá cao nhất",
+        "shortestDuration": "Thời gian ngắn nhất",
+        "viewMore": "Xem thêm",
+        "noTours": "Chưa có tour nào",
+        "noToursDescription": "Hiện tại chưa có tour nào cho địa điểm này. Vui lòng quay lại sau."
+    },
+    "provinceTours": {
+        "foundResults": "Tìm thấy {{count}} kết quả",
+        "sortBy": "Sắp xếp theo",
+        "priceLowToHigh": "Giá (từ thấp đến cao)",
+        "priceHighToLow": "Giá (từ cao đến thấp)",
+        "highestRated": "Đánh giá cao nhất",
+        "loading": "Đang tải...",
+        "viewMore": "Xem thêm"
+    },
+    "filterDialog": {
+        "title": "Lọc tour",
+        "filtersApplied": "bộ lọc đang áp dụng",
+        "description": "Chọn các tiêu chí để tìm tour phù hợp với bạn",
+        "priceRange": "Khoảng giá (VNĐ)",
+        "minPrice": "Giá tối thiểu",
+        "maxPrice": "Giá tối đa",
+        "tourDuration": "Thời gian tour",
+        "duration": {
+            "oneDay": "1 ngày",
+            "twoThreeDays": "2-3 ngày",
+            "fourSevenDays": "4-7 ngày",
+            "eightPlusDays": "8+ ngày"
+        },
+        "suitableAge": "Độ tuổi phù hợp",
+        "ageRange": {
+            "children": "Trẻ em (0-5 tuổi)",
+            "kids": "Thiếu nhi (6-12 tuổi)",
+            "teens": "Thiếu niên (13-17 tuổi)",
+            "adults": "Người lớn (18+ tuổi)",
+            "allAges": "Mọi lứa tuổi"
+        },
+        "groupSize": "Số người",
+        "minGroupSize": "Số người tối thiểu",
+        "maxGroupSize": "Số người tối đa",
+        "minimum": "Tối thiểu",
+        "maximum": "Tối đa",
+        "language": "Ngôn ngữ",
+        "startDate": "Ngày khởi hành",
+        "selectStartDate": "Chọn ngày khởi hành",
+        "reset": "Đặt lại",
+        "apply": "Áp dụng"
+    },
+    "settings": {
+        "title": "Cài Đặt Tài Khoản",
+        "changePassword": {
+            "title": "Đổi mật khẩu",
+            "currentPassword": "Mật khẩu hiện tại",
+            "newPassword": "Mật khẩu mới",
+            "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+            "newPasswordPlaceholder": "Nhập mật khẩu mới (tối thiểu 8 ký tự)",
+            "passwordHint": "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số",
+            "confirm": "Xác nhận",
+            "processing": "Đang xử lý...",
+            "success": "Đổi mật khẩu thành công!",
+            "error": "Đổi mật khẩu thất bại",
+            "fillAllFields": "Vui lòng nhập đầy đủ thông tin",
+            "minLength": "Mật khẩu mới phải có ít nhất 8 ký tự",
+            "loginAgain": "Vui lòng đăng nhập lại"
+        },
+        "language": {
+            "title": "Cài đặt ngôn ngữ",
+            "vietnamese": "Tiếng Việt",
+            "english": "English",
+            "confirm": "Xác nhận",
+            "processing": "Đang xử lý...",
+            "success": "Đổi ngôn ngữ thành công!"
+        },
+        "deleteAccount": {
+            "title": "Xoá tài khoản",
+            "warning": "Bạn có chắc chắn muốn xoá tài khoản này? Hành động này không thể hoàn tác.",
+            "enterUsername": "Nhập tên người dùng",
+            "delete": "Xoá tài khoản",
+            "processing": "Đang xử lý...",
+            "success": "Tài khoản đã được xóa thành công",
+            "error": "Xóa tài khoản thất bại",
+            "usernameMismatch": "Tên người dùng không khớp",
+            "loginAgain": "Vui lòng đăng nhập lại",
+            "serverError": "Không thể kết nối đến server. Vui lòng thử lại."
+        },
+        "logout": {
+            "success": "Đã đăng xuất thành công"
+        }
+    }
+}

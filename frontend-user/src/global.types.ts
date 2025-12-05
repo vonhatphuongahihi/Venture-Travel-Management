@@ -97,30 +97,37 @@ export interface TourStop {
 export interface Attraction {
   id: string;
   name: string;
-  images?: string[]; // Additional images for gallery
-  address?: string;
+  images: string[];
+  address: string;
   description: string;
   category: string;
   provinceId: string;
+  province: Province;
   tourCount: number;
-  rating?: number;
-  reviewCount?: number;
-  coordinates?: {
+  rating: number;
+  reviewCount: number;
+  coordinates: {
     lat: number;
     lon: number;
   };
-  province: Province;
-  tours?: ShortTourInfo[]; // Define proper type if available
-  reviews?: AttractionReview[]; // Define proper type if available
+  tours?: ShortTourInfo[];
+  attractionReviews?: AttractionReview[];
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
 }
 
 export interface Province {
   id: string;
   name: string;
-  slug: string;
-  image: string;
-  description: string;
-  point: {
+  slug?: string;
+  image?: string;
+  description?: string;
+  region?: string;
+  coordinates?: {
+    lat: number;
+    long: number;
+  };
+  point?: {
     long: number;
     lat: number;
   };

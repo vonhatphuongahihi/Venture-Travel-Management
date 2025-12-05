@@ -20,8 +20,10 @@ const Sidebar: React.FC = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('remember');
-
-    navigate('/login');
+    sessionStorage.removeItem('token');
+    
+    navigate('/login', { replace: true }); 
+    window.location.reload();
   };
 
   const menus = [

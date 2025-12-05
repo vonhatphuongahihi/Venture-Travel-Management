@@ -1,10 +1,6 @@
 import Layout from "@/components/Layout";
 import { TouristReports } from "@/components/TouristReports";
 
-
-
-
-
 export default function Reports() {
   return (
     <Layout title="Báo cáo">

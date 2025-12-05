@@ -153,7 +153,19 @@ export class UserController {
 
   static async deleteUser(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
       const userId = req.params.id;
+      
+      // Users can only delete their own account, or admin can delete any account
+      if (req.user.userId !== userId && req.user.role !== "ADMIN") {
+        res.status(403).json(ResponseUtils.error("You can only delete your own account"));
+        return;
+      }
+
       const result = await UserService.deleteUser(userId);
 
       if (result.success) {
@@ -255,6 +267,34 @@ export class UserController {
         .json(
           ResponseUtils.error(
             "Failed to get favorite tours",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  // Change password
+  static async changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      const { oldPassword, newPassword } = req.body;
+      const result = await UserService.changePassword(req.user.userId, oldPassword, newPassword);
+
+      if (result.success) {
+        res.status(200).json(result);
+      } else {
+        res.status(400).json(result);
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to change password",
             error instanceof Error ? error.message : "Unknown error"
           )
         );

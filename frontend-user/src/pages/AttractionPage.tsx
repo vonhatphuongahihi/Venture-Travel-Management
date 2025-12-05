@@ -94,7 +94,7 @@ export function AttractionPage() {
         <div className="max-w-7xl mx-auto px-4">
           <AttractionToursSection tours={attraction.tours || []} />
           <AttractionReviewsSection
-            reviews={attraction.reviews || []}
+            reviews={attraction.attractionReviews || []}
             averageRating={attraction.rating || 0}
             totalReviews={attraction.reviewCount || 0}
           />
@@ -102,7 +102,7 @@ export function AttractionPage() {
             provinceId={attraction.provinceId}
             currentAttractionId={attraction.id}
             category={attraction.category}
-            provinceCoordinates={attraction.province.point}
+            provinceCoordinates={attraction.province.coordinates}
           />
         </div>
       </main>

@@ -3,10 +3,10 @@ import type { BookingStatus } from '../types'
 export function StatusPill({ status }: { status: BookingStatus }) {
   const label =
     status === 'completed'
-      ? 'Đã hoàn thành'
+      ? 'Hoàn tất'
       : status === 'pending'
-      ? 'Chờ xác nhận'
-      : 'Đã hủy'
+      ? 'Đang xử lý'
+      : 'Huỷ'
 
   return (
     <span

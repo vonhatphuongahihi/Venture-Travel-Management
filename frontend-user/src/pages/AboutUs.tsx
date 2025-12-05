@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import { MapPin, Users, Target, Award, Heart, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import landscapeSeaImg from "@/assets/landscape-sea.jpg";
 import fansipanImg from "@/assets/fansipan.jpg";
 import fieldImg from "@/assets/village.jpg";
@@ -17,6 +18,7 @@ import thienphuc from "@/assets/members/thienphuc.jpg";
 import huonguyen from "@/assets/members/huonguyen.jpg";
 
 const AboutUs = () => {
+  const { t } = useTranslation();
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -25,7 +27,7 @@ const AboutUs = () => {
     const timer = setTimeout(() => {
       setIsPageLoaded(true);
     }, 100);
-    return () => clearTimeout(timer); 
+    return () => clearTimeout(timer);
   }, []);
 
   const stats = [
@@ -101,49 +103,47 @@ const AboutUs = () => {
   const values = [
     {
       icon: Heart,
-      title: "Tận tâm",
-      description: "Chúng tôi luôn đặt khách hàng lên hàng đầu và phục vụ với trái tim chân thành."
+      title: t('aboutUs.values.dedication.title'),
+      description: t('aboutUs.values.dedication.description')
     },
     {
       icon: Star,
-      title: "Chất lượng",
-      description: "Cam kết mang đến những trải nghiệm du lịch chất lượng cao nhất."
+      title: t('aboutUs.values.quality.title'),
+      description: t('aboutUs.values.quality.description')
     },
     {
       icon: Users,
-      title: "Đồng hành",
-      description: "Luôn bên cạnh khách hàng trong mọi hành trình khám phá."
+      title: t('aboutUs.values.accompany.title'),
+      description: t('aboutUs.values.accompany.description')
     },
     {
       icon: Target,
-      title: "Sáng tạo",
-      description: "Không ngừng đổi mới để tạo ra những tour du lịch độc đáo."
+      title: t('aboutUs.values.creative.title'),
+      description: t('aboutUs.values.creative.description')
     },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
+
       {/* Hero Section */}
       <section className="relative min-h-[40vh] md:h-[50vh] flex items-center justify-center overflow-hidden py-20 md:py-0">
-        <img 
-          src={landscapeSeaImg} 
-          alt="Landscape Sea Background" 
+        <img
+          src={landscapeSeaImg}
+          alt="Landscape Sea Background"
           className="absolute inset-0 w-full h-full object-cover blur-sm"
         />
         <div className="absolute inset-0 bg-black/40"></div>
-        
-        <div className={`container relative z-10 transition-all duration-1000 px-4 ${
-          isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}>
+
+        <div className={`container relative z-10 transition-all duration-1000 px-4 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}>
           <div className="text-center md:text-right">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 text-white leading-tight">
-              Về <span className="text-gradient">VENTURE</span>
+              {t('aboutUs.title')}
             </h1>
             <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl ml-auto mr-auto md:mr-0">
-              Chúng tôi là đối tác tin cậy trong mọi hành trình khám phá của bạn, 
-              mang đến những trải nghiệm du lịch đáng nhớ và ý nghĩa.
+              {t('aboutUs.subtitle')}
             </p>
           </div>
         </div>
@@ -152,31 +152,25 @@ const AboutUs = () => {
       {/* Mission Section */}
       <section className="py-12 md:py-16 bg-background overflow-hidden">
         <div className="container px-4 md:px-8">
-          <div className={`transition-all duration-1000 delay-200 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`transition-all duration-1000 delay-200 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
-                  SỨ MỆNH CỦA CHÚNG TÔI
+                  {t('aboutUs.mission.title')}
                 </h2>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
-                  VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
-                  chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
-                  Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
-                  mà còn là hành trình khám phá bản thân và kết nối với những con người, 
-                  văn hóa mới lạ.
+                  {t('aboutUs.mission.paragraph1')}
                 </p>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
-                  Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
-                  những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
+                  {t('aboutUs.mission.paragraph2')}
                 </p>
               </div>
-              
+
               <div className="relative flex justify-center order-1 lg:order-2">
                 <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:rotate-2">
-                  <img 
-                    src={fansipanImg} 
+                  <img
+                    src={fansipanImg}
                     className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
@@ -189,32 +183,26 @@ const AboutUs = () => {
       {/* Core Competency Section */}
       <section className="py-12 md:py-16 bg-background overflow-hidden">
         <div className="container px-4 md:px-8">
-          <div className={`transition-all duration-1000 delay-200 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`transition-all duration-1000 delay-200 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="relative flex justify-center order-1">
                 <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:-rotate-2">
-                  <img 
-                    src={fieldImg} 
+                  <img
+                    src={fieldImg}
                     className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
               </div>
               <div className="order-2">
                 <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
-                  NĂNG LỰC CỐT LÕI
+                  {t('aboutUs.competency.title')}
                 </h2>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
-                  VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
-                  chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
-                  Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
-                  mà còn là hành trình khám phá bản thân và kết nối với những con người, 
-                  văn hóa mới lạ.
+                  {t('aboutUs.mission.paragraph1')}
                 </p>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
-                  Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
-                  những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
+                  {t('aboutUs.mission.paragraph2')}
                 </p>
               </div>
             </div>
@@ -225,30 +213,24 @@ const AboutUs = () => {
       {/* Activities Section */}
       <section className="py-12 md:py-16 bg-background overflow-hidden">
         <div className="container px-4 md:px-8">
-          <div className={`transition-all duration-1000 delay-200 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`transition-all duration-1000 delay-200 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div className="order-2 lg:order-1">
                 <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-primary text-center lg:text-left">
-                  CÁCH THỨC HOẠT ĐỘNG
+                  {t('aboutUs.activities.title')}
                 </h2>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 text-justify lg:text-left">
-                  VENTURE được thành lập với mục tiêu mang đến những trải nghiệm du lịch 
-                  chất lượng cao, giúp mọi người khám phá vẻ đẹp của Việt Nam và thế giới. 
-                  Chúng tôi tin rằng du lịch không chỉ là việc di chuyển từ nơi này đến nơi khác, 
-                  mà còn là hành trình khám phá bản thân và kết nối với những con người, 
-                  văn hóa mới lạ.
+                  {t('aboutUs.mission.paragraph1')}
                 </p>
                 <p className="text-muted-foreground text-base md:text-lg leading-relaxed text-justify lg:text-left">
-                  Với đội ngũ chuyên nghiệp và giàu kinh nghiệm, chúng tôi cam kết tạo ra 
-                  những hành trình độc đáo, an toàn và đầy cảm hứng cho mọi khách hàng.
+                  {t('aboutUs.mission.paragraph2')}
                 </p>
               </div>
               <div className="relative flex justify-center order-1 lg:order-2">
                 <div className="relative w-full max-w-md lg:w-[75%] transition-all duration-500 hover:scale-105 md:hover:scale-110 hover:rotate-2">
-                  <img 
-                    src={festivalImg} 
+                  <img
+                    src={festivalImg}
                     className="shadow-xl w-full h-[250px] md:h-[280px] object-cover transition-all duration-500 hover:shadow-2xl rounded-lg lg:rounded-none"
                   />
                 </div>
@@ -261,17 +243,16 @@ const AboutUs = () => {
       {/* Values Section */}
       <section className="py-12 md:py-16 bg-background">
         <div className="container px-4 md:px-8">
-          <div className={`transition-all duration-1000 delay-400 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`transition-all duration-1000 delay-400 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">Giá trị</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('aboutUs.values.title')}</h2>
               <div className="w-20 h-1 bg-primary mx-auto mb-8"></div>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Những giá trị định hướng mọi hoạt động của VENTURE
+                {t('aboutUs.values.subtitle')}
               </p>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {values.map((value, index) => (
                 <div key={index} className="text-center p-6 rounded-lg bg-white/50 hover:bg-white/80 transition-all duration-300 hover:shadow-lg border border-transparent hover:border-primary/20">
@@ -290,22 +271,21 @@ const AboutUs = () => {
       {/* Team Section */}
       <section className="py-12 md:py-16 bg-primary/5">
         <div className="container px-4 md:px-8">
-          <div className={`transition-all duration-1000 delay-500 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`transition-all duration-1000 delay-500 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Đội ngũ của chúng tôi</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('aboutUs.team.title')}</h2>
               <div className="w-20 h-1 bg-primary mx-auto mb-6"></div>
             </div>
-            
+
             {/* --- MOBILE VIEW: Grid tĩnh (Không carousel) --- */}
             <div className="block md:hidden">
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {teamMembers.map((member, index) => (
                   <div key={index} className="text-center p-3 bg-white/60 rounded-lg shadow-sm">
                     <div className="w-20 h-20 mx-auto mb-2 relative">
-                      <img 
-                        src={member.image} 
+                      <img
+                        src={member.image}
                         alt={member.name}
                         className="w-full h-full rounded-full object-cover shadow-sm"
                       />
@@ -321,7 +301,7 @@ const AboutUs = () => {
             {/* --- DESKTOP VIEW: Carousel như cũ --- */}
             <div className="hidden md:block relative max-w-6xl mx-auto">
               <div className="overflow-hidden">
-                <div 
+                <div
                   className="flex transition-transform duration-500 ease-in-out"
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
@@ -333,8 +313,8 @@ const AboutUs = () => {
                           .map((member, index) => (
                             <div key={index} className="text-center p-4 bg-white/50 rounded-xl hover:bg-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
                               <div className="w-28 h-28 mx-auto mb-4 relative group">
-                                <img 
-                                  src={member.image} 
+                                <img
+                                  src={member.image}
                                   alt={member.name}
                                   className="w-full h-full rounded-full object-cover transition-all duration-300 group-hover:scale-105 shadow-md"
                                 />
@@ -358,7 +338,7 @@ const AboutUs = () => {
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              
+
               <button
                 onClick={nextSlide}
                 className="absolute -right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-primary hover:text-white text-primary p-3 rounded-full shadow-lg transition-all duration-300 z-10"
@@ -373,11 +353,10 @@ const AboutUs = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                      currentSlide === index 
-                        ? 'bg-primary scale-125 w-5' 
-                        : 'bg-primary/30 hover:bg-primary/50'
-                    }`}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${currentSlide === index
+                      ? 'bg-primary scale-125 w-5'
+                      : 'bg-primary/30 hover:bg-primary/50'
+                      }`}
                   />
                 ))}
               </div>
@@ -389,36 +368,34 @@ const AboutUs = () => {
       {/* Contact CTA Section */}
       <section className="py-12 md:py-16 bg-background">
         <div className="container px-4 md:px-8">
-          <div className={`text-center transition-all duration-1000 delay-600 ${
-            isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}>
+          <div className={`text-center transition-all duration-1000 delay-600 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}>
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Sẵn sàng khám phá cùng <span className="text-gradient">VENTURE</span>?
+              {t('aboutUs.cta.title')}
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-              Hãy để chúng tôi đồng hành cùng bạn trong những hành trình khám phá tuyệt vời nhất.
+              {t('aboutUs.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="w-full sm:w-auto px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors text-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Khám phá Tour
+                {t('aboutUs.cta.exploreTours')}
               </Link>
-              <Link 
-                to="/contact" 
+              <Link
+                to="/contact"
                 className="w-full sm:w-auto px-8 py-3 border border-primary text-primary rounded-full hover:bg-primary/10 transition-colors text-center"
               >
-                Liên hệ tư vấn
+                {t('aboutUs.cta.contactConsult')}
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <div className={`transition-all duration-1000 delay-700 ${
-        isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      }`}>
+      <div className={`transition-all duration-1000 delay-700 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        }`}>
         <Footer />
       </div>
     </div>

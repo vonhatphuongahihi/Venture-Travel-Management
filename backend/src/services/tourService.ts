@@ -14,10 +14,26 @@ interface MapboxIsochroneResponse {
         type: string;
         geometry: {
             type: string;
-            coordinates: number[][][]; // Array of polygons
+            coordinates: number[][][];
         };
         properties: any;
     }>;
+}
+
+interface MapboxDirectionsResponse {
+    code: string;
+    routes: Array<{
+        geometry: {
+            coordinates: number[][]; // Array of [lng, lat] points
+            type: string;
+        };
+        legs: any[];
+        weight_name: string;
+        weight: number;
+        duration: number;
+        distance: number;
+    }>;
+    waypoints: any[];
 }
 
 export class TourService {
@@ -26,67 +42,175 @@ export class TourService {
         this.mapboxAccessToken = mapboxAccessToken || process.env.MAPBOX_ACCESS_TOKEN || "";
     }
 
-    async createTour(data: CreateTourRequest, userId: string) {
+    async createTour(data: CreateTourRequest) {
         try {
             await this.validateTourData(data);
 
-            const tour = await this.prisma.$transaction(async (tx) => {
-                const pickupPointId = await this.findOrCreatePoint(tx, data.pickupPointCoordinates);
-
-                const pickupAreaPolygonId = await this.createPickupAreaPolygon(
-                    tx,
+            let pickupAreaPolygonData: any;
+            if (data.pickupAreaRadius) {
+                pickupAreaPolygonData = await this.preparePickupAreaData(
                     data.pickupPointCoordinates,
                     data.pickupAreaRadius
                 );
+            }
 
-                let endPointId: string | undefined;
-                if (data.endPointCoordinates) {
-                    endPointId = await this.findOrCreatePoint(tx, data.endPointCoordinates);
-                }
-                const newTour = await tx.tour.create({
-                    data: {
-                        name: data.name,
-                        images: data.images,
-                        about: data.about,
-                        ageRange: data.ageRange,
-                        maxGroupSize: data.maxGroupSize,
-                        duration: data.duration,
-                        languages: data.languages,
-                        categories: data.categories,
-                        highlights: data.highlights || [],
-                        inclusions: data.inclusions,
-                        exclusions: data.exclusions,
-                        expectations: data.expectations,
-                        pickupPoint: data.pickupPoint,
-                        pickupPointGeom: pickupPointId,
-                        pickupDetails: data.pickupDetails,
-                        pickupAreaGeom: pickupAreaPolygonId,
-                        endPoint: data.endPoint,
-                        endPointGeom: endPointId,
-                        additionalInformation: data.additionalInformation,
-                        cancellationPolicy: data.cancellationPolicy,
-                        startDate: data.startDate,
-                        endDate: data.endDate,
-                        isActive: true,
-                    },
+            // 1.2. Chuẩn bị routes data
+            let routesData: Array<{
+                startCoordinates: PointCoordinates;
+                endCoordinates: PointCoordinates;
+                routeCoordinates: number[][];
+            }> = [];
+
+            if (data.tourStops && data.tourStops.length > 0) {
+                // Lấy attractions trước
+                const attractionIds = data.tourStops.map((stop) => stop.attractionId);
+                const attractions = await this.prisma.attraction.findMany({
+                    where: { attractionId: { in: attractionIds } },
+                    include: { point: true },
                 });
 
-                if (data.tourStops && data.tourStops.length > 0) {
-                    await this.createTourStops(tx, newTour.tourId, data.tourStops);
+                const attractionMap = new Map(attractions.map((attr) => [attr.attractionId, attr]));
+
+                // Chuẩn bị routes data
+                routesData = await this.prepareRoutesData(
+                    data.pickupPointCoordinates,
+                    data.tourStops,
+                    attractionMap,
+                    "driving"
+                );
+            }
+
+            const tour = await this.prisma.$transaction(
+                async (tx) => {
+                    const pickupPointId = await this.findOrCreatePoint(
+                        tx,
+                        data.pickupPointCoordinates
+                    );
+
+                    // 2.2. Tạo pickup area polygon (nếu có data)
+                    let pickupAreaPolygonId: string;
+                    pickupAreaPolygonId = await this.createPolygonFromData(
+                        tx,
+                        pickupAreaPolygonData
+                    );
+
+                    // 2.3. Tìm hoặc tạo end point (nếu có)
+                    let endPointId: string | undefined;
+                    if (data.endPointCoordinates) {
+                        endPointId = await this.findOrCreatePoint(tx, data.endPointCoordinates);
+                    }
+
+                    // 2.4. Tạo routes từ data đã chuẩn bị
+                    if (routesData.length > 0) {
+                        await this.createRoutesFromData(tx, routesData);
+                    }
+
+                    const newTour = await tx.tour.create({
+                        data: {
+                            name: data.name,
+                            images: data.images,
+                            about: data.about,
+                            ageRange: data.ageRange,
+                            maxGroupSize: data.maxGroupSize,
+                            duration: data.duration,
+                            languages: data.languages,
+                            categories: data.categories,
+                            highlights: data.highlights || [],
+                            inclusions: data.inclusions,
+                            exclusions: data.exclusions,
+                            expectations: data.expectations,
+                            pickupPoint: data.pickupPoint,
+                            pickupPointGeom: pickupPointId,
+                            pickupDetails: data.pickupDetails,
+                            pickupAreaGeom: pickupAreaPolygonId,
+                            endPoint: data.endPoint,
+                            endPointGeom: endPointId,
+                            additionalInformation: data.additionalInformation,
+                            cancellationPolicy: data.cancellationPolicy,
+                            startDate: data.startDate,
+                            endDate: data.endDate,
+                            isActive: true,
+                        },
+                    });
+
+                    if (data.tourStops && data.tourStops.length > 0) {
+                        await this.createTourStops(tx, newTour.tourId, data.tourStops);
+                    }
+
+                    // 3. Tạo các loại vé và giá vé
+                    if (data.ticketTypes && data.ticketTypes.length > 0) {
+                        await this.createTicketTypes(tx, newTour.tourId, data.ticketTypes);
+                    }
+
+                    return newTour;
+                },
+                {
+                    timeout: 45000,
+                    maxWait: 25000,
                 }
+            );
 
-                // 3. Tạo các loại vé và giá vé
-                if (data.ticketTypes && data.ticketTypes.length > 0) {
-                    await this.createTicketTypes(tx, newTour.tourId, data.ticketTypes);
-                }
-
-                return newTour;
-            });
-
-            // Lấy thông tin tour đầy đủ sau khi tạo
-            return await this.getTourById(tour.tourId);
+            return tour;
         } catch (error) {
             throw this.handleError(error);
+        }
+    }
+
+    private async findOrCreateNode(tx: any, pointId: string): Promise<string> {
+        // Tìm node đã tồn tại
+        const existingNode = await tx.node.findUnique({
+            where: { pointId },
+        });
+
+        if (existingNode) {
+            return existingNode.nodeId;
+        }
+
+        // Tạo node mới
+        const newNode = await tx.node.create({
+            data: {
+                pointId,
+            },
+        });
+
+        return newNode.nodeId;
+    }
+
+    /**
+     * Gọi Mapbox Directions API
+     */
+    private async fetchMapboxDirections(
+        startCoordinates: PointCoordinates,
+        endCoordinates: PointCoordinates,
+        mode: "driving" | "walking" | "cycling"
+    ): Promise<MapboxDirectionsResponse> {
+        if (!this.mapboxAccessToken) {
+            throw new Error("Mapbox access token chưa được cấu hình");
+        }
+
+        // Format: lng,lat;lng,lat
+        const coordinates = `${startCoordinates.longitude},${startCoordinates.latitude};${endCoordinates.longitude},${endCoordinates.latitude}`;
+
+        const url = `https://api.mapbox.com/directions/v5/mapbox/${mode}/${coordinates}`;
+
+        const params = {
+            geometries: "geojson", // Trả về geometry dạng GeoJSON
+            overview: "full", // Trả về toàn bộ route
+            steps: false, // Không cần turn-by-turn directions
+            access_token: this.mapboxAccessToken,
+        };
+
+        try {
+            const response = await axios.get<MapboxDirectionsResponse>(url, { params });
+
+            if (response.data.code !== "Ok") {
+                throw new Error(`Mapbox Directions API error: ${response.data.code}`);
+            }
+
+            return response.data;
+        } catch (error) {
+            console.error("Mapbox Directions API error:", error);
+            throw new Error("Lỗi khi gọi Mapbox Directions API");
         }
     }
 
@@ -104,7 +228,6 @@ export class TourService {
             return existingPoint.pointId;
         }
 
-        // Nếu chưa tồn tại, tạo mới
         const newPoint = await tx.point.create({
             data: {
                 latitude,
@@ -113,57 +236,6 @@ export class TourService {
         });
 
         return newPoint.pointId;
-    }
-
-    private async createPickupAreaPolygon(
-        tx: any,
-        pickupCoordinates: PointCoordinates,
-        radius: number
-    ): Promise<string> {
-        try {
-            const { latitude, longitude } = pickupCoordinates;
-
-            // Gọi Mapbox Isochrone API
-            const isochroneData = await this.fetchMapboxIsochrone(longitude, latitude, radius);
-
-            if (!isochroneData || !isochroneData.features || isochroneData.features.length === 0) {
-                throw new Error("Không thể tạo vùng đón khách từ Mapbox");
-            }
-
-            const polygonCoordinates = isochroneData.features[0].geometry.coordinates[0];
-
-            const polygon = await tx.polygon.create({
-                data: {},
-            });
-
-            const polygonPointsData = [];
-            for (const coord of polygonCoordinates) {
-                const [lng, lat] = coord;
-
-                const pointId = await this.findOrCreatePoint(tx, {
-                    latitude: lat,
-                    longitude: lng,
-                });
-
-                polygonPointsData.push({
-                    polygonId: polygon.polygonId,
-                    pointId: pointId,
-                });
-            }
-
-            // Tạo tất cả polygon points
-            await tx.polygonPoint.createMany({
-                data: polygonPointsData,
-            });
-
-            return polygon.polygonId;
-        } catch (error) {
-            console.error("Error creating pickup area polygon:", error);
-            throw new Error(
-                "Không thể tạo vùng đón khách: " +
-                    (error instanceof Error ? error.message : "Unknown error")
-            );
-        }
     }
 
     private async fetchMapboxIsochrone(
@@ -191,6 +263,203 @@ export class TourService {
         } catch (error) {
             console.error("Mapbox Isochrone API error:", error);
             throw new Error("Lỗi khi gọi Mapbox Isochrone API");
+        }
+    }
+
+    private async preparePickupAreaData(
+        pickupCoordinates: PointCoordinates,
+        radius: number
+    ): Promise<number[][]> {
+        try {
+            const { latitude, longitude } = pickupCoordinates;
+
+            const isochroneData = await this.fetchMapboxIsochrone(longitude, latitude, radius);
+
+            if (!isochroneData || !isochroneData.features || isochroneData.features.length === 0) {
+                throw new Error("Không thể tạo vùng đón khách từ Mapbox");
+            }
+
+            console.log("prepare pickup area data");
+
+            return isochroneData.features[0].geometry.coordinates[0];
+        } catch (error) {
+            console.error("Error preparing pickup area data:", error);
+            throw error;
+        }
+    }
+
+    /**
+     * Tạo polygon từ data đã chuẩn bị TRONG transaction
+     */
+    private async createPolygonFromData(tx: any, polygonCoordinates: number[][]): Promise<string> {
+        // Tạo Polygon
+        const polygon = await tx.polygon.create({
+            data: {},
+        });
+
+        // Tạo các PolygonPoints
+        const polygonPointsData = [];
+        for (let i = 0; i < polygonCoordinates.length; i++) {
+            const [lng, lat] = polygonCoordinates[i];
+
+            const point = await tx.point.create({
+                data: {
+                    latitude: lat,
+                    longitude: lng,
+                },
+            });
+
+            polygonPointsData.push({
+                polygonId: polygon.polygonId,
+                pointId: point.pointId,
+                sequence: i,
+            });
+        }
+
+        await tx.polygonPoint.createMany({
+            data: polygonPointsData,
+        });
+
+        return polygon.polygonId;
+    }
+
+    /**
+     * Chuẩn bị dữ liệu routes NGOÀI transaction
+     */
+    private async prepareRoutesData(
+        pickupCoordinates: PointCoordinates,
+        tourStops: CreateTourStopRequest[],
+        attractionMap: Map<string, any>,
+        mode: "driving" | "walking" | "cycling"
+    ): Promise<
+        Array<{
+            startCoordinates: PointCoordinates;
+            endCoordinates: PointCoordinates;
+            routeCoordinates: number[][];
+        }>
+    > {
+        const routesData = [];
+        let currentCoordinates = pickupCoordinates;
+
+        for (const stop of tourStops) {
+            const attraction = attractionMap.get(stop.attractionId);
+
+            if (!attraction || !attraction.point) {
+                console.warn(`Attraction ${stop.attractionId} không có tọa độ, bỏ qua route`);
+                continue;
+            }
+
+            const nextCoordinates: PointCoordinates = {
+                latitude: attraction.point.latitude,
+                longitude: attraction.point.longitude,
+            };
+
+            // Gọi Mapbox Directions API
+            try {
+                const routeData = await this.fetchMapboxDirections(
+                    currentCoordinates,
+                    nextCoordinates,
+                    mode
+                );
+
+                if (routeData && routeData.routes && routeData.routes.length > 0) {
+                    routesData.push({
+                        startCoordinates: currentCoordinates,
+                        endCoordinates: nextCoordinates,
+                        routeCoordinates: routeData.routes[0].geometry.coordinates,
+                    });
+                }
+
+                console.log("prepare route data");
+            } catch (error) {
+                console.error(`Error fetching route data:`, error);
+                // Continue với routes khác nếu 1 route fail
+            }
+
+            currentCoordinates = nextCoordinates;
+        }
+
+        return routesData;
+    }
+
+    /**
+     * Tạo routes từ data đã chuẩn bị TRONG transaction
+     */
+    private async createRoutesFromData(
+        tx: any,
+        routesData: Array<{
+            startCoordinates: PointCoordinates;
+            endCoordinates: PointCoordinates;
+            routeCoordinates: number[][];
+        }>
+    ): Promise<void> {
+        for (const route of routesData) {
+            try {
+                // Tìm hoặc tạo start/end points
+                const startPointId = await this.findOrCreatePoint(tx, route.startCoordinates);
+                const endPointId = await this.findOrCreatePoint(tx, route.endCoordinates);
+
+                // Tìm hoặc tạo nodes
+                const startNodeId = await this.findOrCreateNode(tx, startPointId);
+                const endNodeId = await this.findOrCreateNode(tx, endPointId);
+
+                // Kiểm tra arc đã tồn tại
+                const existingArc = await tx.arc.findFirst({
+                    where: {
+                        startNodeId,
+                        endNodeId,
+                    },
+                    include: {
+                        arcPoints: true,
+                    },
+                });
+
+                if (existingArc && existingArc.arcPoints.length > 0) {
+                    console.log(`Route already exists: ${startNodeId} -> ${endNodeId}`);
+                    continue;
+                }
+
+                // Tạo Arc
+                let arc = existingArc;
+                if (!arc) {
+                    arc = await tx.arc.create({
+                        data: {
+                            startNodeId,
+                            endNodeId,
+                        },
+                    });
+                }
+
+                // Tạo ArcPoints
+                const arcPointsData = [];
+                for (let i = 0; i < route.routeCoordinates.length; i++) {
+                    const [lng, lat] = route.routeCoordinates[i];
+
+                    const point = await tx.point.create({
+                        data: {
+                            latitude: lat,
+                            longitude: lng,
+                        },
+                    });
+
+                    arcPointsData.push({
+                        arcId: arc.arcId,
+                        pointId: point.pointId,
+                        sequence: i,
+                    });
+                }
+
+                await tx.arcPoint.createMany({
+                    data: arcPointsData,
+                    skipDuplicates: true,
+                });
+
+                console.log(
+                    `Created route: ${startNodeId} -> ${endNodeId} with ${arcPointsData.length} points`
+                );
+            } catch (error) {
+                console.error("Error creating route from data:", error);
+            }
         }
     }
 
@@ -290,40 +559,118 @@ export class TourService {
         }
     }
 
-    /**
-     * Lấy thông tin tour theo ID với đầy đủ relations
-     */
-    async getTourById(tourId: string) {
-        const tour = await this.prisma.tour.findUnique({
-            where: { tourId },
-            include: {
-                province: true,
-                tourStops: {
-                    include: {
-                        attraction: true,
-                    },
-                    orderBy: {
-                        stopOrder: "asc",
+    async getAllAttractions(filters?: { provinceId?: string; category?: string; search?: string }) {
+        const where: any = {};
+
+        if (filters?.provinceId) {
+            where.provinceId = filters.provinceId;
+        }
+
+        if (filters?.category) {
+            where.category = filters.category;
+        }
+
+        if (filters?.search) {
+            where.OR = [
+                { name: { contains: filters.search, mode: "insensitive" } },
+                { address: { contains: filters.search, mode: "insensitive" } },
+                { description: { contains: filters.search, mode: "insensitive" } },
+            ];
+        }
+
+        const attractions = await this.prisma.attraction.findMany({
+            where,
+            select: {
+                attractionId: true,
+                name: true,
+                address: true,
+                description: true,
+
+                province: {
+                    select: {
+                        provinceId: true,
+                        name: true,
                     },
                 },
-                ticketTypes: {
-                    include: {
-                        ticketPrices: {
-                            include: {
-                                priceCategory: true,
-                            },
-                        },
+
+                point: {
+                    select: {
+                        pointId: true,
+                        latitude: true,
+                        longitude: true,
                     },
                 },
             },
+            orderBy: {
+                name: "asc",
+            },
         });
 
-        if (!tour) {
-            throw new Error("Tour không tồn tại");
-        }
-
-        return tour;
+        return attractions;
     }
+
+    /**
+     * Lấy tất cả price categories
+     */
+    async getAllPriceCategories() {
+        const categories = await this.prisma.priceCategory.findMany({
+            orderBy: {
+                name: "asc",
+            },
+        });
+
+        return categories;
+    }
+
+    /**
+     * Lấy metadata cho form tạo tour
+     * Bao gồm: attractions, price categories, provinces
+     */
+    async getTourFormMetadata(provinceId?: string) {
+        const [attractions, priceCategories] = await Promise.all([
+            this.getAllAttractions(provinceId ? { provinceId } : undefined),
+            this.getAllPriceCategories(),
+        ]);
+
+        return {
+            attractions,
+            priceCategories,
+        };
+    }
+    /**
+     * Lấy thông tin tour theo ID với đầy đủ relations
+     */
+    // async getTourById(tourId: string) {
+    //     const tour = await this.prisma.tour.findUnique({
+    //         where: { tourId },
+    //         include: {
+    //             province: true,
+    //             tourStops: {
+    //                 include: {
+    //                     attraction: true,
+    //                 },
+    //                 orderBy: {
+    //                     stopOrder: "asc",
+    //                 },
+    //             },
+    //             ticketTypes: {
+    //                 include: {
+    //                     ticketPrices: {
+    //                         include: {
+    //                             priceCategory: true,
+    //                         },
+    //                     },
+    //                 },
+    //             },
+    //         },
+    //     });
+
+    //     if (!tour) {
+    //         throw new Error("Tour không tồn tại");
+    //     }
+
+    //     return tour;
+    // }
 
     private handleError(error: any): Error {
         if (error instanceof Error) {

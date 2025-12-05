@@ -30,11 +30,13 @@ function AttractionHeroSection({ attraction }: AttractionHeroSectionProps) {
   const reviewInfo = useMemo(() => {
     return {
       rating:
-        attraction.reviews.reduce((sum, review) => sum + review.rate, 0) /
-        (attraction.reviews.length || 1),
-      count: attraction.reviews.length,
+        (attraction.attractionReviews || []).reduce(
+          (sum, review) => sum + review.rate,
+          0
+        ) / ((attraction.attractionReviews || []).length || 1),
+      count: (attraction.attractionReviews || []).length,
     };
-  }, [attraction.reviews]);
+  }, [attraction.attractionReviews]);
 
   useEffect(() => {
     if (textRef.current) {

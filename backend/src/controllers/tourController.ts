@@ -37,7 +37,7 @@ export class TourController {
                 prisma.tour.findMany({
                     where,
                     include: {
-                        reviews: {
+                        tourReviews: {
                             select: {
                                 rate: true,
                             },
@@ -66,8 +66,8 @@ export class TourController {
             // Format response
             const formattedTours = tours.map((tour: any) => {
                 // Calculate average rating
-                const avgRating = tour.reviews.length > 0
-                    ? tour.reviews.reduce((sum: number, review: any) => sum + review.rate, 0) / tour.reviews.length
+                const avgRating = tour.tourReviews.length > 0
+                    ? tour.tourReviews.reduce((sum: number, review: any) => sum + review.rate, 0) / tour.tourReviews.length
                     : 0;
 
                 // Get base price from ticket prices
@@ -96,7 +96,7 @@ export class TourController {
                     duration: tour.duration,
                     location: 'Việt Nam',
                     rating: Math.round(avgRating * 10) / 10,
-                    reviewCount: tour.reviews.length,
+                    reviewCount: tour.tourReviews.length,
                     category: tour.categories && tour.categories.length > 0 ? tour.categories[0] : 'Tour du lịch',
                     categories: tour.categories,
                     status,
@@ -166,7 +166,7 @@ export class TourController {
                             },
                         },
                     },
-                    reviews: {
+                    tourReviews: {
                         include: {
                             user: {
                                 select: {
@@ -201,8 +201,8 @@ export class TourController {
             }
 
             // Calculate average rating
-            const avgRating = tour.reviews.length > 0
-                ? tour.reviews.reduce((sum: number, review: any) => sum + review.rate, 0) / tour.reviews.length
+            const avgRating = tour.tourReviews.length > 0
+                ? tour.tourReviews.reduce((sum: number, review: any) => sum + review.rate, 0) / tour.tourReviews.length
                 : 0;
 
             // Format response
@@ -213,7 +213,7 @@ export class TourController {
                 about: tour.about,
                 price: 0, // Will be calculated from ticket prices
                 rating: Math.round(avgRating * 10) / 10,
-                reviewCount: tour.reviews.length,
+                reviewCount: tour.tourReviews.length,
                 duration: tour.duration,
                 ageRange: tour.ageRange,
                 maxGroupSize: tour.maxGroupSize,
@@ -262,7 +262,7 @@ export class TourController {
                         notes: price.notes,
                     })),
                 })),
-                reviews: tour.reviews.map((review: any) => ({
+                tourReviews: tour.tourReviews.map((review: any) => ({
                     reviewId: review.reviewId,
                     user: {
                         id: review.user.userId,

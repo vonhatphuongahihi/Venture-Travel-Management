@@ -3,10 +3,24 @@ import { Attraction } from "@/global.types";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:3001/api";
 
+export interface PaginationData {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface AttractionResponse {
   success: boolean;
   message: string;
-  data?: Attraction | Attraction[] | any;
+  data?:
+    | Attraction
+    | Attraction[]
+    | {
+        destinations?: Attraction[];
+        attractions?: Attraction[];
+        pagination?: PaginationData;
+      };
 }
 
 export interface TopDestination {
@@ -18,8 +32,14 @@ export interface TopDestination {
   description: string;
   category: string;
   provinceId: string;
-  provinceName: string;
+  province?: {
+    id: string;
+    name: string;
+    region?: string;
+  };
   tourCount: number;
+  rating: number;
+  reviewCount: number;
 }
 
 class AttractionAPI {
@@ -46,22 +66,29 @@ class AttractionAPI {
 
       const result: AttractionResponse = await response.json();
 
-      if (result.success && result.data && result.data.destinations) {
-        return result.data.destinations.map((destination: any) => ({
-          id: destination.id || destination.attractionId || "",
+      if (
+        result.success &&
+        result.data &&
+        typeof result.data === "object" &&
+        "destinations" in result.data &&
+        result.data.destinations
+      ) {
+        return result.data.destinations.map((destination) => ({
+          id: destination.id || "",
           name: destination.name || "",
           images: destination.images || [],
           image:
-            destination.image ||
-            (destination.images && destination.images.length > 0
+            destination.images && destination.images.length > 0
               ? destination.images[0]
-              : "/placeholder.svg"),
+              : "/placeholder.svg",
           address: destination.address || "",
           description: destination.description || "",
           category: destination.category || "",
           provinceId: destination.provinceId || "",
-          provinceName: destination.provinceName || "",
+          province: destination.province,
           tourCount: destination.tourCount || 0,
+          rating: destination.rating || 0,
+          reviewCount: destination.reviewCount || 0,
         }));
       }
 
@@ -80,7 +107,7 @@ class AttractionAPI {
     category?: string;
     sortBy?: string;
     order?: "asc" | "desc";
-  }): Promise<{ attractions: Attraction[]; pagination: any }> {
+  }): Promise<{ attractions: Attraction[]; pagination: PaginationData }> {
     try {
       const queryParams = new URLSearchParams();
       if (params) {
@@ -112,26 +139,31 @@ class AttractionAPI {
 
       const result: AttractionResponse = await response.json();
 
-      if (result.success && result.data && result.data.attractions) {
+      if (
+        result.success &&
+        result.data &&
+        typeof result.data === "object" &&
+        "attractions" in result.data &&
+        result.data.attractions
+      ) {
         return {
-          attractions: result.data.attractions.map((attraction: any) => ({
-            id: attraction.id || attraction.attractionId || "",
+          attractions: result.data.attractions.map((attraction) => ({
+            id: attraction.id || "",
             name: attraction.name || "",
             images: attraction.images || [],
-            image:
-              attraction.image ||
-              (attraction.images && attraction.images.length > 0
-                ? attraction.images[0]
-                : "/placeholder.svg"),
             address: attraction.address || "",
             description: attraction.description || "",
             category: attraction.category || "",
             provinceId: attraction.provinceId || "",
-            provinceName: attraction.provinceName || "",
+            province: attraction.province,
             tourCount: attraction.tourCount || 0,
-            rating: attraction.rating,
-            reviewCount: attraction.reviewCount,
-            coordinates: attraction.coordinates || null,
+            rating: attraction.rating || 0,
+            reviewCount: attraction.reviewCount || 0,
+            coordinates: attraction.coordinates || { lat: 0, lon: 0 },
+            tours: attraction.tours || [],
+            attractionReviews: attraction.attractionReviews || [],
+            createdAt: attraction.createdAt || new Date().toISOString(),
+            updatedAt: attraction.updatedAt || new Date().toISOString(),
           })),
           pagination: result.data.pagination || {
             page: 1,
@@ -173,9 +205,8 @@ class AttractionAPI {
 
       const result: AttractionResponse = await response.json();
 
-      if (result.success && result.data) {
-        const attraction = result.data;
-        return attraction;
+      if (result.success && result.data && !Array.isArray(result.data)) {
+        return result.data as Attraction;
       }
 
       return null;

@@ -3,13 +3,21 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface PickUpAreaMapProps {
-    pickupPoint: [number, number]; // [lng, lat]
-    pickupAreaCoordinates: [number, number][]; // array of [lng, lat]
+    pickupPoint: [number, number];
+    pickupAreaCoordinates: [number, number][];
+    selectedAddress?: [number, number] | null;
+    selectedAddressName?: string;
 }
 
-export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: PickUpAreaMapProps) {
+export default function PickUpAreaMap({
+    pickupPoint,
+    pickupAreaCoordinates,
+    selectedAddress,
+    selectedAddressName
+}: PickUpAreaMapProps) {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
+    const selectedMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
     useEffect(() => {
         if (!mapContainerRef.current || !pickupAreaCoordinates || pickupAreaCoordinates.length === 0) return;
@@ -22,7 +30,6 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
 
         mapboxgl.accessToken = MAPBOX_TOKEN;
 
-        // Initialize map
         const map = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: 'mapbox://styles/mapbox/streets-v12',
@@ -33,9 +40,7 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
         mapInstanceRef.current = map;
 
         map.on('load', () => {
-            // Add polygon for pickup area
             if (pickupAreaCoordinates.length > 0) {
-                // Create a closed polygon by adding the first point at the end
                 const coordinates = [...pickupAreaCoordinates, pickupAreaCoordinates[0]];
 
                 map.addSource('pickup-area', {
@@ -50,7 +55,6 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
                     },
                 });
 
-                // Add fill layer (green with transparency)
                 map.addLayer({
                     id: 'pickup-area-fill',
                     type: 'fill',
@@ -61,7 +65,6 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
                     },
                 });
 
-                // Add border layer
                 map.addLayer({
                     id: 'pickup-area-border',
                     type: 'line',
@@ -72,7 +75,6 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
                     },
                 });
 
-                // Fit map to polygon bounds
                 const bounds = new mapboxgl.LngLatBounds();
                 pickupAreaCoordinates.forEach((coord) => {
                     bounds.extend(coord);
@@ -80,7 +82,6 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
                 map.fitBounds(bounds, { padding: 50 });
             }
 
-            // Add pickup point marker if available
             if (pickupPoint[0] !== 0 && pickupPoint[1] !== 0) {
                 const el = document.createElement('div');
                 el.innerHTML = `
@@ -111,17 +112,66 @@ export default function PickUpAreaMap({ pickupPoint, pickupAreaCoordinates }: Pi
                     )
                     .addTo(map);
             }
-
         });
 
-        // Cleanup
         return () => {
+            if (selectedMarkerRef.current) {
+                selectedMarkerRef.current.remove();
+                selectedMarkerRef.current = null;
+            }
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
             }
         };
     }, [pickupPoint, pickupAreaCoordinates]);
+
+    useEffect(() => {
+        if (!mapInstanceRef.current || !mapInstanceRef.current.loaded()) return;
+
+        if (selectedMarkerRef.current) {
+            selectedMarkerRef.current.remove();
+            selectedMarkerRef.current = null;
+        }
+
+        if (selectedAddress && selectedAddress[0] !== 0 && selectedAddress[1] !== 0) {
+            const selectedEl = document.createElement('div');
+            selectedEl.innerHTML = `
+          <div style="
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5), 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+          ">
+            📌
+          </div>
+        `;
+
+            selectedMarkerRef.current = new mapboxgl.Marker(selectedEl)
+                .setLngLat(selectedAddress)
+                .setPopup(
+                    new mapboxgl.Popup({ offset: 25 }).setHTML(
+                        `<div style="padding: 8px; font-family: 'Inter', sans-serif;">
+                <p style="margin: 0; font-weight: 600; color: #3b82f6;">Địa chỉ đã chọn</p>
+                ${selectedAddressName ? `<p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">${selectedAddressName}</p>` : ''}
+              </div>`
+                    )
+                )
+                .addTo(mapInstanceRef.current);
+
+            mapInstanceRef.current.flyTo({
+                center: selectedAddress,
+                zoom: 15,
+                duration: 1000
+            });
+        }
+    }, [selectedAddress, selectedAddressName]);
 
     if (!pickupAreaCoordinates || pickupAreaCoordinates.length === 0) {
         return (

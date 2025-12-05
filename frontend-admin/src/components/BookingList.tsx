@@ -1,150 +1,123 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { StatusPill } from "./StatusPill";
-import { ChevronDown, Pencil, Search, Trash } from "lucide-react"; // dùng icon chuẩn
+import { ChevronDown, Pencil, Search, Trash, Plus } from "lucide-react";
+import { BookingAPI } from "@/services/BookingAPI"; // client API
+import type { Booking } from "./BookingModal";
+import DeleteConfirm from "./DeleteConfirm";
 
-// --- Types ---
-export type BookingStatus = "completed" | "pending" | "canceled";
-export type PaymentStatus = "unpaid" | "paid" | "refunded";
-
-export type Booking = {
-  id: string;
-  customerName: string;
-  customerAvatarUrl: string;
-  tourTitle: string;
-  bookedAt: string;
-  startAt: string;
-  status: BookingStatus;
-  email: string;
-  phone: string;
-  address: string;
-  quantity: number;
-  paymentStatus: PaymentStatus;
-  tourSlug: string;
-  note?: string;
-};
-
-// --- Data ---
-const initialBookings: Booking[] = [
-  {
-    id: "b1",
-    customerName: "Thùy Dương",
-    customerAvatarUrl:
-      "https://i.pinimg.com/originals/26/82/bf/2682bf05bc23c0b6a1145ab9c966374b.png",
-    tourTitle: "Sapa – Fansipan – Bản Cát Cát",
-    bookedAt: "12.09.2019 - 12:53 PM",
-    startAt: "12.09.2019 - 12:53 PM",
-    status: "completed",
-    email: "thuongxpxk0904@gmail.com",
-    phone: "0324456786",
-    address: "Số 1 Nguyễn Huệ, Q1, TP.HCM",
-    quantity: 5,
-    paymentStatus: "paid",
-    tourSlug: "sapa-fansipan",
-  },
-  {
-    id: "b2",
-    customerName: "Thùy Dương",
-    customerAvatarUrl:
-      "https://i.pinimg.com/originals/26/82/bf/2682bf05bc23c0b6a1145ab9c966374b.png",
-    tourTitle: "Sapa – Fansipan – Bản Cát Cát",
-    bookedAt: "12.09.2019 - 12:53 PM",
-    startAt: "12.09.2019 - 12:53 PM",
-    status: "pending",
-    email: "thuongxpxk0904@gmail.com",
-    phone: "0324456786",
-    address: "Số 1 Nguyễn Huệ, Q1, TP.HCM",
-    quantity: 5,
-    paymentStatus: "unpaid",
-    tourSlug: "sapa-fansipan",
-  },
-  {
-    id: "b3",
-    customerName: "Thùy Dương",
-    customerAvatarUrl:
-      "https://i.pinimg.com/originals/26/82/bf/2682bf05bc23c0b6a1145ab9c966374b.png",
-    tourTitle: "Sapa – Fansipan – Bản Cát Cát",
-    bookedAt: "12.09.2019 - 12:53 PM",
-    startAt: "12.09.2019 - 12:53 PM",
-    status: "canceled",
-    email: "thuongxpxk0904@gmail.com",
-    phone: "0324456786",
-    address: "Số 1 Nguyễn Huệ, Q1, TP.HCM",
-    quantity: 5,
-    paymentStatus: "refunded",
-    tourSlug: "sapa-fansipan",
-  },
-];
-
-// --- Options ---
-const statusOptions: { label: string; value: BookingStatus | "all" }[] = [
-  { label: "Chọn trạng thái", value: "all" },
-  { label: "Đã hoàn thành", value: "completed" },
-  { label: "Chờ xác nhận", value: "pending" },
-  { label: "Đã hủy", value: "canceled" },
-];
-
-// --- Component ---
 export function BookingList() {
-  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<BookingStatus | "all">("all");
-  const [tour, setTour] = useState<string>("all");
+  const [status, setStatus] = useState<Booking["status"] | "all">("all");
   const [selected, setSelected] = useState<Booking | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
 
-  const tourOptions = useMemo(() => {
-    const unique = Array.from(new Set(bookings.map((b) => b.tourTitle)));
-    return ["all", ...unique];
-  }, [bookings]);
+  const statusOptions = [
+    { label: "Chọn trạng thái", value: "all" },
+    { label: "Hoàn tất", value: "completed" },
+    { label: "Đang xử lý", value: "pending" },
+    { label: "Huỷ", value: "canceled" },
+  ];
+
+  // --- Load bookings từ backend ---
+  const fetchBookings = async () => {
+    setLoading(true);
+    try {
+      const data = await BookingAPI.getBookings();
+      setBookings(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const filtered = useMemo(() => {
+    const q = query.toLowerCase();
     return bookings.filter((b) => {
+      const ticketNames = b.bookingDetails
+        .map((d) => d.ticketTypeName)
+        .join(" ")
+        .toLowerCase();
       const matchesQuery =
-        query.trim() === "" ||
-        b.customerName.toLowerCase().includes(query.toLowerCase()) ||
-        b.tourTitle.toLowerCase().includes(query.toLowerCase());
+        b.name.toLowerCase().includes(q) ||
+        b.email.toLowerCase().includes(q) ||
+        ticketNames.includes(q);
       const matchesStatus = status === "all" ? true : b.status === status;
-      const matchesTour = tour === "all" ? true : b.tourTitle === tour;
-      return matchesQuery && matchesStatus && matchesTour;
+      return matchesQuery && matchesStatus;
     });
-  }, [bookings, query, status, tour]);
+  }, [bookings, query, status]);
 
-  function removeBooking(id: string) {
-    setBookings((prev) => prev.filter((b) => b.id !== id));
-  }
+  const removeBooking = async (id: string) => {
+    try {
+      await BookingAPI.deleteBooking(id);
+      setBookings((prev) => prev.filter((b) => b.bookingId !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  function saveBooking(updated: Booking) {
-    setBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
-    setSelected(null);
-  }
+  const saveBooking = async (b: Booking, isNew = false) => {
+    try {
+      let updated: Booking;
+      if (isNew) {
+        updated = await BookingAPI.createBooking(b);
+        setBookings((prev) => [...prev, updated]);
+      } else {
+        updated = await BookingAPI.updateBooking(b.bookingId, b);
+        setBookings((prev) =>
+          prev.map((item) =>
+            item.bookingId === updated.bookingId ? updated : item
+          )
+        );
+      }
+      setSelected(null);
+      setIsAdding(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-   
+      <div className="flex justify-between items-center">
+        <p className="text-[18px] text-primary font-semibold ml-2">
+          Danh sách booking
+        </p>
+        <button
+          className="inline-flex items-center gap-2 rounded bg-sky-500 px-4 py-2 text-white hover:bg-sky-600"
+          onClick={() => setIsAdding(true)}
+        >
+          <Plus size={16} /> Thêm Booking
+        </button>
+      </div>
 
-     <div className="rounded-[12.75px] border border-black/10 bg-white p-4">
-      {/* Filters */}
-      <div className="flex items-center gap-3 mb-6">
-        {/* Ô tìm kiếm */}
-        <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-            <Search size={16} />
-          </span>
-          <input
-            type="text"
-            className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-[#26B8ED] focus:ring-2 focus:ring-[#26B8ED]/50"
-            placeholder="Tìm kiếm"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+      <div className="rounded-[12.75px] border border-black/10 bg-white p-4">
+        {/* Search + Filter */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="relative flex-1">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <Search size={16} />
+            </span>
+            <input
+              type="text"
+              className="h-10 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-3 text-sm"
+              placeholder="Tìm tên, email, ..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
 
-        {/* Bộ lọc */}
-        <div className="flex items-center gap-3">
           <div className="relative">
             <select
-              className="h-10 appearance-none rounded-md border border-gray-200 bg-white pl-3 pr-8 text-sm text-gray-700 focus:border-[#26B8ED] focus:ring-2 focus:ring-[#26B8ED]/50"
+              className="h-10 appearance-none rounded-md border border-gray-200 bg-white pl-3 pr-8 text-sm text-gray-700"
               value={status}
               onChange={(e) => setStatus(e.target.value as any)}
             >
@@ -158,97 +131,96 @@ export function BookingList() {
               <ChevronDown size={16} />
             </span>
           </div>
+        </div>
 
-          <div className="relative">
-            <select
-              className="h-10 appearance-none rounded-md border border-gray-200 bg-white pl-3 pr-8 text-sm text-gray-700 focus:border-[#26B8ED] focus:ring-2 focus:ring-[#26B8ED]/50"
-              value={tour}
-              onChange={(e) => setTour(e.target.value)}
-            >
-              <option value="all">Chọn tour</option>
-              {tourOptions
-                .filter((t) => t !== "all")
-                .map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-            </select>
-            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
-              <ChevronDown size={16} />
-            </span>
+        {loading ? (
+          <p className="text-center py-4 text-gray-500">Đang tải dữ liệu...</p>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50 text-gray-600">
+                  <tr>
+                    <th className="px-4 py-3">Khách hàng</th>
+                    <th className="px-4 py-3">Số điện thoại</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Ngày đặt</th>
+                    <th className="px-4 py-3">Khởi hành</th>
+                    <th className="px-4 py-3">Tổng giá</th>
+                    <th className="px-4 py-3">Trạng thái</th>
+                    <th className="px-4 py-3">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((b) => (
+                    <tr
+                      key={b.bookingId}
+                      className="border-t border-gray-100 hover:bg-gray-50"
+                    >
+                      <td className="px-4 py-3">{b.name}</td>
+                      <td className="px-4 py-3">{b.phone}</td>
+                      <td className="px-4 py-3">{b.email}</td>
+                      <td className="px-4 py-3">{b.createdAt.slice(0, 10)}</td>
+                      <td className="px-4 py-3">
+                        {b.departureDate.slice(0, 10)}
+                      </td>
+                      <td className="px-4 py-3">
+                        {b.totalPrice.toLocaleString()} ₫
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusPill status={b.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <button
+                            className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
+                            onClick={() => setSelected(b)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-red-50 text-red-600"
+                            onClick={() => setDeleteTarget(b)}
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
+
+        {selected && (
+          <BookingModal
+            booking={selected}
+            onClose={() => setSelected(null)}
+            onSave={saveBooking}
+          />
+        )}
+
+        {isAdding && (
+          <BookingModal
+            booking={null}
+            onClose={() => setIsAdding(false)}
+            onSave={(b) => saveBooking(b, true)}
+          />
+        )}
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-gray-600">
-              <tr>
-                <th className="px-4 py-3">Khách hàng</th>
-                <th className="px-4 py-3">Tên Tour</th>
-                <th className="px-4 py-3">Ngày đặt</th>
-                <th className="px-4 py-3">Ngày khởi hành</th>
-                <th className="px-4 py-3">Trạng thái</th>
-                <th className="px-4 py-3">Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((b) => (
-                <tr
-                  key={b.id}
-                  className="border-t border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={b.customerAvatarUrl}
-                        className="h-8 w-8 rounded-full object-cover"
-                      />
-                      <span>{b.customerName}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{b.tourTitle}</td>
-                  <td className="px-4 py-3">{b.bookedAt}</td>
-                  <td className="px-4 py-3">{b.startAt}</td>
-                  <td className="px-4 py-3">
-                    <StatusPill status={b.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <button
-                        className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-gray-100"
-                        title="Sửa"
-                        onClick={() => setSelected(b)}
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        className="inline-flex h-8 w-8 items-center justify-center rounded hover:bg-red-50 text-red-600"
-                        title="Xóa"
-                        onClick={() => removeBooking(b.id)}
-                      >
-                        <Trash size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {selected && (
-        <BookingModal
-          booking={selected}
-          onClose={() => setSelected(null)}
-          onSave={saveBooking}
-        />
-      )}
-    </div>
+      <DeleteConfirm
+        open={!!deleteTarget}
+        itemName={deleteTarget?.name ?? ""}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={async () => {
+          if (!deleteTarget) return;
+          await removeBooking(deleteTarget.bookingId);
+          setDeleteTarget(null);
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { PasswordUtils, ResponseUtils } from "@/utils";
 import { PrismaClient } from "@prisma/client";
 import { CloudinaryService } from "./cloudinaryService";
 import { GetUsersRequest } from "@/types";
+import { v4 as uuidv4 } from "uuid";
 
 const prisma = new PrismaClient();
 const cloudinaryService = new CloudinaryService();
@@ -232,20 +233,18 @@ export class UserService {
       }
 
       // Check if already in favorites
-      const existingFavorite = await prisma.favoriteTour.findUnique({
+      const existingFavorite = await prisma.favorite_tours.findFirst({
         where: {
-          userId_tourId: {
-            userId: userId,
-            tourId: tourId,
-          },
+          user_id: userId,
+          tour_id: tourId,
         },
       });
 
       if (existingFavorite) {
         // Remove from favorites
-        await prisma.favoriteTour.delete({
+        await prisma.favorite_tours.delete({
           where: {
-            favoriteId: existingFavorite.favoriteId,
+            favorite_id: existingFavorite.favorite_id,
           },
         });
 
@@ -253,11 +252,12 @@ export class UserService {
           isFavorite: false,
         });
       } else {
-        // Add to favorites
-        await prisma.favoriteTour.create({
+        // Add to favorites - generate UUID for favorite_id
+        await prisma.favorite_tours.create({
           data: {
-            userId: userId,
-            tourId: tourId,
+            favorite_id: uuidv4(),
+            user_id: userId,
+            tour_id: tourId,
           },
         });
 
@@ -277,10 +277,10 @@ export class UserService {
   static async getFavoriteTours(userId: string) {
     try {
       // Get user's favorite tours from junction table
-      const favoriteTours = await prisma.favoriteTour.findMany({
-        where: { userId: userId },
+      const favoriteTours = await prisma.favorite_tours.findMany({
+        where: { user_id: userId },
         include: {
-          tour: {
+          tours: {
             select: {
               tourId: true,
               name: true,
@@ -294,14 +294,14 @@ export class UserService {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          created_at: 'desc',
         },
       });
 
       // Filter only active tours and map to tour data
       const activeTours = favoriteTours
-        .filter(fav => fav.tour.isActive)
-        .map(fav => fav.tour);
+        .filter(fav => fav.tours.isActive)
+        .map(fav => fav.tours);
 
       return ResponseUtils.success("Lấy danh sách tour yêu thích thành công", activeTours);
     } catch (error) {

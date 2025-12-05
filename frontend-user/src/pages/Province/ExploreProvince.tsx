@@ -9,7 +9,10 @@ import WeatherSection from "@/components/province/WeatherSection";
 import { mockAttractions } from "@/data/attractions";
 import { Attraction, Province, Tour } from "@/global.types";
 
-import { useProvinceAttractions, useProvinceTours } from "@/hooks/useProvince";
+import {
+  useProvinceAttractions,
+  useProvinceTours,
+} from "@/services/province/provinceHook";
 
 interface ExploreProvinceContext {
   province: Province;
@@ -17,7 +20,7 @@ interface ExploreProvinceContext {
 
 const ExploreProvince = () => {
   const { province } = useOutletContext<ExploreProvinceContext>();
-  
+
   const { data: toursData } = useProvinceTours(province?.id || "", 1, 10);
   const tours = toursData?.data || [];
 
@@ -36,7 +39,6 @@ const ExploreProvince = () => {
   }, []);
 
   if (!province) return null;
-
 
   return (
     <div className="container mx-auto max-w-7xl space-y-8 mb-8">

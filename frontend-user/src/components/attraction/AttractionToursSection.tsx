@@ -8,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tour } from "@/global.types";
+import { ShortTourInfo, Tour } from "@/global.types";
 import { useTranslation } from "react-i18next";
 
 interface AttractionToursSectionProps {
-  tours: Tour[];
+  tours: ShortTourInfo[];
 }
 
 function AttractionToursSection({ tours }: AttractionToursSectionProps) {
@@ -60,16 +60,26 @@ function AttractionToursSection({ tours }: AttractionToursSectionProps) {
         </div>
 
         <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-700">{t("attractionTours.sortBy")}</span>
+          <span className="text-sm text-gray-700">
+            {t("attractionTours.sortBy")}
+          </span>
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[200px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price-asc">{t("attractionTours.priceLowToHigh")}</SelectItem>
-              <SelectItem value="price-desc">{t("attractionTours.priceHighToLow")}</SelectItem>
-              <SelectItem value="rating-desc">{t("attractionTours.highestRated")}</SelectItem>
-              <SelectItem value="duration-asc">{t("attractionTours.shortestDuration")}</SelectItem>
+              <SelectItem value="price-asc">
+                {t("attractionTours.priceLowToHigh")}
+              </SelectItem>
+              <SelectItem value="price-desc">
+                {t("attractionTours.priceHighToLow")}
+              </SelectItem>
+              <SelectItem value="rating-desc">
+                {t("attractionTours.highestRated")}
+              </SelectItem>
+              <SelectItem value="duration-asc">
+                {t("attractionTours.shortestDuration")}
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>

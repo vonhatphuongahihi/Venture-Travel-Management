@@ -1,7 +1,7 @@
 import { Compass, Navigation } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import ProvinceAPI from "@/services/provinceAPI";
-import AttractionAPI, { Attraction } from "@/services/attractionAPI";
+import ProvinceAPI from "@/services/province/provinceAPI";
+import AttractionAPI, { Attraction } from "@/services/attraction/attractionAPI";
 import { Button } from "@/components/ui/button";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -38,12 +38,14 @@ const ProvinceMapSection = () => {
         setLoading(true);
         const [provincesData, attractionsData] = await Promise.all([
           ProvinceAPI.getProvinces(),
-          AttractionAPI.getAttractions({ limit: 1000 })
+          AttractionAPI.getAttractions({ limit: 1000 }),
         ]);
         setProvinces(provincesData);
-        setAttractions(attractionsData.attractions.filter(a => a.coordinates));
+        setAttractions(
+          attractionsData.attractions.filter((a) => a.coordinates)
+        );
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -56,7 +58,7 @@ const ProvinceMapSection = () => {
   const renderMap = () => {
     if (!mapInstanceRef.current || !mapLoaded) return;
 
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
     attractions.forEach((attraction) => {
@@ -65,8 +67,8 @@ const ProvinceMapSection = () => {
       const { lat, lon } = attraction.coordinates;
       if (!lat || !lon) return;
 
-      const el = document.createElement('div');
-      el.className = 'attraction-marker';
+      const el = document.createElement("div");
+      el.className = "attraction-marker";
       el.innerHTML = `
         <div style="
           width: 36px;
@@ -89,27 +91,51 @@ const ProvinceMapSection = () => {
 
       const popupContent = `
         <div class="p-3" style="max-width: 320px;">
-          ${attraction.image ? `
+          ${
+            attraction.image
+              ? `
             <img src="${attraction.image}" alt="${attraction.name}" 
                  style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
-          ` : ''}
-          <strong class="text-primary text-base font-bold">${attraction.name}</strong>
+          `
+              : ""
+          }
+          <strong class="text-primary text-base font-bold">${
+            attraction.name
+          }</strong>
           <p class="text-sm text-gray-600 mt-1 mb-2">${attraction.address}</p>
-          ${attraction.category ? `
+          ${
+            attraction.category
+              ? `
             <span class="inline-block px-2 py-1 text-xs bg-primary/10 text-primary rounded-full mb-2">
               ${attraction.category}
             </span>
-          ` : ''}
-          ${attraction.description ? `
+          `
+              : ""
+          }
+          ${
+            attraction.description
+              ? `
             <p class="text-xs text-gray-500 mt-2 line-clamp-2">${attraction.description}</p>
-          ` : ''}
-          ${attraction.rating ? `
+          `
+              : ""
+          }
+          ${
+            attraction.rating
+              ? `
             <div class="flex items-center gap-1 mt-2">
               <span class="text-yellow-500 text-xs">★</span>
-              <span class="text-xs text-gray-600">${attraction.rating.toFixed(1)}</span>
-              ${attraction.reviewCount ? `<span class="text-xs text-gray-500">(${attraction.reviewCount})</span>` : ''}
+              <span class="text-xs text-gray-600">${attraction.rating.toFixed(
+                1
+              )}</span>
+              ${
+                attraction.reviewCount
+                  ? `<span class="text-xs text-gray-500">(${attraction.reviewCount})</span>`
+                  : ""
+              }
             </div>
-          ` : ''}
+          `
+              : ""
+          }
         </div>
       `;
 
@@ -119,11 +145,11 @@ const ProvinceMapSection = () => {
         .addTo(mapInstanceRef.current);
 
       // Add click event to zoom in when marker is clicked
-      el.addEventListener('click', (e) => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
         if (mapInstanceRef.current) {
           // Close all other popups first
-          markersRef.current.forEach(m => {
+          markersRef.current.forEach((m) => {
             const popup = m.getPopup();
             if (popup && popup.isOpen() && m !== marker) {
               popup.remove();
@@ -135,7 +161,7 @@ const ProvinceMapSection = () => {
             center: [lon, lat],
             zoom: 14,
             duration: 1500,
-            essential: true
+            essential: true,
           });
 
           marker.togglePopup();
@@ -145,11 +171,14 @@ const ProvinceMapSection = () => {
       markersRef.current.push(marker);
     });
 
-    if (attractions.length > 0 && attractions.some(a => a.coordinates)) {
+    if (attractions.length > 0 && attractions.some((a) => a.coordinates)) {
       const bounds = new mapboxgl.LngLatBounds();
       attractions.forEach((attraction) => {
         if (attraction.coordinates) {
-          bounds.extend([attraction.coordinates.lon, attraction.coordinates.lat]);
+          bounds.extend([
+            attraction.coordinates.lon,
+            attraction.coordinates.lat,
+          ]);
         }
       });
 
@@ -171,7 +200,7 @@ const ProvinceMapSection = () => {
 
     const initMap = () => {
       if (!mapRef.current) {
-        console.error('Map container not found');
+        console.error("Map container not found");
         return;
       }
 
@@ -184,25 +213,28 @@ const ProvinceMapSection = () => {
       try {
         mapInstanceRef.current = new mapboxgl.Map({
           container: mapRef.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
+          style: "mapbox://styles/mapbox/streets-v12",
           center: [108.2772, 14.0583], // Vietnam center
           zoom: 5,
           attributionControl: false,
         });
 
         // Add navigation controls
-        mapInstanceRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapInstanceRef.current.addControl(
+          new mapboxgl.NavigationControl(),
+          "bottom-right"
+        );
 
         // Add attribution
         mapInstanceRef.current.addControl(
           new mapboxgl.AttributionControl({
             compact: true,
           }),
-          'bottom-right'
+          "bottom-right"
         );
 
         // Wait for map to load
-        mapInstanceRef.current.on('load', () => {
+        mapInstanceRef.current.on("load", () => {
           if (isMounted) {
             setMapLoaded(true);
             renderMap();
@@ -210,9 +242,9 @@ const ProvinceMapSection = () => {
         });
 
         // Close popup when clicking on the map
-        mapInstanceRef.current.on('click', (e: any) => {
+        mapInstanceRef.current.on("click", (e: any) => {
           // Close all popups when clicking on the map (not on a marker)
-          markersRef.current.forEach(marker => {
+          markersRef.current.forEach((marker) => {
             const popup = marker.getPopup();
             if (popup && popup.isOpen()) {
               popup.remove();
@@ -220,11 +252,11 @@ const ProvinceMapSection = () => {
           });
         });
 
-        mapInstanceRef.current.on('error', (e: any) => {
-          console.error('Mapbox error:', e);
+        mapInstanceRef.current.on("error", (e: any) => {
+          console.error("Mapbox error:", e);
         });
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error("Error initializing map:", error);
       }
     };
 
@@ -236,7 +268,7 @@ const ProvinceMapSection = () => {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
-      markersRef.current.forEach(marker => marker.remove());
+      markersRef.current.forEach((marker) => marker.remove());
       markersRef.current = [];
     };
   }, [loading]);
@@ -268,21 +300,33 @@ const ProvinceMapSection = () => {
   // Calculate center point for a province based on its attractions
   const getProvinceCenter = (provinceName: string): [number, number] | null => {
     const provinceAttractions = attractions.filter(
-      a => a.provinceName === provinceName && a.coordinates
+      (a) => a.provinceName === provinceName && a.coordinates
     );
 
     if (provinceAttractions.length === 0) {
       // Try to find province by ID
-      const province = provinces.find(p => p.name === provinceName);
-      if (province?.point && province.point.long !== 0 && province.point.lat !== 0) {
+      const province = provinces.find((p) => p.name === provinceName);
+      if (
+        province?.point &&
+        province.point.long !== 0 &&
+        province.point.lat !== 0
+      ) {
         return [province.point.long, province.point.lat];
       }
       return null;
     }
 
     // Calculate average coordinates
-    const avgLon = provinceAttractions.reduce((sum, a) => sum + (a.coordinates?.lon || 0), 0) / provinceAttractions.length;
-    const avgLat = provinceAttractions.reduce((sum, a) => sum + (a.coordinates?.lat || 0), 0) / provinceAttractions.length;
+    const avgLon =
+      provinceAttractions.reduce(
+        (sum, a) => sum + (a.coordinates?.lon || 0),
+        0
+      ) / provinceAttractions.length;
+    const avgLat =
+      provinceAttractions.reduce(
+        (sum, a) => sum + (a.coordinates?.lat || 0),
+        0
+      ) / provinceAttractions.length;
 
     return [avgLon, avgLat];
   };
@@ -299,7 +343,7 @@ const ProvinceMapSection = () => {
 
     // Get all attractions for this province
     const provinceAttractions = attractions.filter(
-      a => a.provinceName === provinceName && a.coordinates
+      (a) => a.provinceName === provinceName && a.coordinates
     );
 
     if (provinceAttractions.length > 0) {
@@ -307,7 +351,10 @@ const ProvinceMapSection = () => {
       const bounds = new mapboxgl.LngLatBounds();
       provinceAttractions.forEach((attraction) => {
         if (attraction.coordinates) {
-          bounds.extend([attraction.coordinates.lon, attraction.coordinates.lat]);
+          bounds.extend([
+            attraction.coordinates.lon,
+            attraction.coordinates.lat,
+          ]);
         }
       });
 
@@ -322,7 +369,7 @@ const ProvinceMapSection = () => {
         center: center,
         zoom: 10,
         duration: 1500,
-        essential: true
+        essential: true,
       });
     }
   };
@@ -333,30 +380,34 @@ const ProvinceMapSection = () => {
       id: "north",
       name: t("provinceMap.regions.north"),
       provinces: provinces
-        .filter(p => p.region === "Bắc Bộ")
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .filter((p) => p.region === "Bắc Bộ")
+        .sort((a, b) => a.name.localeCompare(b.name)),
     },
     {
       id: "central",
       name: t("provinceMap.regions.central"),
       provinces: provinces
-        .filter(p => p.region === "Trung Bộ")
-        .sort((a, b) => a.name.localeCompare(b.name))
+        .filter((p) => p.region === "Trung Bộ")
+        .sort((a, b) => a.name.localeCompare(b.name)),
     },
     {
       id: "south",
       name: t("provinceMap.regions.south"),
       provinces: provinces
-        .filter(p => p.region === "Nam Bộ")
-        .sort((a, b) => a.name.localeCompare(b.name))
-    }
+        .filter((p) => p.region === "Nam Bộ")
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    },
   ];
 
   return (
     <section ref={sectionRef} className="py-16 bg-background">
       <div className="container">
         {/* Header */}
-        <div className={`text-center mb-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div
+          className={`text-center mb-12 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
           <div className="inline-flex items-center gap-2 bg-yellow-200 text-yellow-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Compass className="h-4 w-4" />
             {t("provinceMap.badge")}
@@ -374,21 +425,34 @@ const ProvinceMapSection = () => {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">{t("provinceMap.loading")}</p>
+              <p className="text-muted-foreground">
+                {t("provinceMap.loading")}
+              </p>
             </div>
           </div>
         ) : (
-          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+          <div
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${
+              isVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-12"
+            }`}
+          >
             {/* Left Side - Map */}
             <div>
               <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-gray-200">
-                <div className="relative w-full rounded-lg overflow-hidden" style={{ minHeight: '600px', height: '600px' }}>
+                <div
+                  className="relative w-full rounded-lg overflow-hidden"
+                  style={{ minHeight: "600px", height: "600px" }}
+                >
                   <div ref={mapRef} className="w-full h-full" />
                   {!mapLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
                       <div className="text-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                        <p className="text-gray-600">{t("provinceMap.loadingMap")}</p>
+                        <p className="text-gray-600">
+                          {t("provinceMap.loadingMap")}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -396,15 +460,26 @@ const ProvinceMapSection = () => {
                     <div className="absolute top-4 left-4 z-10">
                       <Button
                         onClick={() => {
-                          if (mapInstanceRef.current && attractions.length > 0) {
+                          if (
+                            mapInstanceRef.current &&
+                            attractions.length > 0
+                          ) {
                             const bounds = new mapboxgl.LngLatBounds();
                             attractions.forEach((attraction) => {
                               if (attraction.coordinates) {
-                                bounds.extend([attraction.coordinates.lon, attraction.coordinates.lat]);
+                                bounds.extend([
+                                  attraction.coordinates.lon,
+                                  attraction.coordinates.lat,
+                                ]);
                               }
                             });
                             mapInstanceRef.current.fitBounds(bounds, {
-                              padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                              padding: {
+                                top: 50,
+                                bottom: 50,
+                                left: 50,
+                                right: 50,
+                              },
                               maxZoom: 10,
                               duration: 1000,
                             });
@@ -420,7 +495,9 @@ const ProvinceMapSection = () => {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
-                  {t("provinceMap.attractionsCount", { count: attractions.length })}
+                  {t("provinceMap.attractionsCount", {
+                    count: attractions.length,
+                  })}
                 </p>
               </div>
             </div>
@@ -449,16 +526,25 @@ const ProvinceMapSection = () => {
                       </h4>
                       <div className="grid grid-cols-2 gap-2">
                         {region.provinces.map((province, index) => {
-                          const hasAttractions = attractions.some(a => a.provinceName === province.name);
+                          const hasAttractions = attractions.some(
+                            (a) => a.provinceName === province.name
+                          );
                           return (
                             <div
                               key={province.id || index}
                               onClick={() => handleProvinceClick(province.name)}
-                              className={`text-muted-foreground hover:text-primary cursor-pointer transition-colors duration-200 ${hasAttractions
-                                ? ''
-                                : 'opacity-60 cursor-not-allowed'
-                                }`}
-                              title={hasAttractions ? t("provinceMap.viewOnMap", { province: province.name }) : t("provinceMap.noDestinations")}
+                              className={`text-muted-foreground hover:text-primary cursor-pointer transition-colors duration-200 ${
+                                hasAttractions
+                                  ? ""
+                                  : "opacity-60 cursor-not-allowed"
+                              }`}
+                              title={
+                                hasAttractions
+                                  ? t("provinceMap.viewOnMap", {
+                                      province: province.name,
+                                    })
+                                  : t("provinceMap.noDestinations")
+                              }
                             >
                               {province.name}
                             </div>

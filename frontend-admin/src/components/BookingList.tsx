@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { BookingModal } from "./BookingModal";
-import { StatusPill } from "./StatusPill";
 import { ChevronDown, Pencil, Search, Trash, Plus } from "lucide-react";
-import { BookingAPI } from "@/services/BookingAPI"; // client API
-import type { Booking } from "./BookingModal";
+import { BookingAPI } from "@/services/BookingAPI";
+import type { Booking } from "@/services/BookingAPI";
 import DeleteConfirm from "./DeleteConfirm";
+import { useToast } from "@/contexts/ToastContext";
 
 export function BookingList() {
+  const { showToast } = useToast();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<Booking["status"] | "all">("all");
@@ -15,11 +16,21 @@ export function BookingList() {
   const [loading, setLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
 
+  // Normalize status từ backend sang frontend
+  const normalizeStatus = (
+    status: string
+  ): "pending" | "confirmed" | "cancelled" => {
+    if (status === "completed") return "confirmed";
+    if (status === "canceled" || status === "cancelled") return "cancelled";
+    if (status === "processing") return "pending";
+    return status as "pending" | "confirmed" | "cancelled";
+  };
+
   const statusOptions = [
     { label: "Chọn trạng thái", value: "all" },
-    { label: "Hoàn tất", value: "completed" },
+    { label: "Hoàn tất", value: "confirmed" },
     { label: "Đang xử lý", value: "pending" },
-    { label: "Huỷ", value: "canceled" },
+    { label: "Huỷ", value: "cancelled" },
   ];
 
   // --- Load bookings từ backend ---
@@ -46,11 +57,17 @@ export function BookingList() {
         .map((d) => d.ticketTypeName)
         .join(" ")
         .toLowerCase();
+      const tourName = b.tour?.name?.toLowerCase() || "";
       const matchesQuery =
         b.name.toLowerCase().includes(q) ||
         b.email.toLowerCase().includes(q) ||
-        ticketNames.includes(q);
-      const matchesStatus = status === "all" ? true : b.status === status;
+        ticketNames.includes(q) ||
+        tourName.includes(q);
+
+      // Normalize status để so sánh
+      const normalizedBookingStatus = normalizeStatus(b.status);
+      const matchesStatus =
+        status === "all" ? true : normalizedBookingStatus === status;
       return matchesQuery && matchesStatus;
     });
   }, [bookings, query, status]);
@@ -59,8 +76,13 @@ export function BookingList() {
     try {
       await BookingAPI.deleteBooking(id);
       setBookings((prev) => prev.filter((b) => b.bookingId !== id));
-    } catch (err) {
+      showToast("Xóa booking thành công", "success");
+    } catch (err: any) {
       console.error(err);
+      showToast(
+        err?.response?.data?.message || "Xóa booking thất bại",
+        "error"
+      );
     }
   };
 
@@ -70,6 +92,7 @@ export function BookingList() {
       if (isNew) {
         updated = await BookingAPI.createBooking(b);
         setBookings((prev) => [...prev, updated]);
+        showToast("Thêm booking thành công", "success");
       } else {
         updated = await BookingAPI.updateBooking(b.bookingId, b);
         setBookings((prev) =>
@@ -77,11 +100,39 @@ export function BookingList() {
             item.bookingId === updated.bookingId ? updated : item
           )
         );
+        showToast("Cập nhật booking thành công", "success");
       }
       setSelected(null);
       setIsAdding(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      showToast(
+        err?.response?.data?.message ||
+          (isNew ? "Thêm booking thất bại" : "Cập nhật booking thất bại"),
+        "error"
+      );
+    }
+  };
+
+  const updateStatus = async (bookingId: string, newStatus: string) => {
+    try {
+      // Backend đã hỗ trợ "confirmed" nên không cần convert
+      const updated = await BookingAPI.updateBookingStatus(
+        bookingId,
+        newStatus
+      );
+      setBookings((prev) =>
+        prev.map((item) =>
+          item.bookingId === updated.bookingId ? updated : item
+        )
+      );
+      showToast("Cập nhật trạng thái thành công", "success");
+    } catch (err: any) {
+      console.error("Error updating status:", err);
+      showToast(
+        err?.response?.data?.message || "Cập nhật trạng thái thất bại",
+        "error"
+      );
     }
   };
 
@@ -141,11 +192,12 @@ export function BookingList() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-gray-50 text-gray-600">
                   <tr>
+                    <th className="px-4 py-3">Tour</th>
                     <th className="px-4 py-3">Khách hàng</th>
                     <th className="px-4 py-3">Số điện thoại</th>
                     <th className="px-4 py-3">Email</th>
                     <th className="px-4 py-3">Ngày đặt</th>
-                    <th className="px-4 py-3">Khởi hành</th>
+
                     <th className="px-4 py-3">Tổng giá</th>
                     <th className="px-4 py-3">Trạng thái</th>
                     <th className="px-4 py-3">Hành động</th>
@@ -157,18 +209,69 @@ export function BookingList() {
                       key={b.bookingId}
                       className="border-t border-gray-100 hover:bg-gray-50"
                     >
+                      <td className="px-4 py-3">
+                        {b.tour ? (
+                          <div className="flex items-center gap-2">
+                            {b.tour.images && b.tour.images.length > 0 && (
+                              <img
+                                src={b.tour.images[0]}
+                                alt={b.tour.name}
+                                className="w-10 h-10 object-cover rounded"
+                              />
+                            )}
+                            <div>
+                              <p className="font-medium text-gray-900 line-clamp-1 max-w-[120px]">
+                                {b.tour.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {b.tour.duration}
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3">{b.name}</td>
                       <td className="px-4 py-3">{b.phone}</td>
                       <td className="px-4 py-3">{b.email}</td>
-                      <td className="px-4 py-3">{b.createdAt.slice(0, 10)}</td>
                       <td className="px-4 py-3">
-                        {b.departureDate.slice(0, 10)}
+                        {(() => {
+                          const d = b.createdAt.slice(0, 10);
+                          const [y, m, day] = d.split("-");
+                          return `${day}-${m}-${y}`;
+                        })()}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <span className="font-medium">
+                          {b.totalPrice.toLocaleString()} ₫
+                        </span>
                       </td>
                       <td className="px-4 py-3">
-                        {b.totalPrice.toLocaleString()} ₫
-                      </td>
-                      <td className="px-4 py-3">
-                        <StatusPill status={b.status} />
+                        {(() => {
+                          const normalizedStatus = normalizeStatus(b.status);
+                          return (
+                            <select
+                              className={`h-8 rounded-md border px-2 text-xs font-medium focus:ring-1 focus:ring-sky-400 focus:outline-none cursor-pointer ${
+                                normalizedStatus === "confirmed"
+                                  ? "bg-[#00B69B] text-white border-[#00B69B]"
+                                  : normalizedStatus === "pending"
+                                  ? "bg-[#FCBE2D] text-white border-[#FCBE2D]"
+                                  : "bg-[#FD5454] text-white border-[#FD5454]"
+                              }`}
+                              value={normalizedStatus}
+                              onChange={(e) =>
+                                updateStatus(b.bookingId, e.target.value)
+                              }
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <option value="pending">Đang xử lý</option>
+                              <option value="confirmed">Hoàn tất</option>
+                              <option value="cancelled">Huỷ</option>
+                            </select>
+                          );
+                        })()}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2 text-gray-600">

@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import ToursSection from "@/components/tour/ToursSection";
-import { MapPin, Clock, Mail, FacebookIcon, InstagramIcon, TwitterIcon, YoutubeIcon } from "lucide-react";
-import heroVietnam from "@/assets/top-3-destination.png"
+import { MapPin, Mail, Phone, Send } from "lucide-react";
 import { useSendContactMessage } from "@/services/contact/contactHook";
 import { useToast } from "@/contexts/ToastContext";
-import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
 // Contact information for the company
@@ -80,155 +77,158 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#FAFDFF] flex flex-col">
       <Header />
-      <div className="w-full">
-        <img
-          src="/src/assets/hero-vietnam-2.jpg"
-          alt="Contact banner"
-          className="w-full h-44 object-cover"
-        />
-      </div>
-      <main className="flex-1 flex flex-col items-center justify-center py-10">
-        <div className="w-full max-w-3xl lg:max-w-5xl px-4">
-          {/* Page title */}
-          <h1 className="text-3xl font-bold mb-6 text-center text-primary">
-            {t("contact.title")}
-          </h1>
-          <div className="flex flex-col lg:flex-row lg:items-stretch gap-4 justify-between">
-            {/* Contact information section */}
-            <div className="w-full lg:w-1/2 bg-card rounded-2xl shadow-lg p-6 border border-border bg-cover" style={{ backgroundImage: `url(${heroVietnam})` }}>
-              <h2 className="text-xl font-semibold mb-4 text-background">
+      <main className="container mx-auto px-4 py-12 flex-1">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+          {/* Contact Information */}
+          <div className="space-y-8">
+            <h1 className="text-4xl font-bold text-primary">
+              {t("contact.title")}
+            </h1>
+
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-gray-700">
                 {t("contact.info.title")}
               </h2>
-              <ul className="space-y-2 lg:space-y-6 mb-4 lg:mb-8 text-background">
-                <li>
-                  <strong className="text-background">{t("contact.info.addressLabel")}</strong>{" "}
-                  {CONTACT_INFO.address}
-                </li>
-                <li>
-                  <strong className="text-background">{t("contact.info.emailLabel")}</strong>{" "}
+
+              <div className="flex items-start space-x-4">
+                <MapPin className="text-primary mt-1 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-medium text-gray-800">{t("contact.info.addressLabel")}</h3>
+                  <p className="text-gray-600">{CONTACT_INFO.address}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Mail className="text-primary mt-1 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-medium text-gray-800">{t("contact.info.emailLabel")}</h3>
                   <a
                     href={`mailto:${CONTACT_INFO.email}`}
-                    className="text-background underline hover:text-primary"
+                    className="text-gray-600 hover:text-primary transition-colors"
                   >
                     {CONTACT_INFO.email}
                   </a>
-                </li>
-                <li>
-                  <strong className="text-background">{t("contact.info.phoneLabel")}</strong>{" "}
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <Phone className="text-primary mt-1 w-5 h-5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-medium text-gray-800">{t("contact.info.phoneLabel")}</h3>
                   <a
                     href={`tel:${CONTACT_INFO.phone}`}
-                    className="text-background underline hover:text-primary"
+                    className="text-gray-600 hover:text-primary transition-colors"
                   >
                     {CONTACT_INFO.phone}
                   </a>
-                </li>
-              </ul>
-              {/* Social button section */}
-              <div className="flex items-center gap-4 w-full">
-                <Button className="size-8 lg:size-10 rounded-full bg-background text-primary hover:bg-background/80" title={t("contact.social.facebook")}>
-                  <a href="https://facebook.com" target="_blank"><FacebookIcon /></a>
-                </Button>
-                <Button className="size-8 lg:size-10 rounded-full bg-background text-primary hover:bg-background/80" title={t("contact.social.instagram")}>
-                  <a href="https://instagram.com" target="_blank"><InstagramIcon /></a>
-                </Button>
-                <Button className="size-8 lg:size-10 rounded-full bg-background text-primary hover:bg-background/80" title={t("contact.social.twitter")}>
-                  <a href="https://x.com" target="_blank"><TwitterIcon /></a>
-                </Button>
-                <Button className="size-8 lg:size-10 rounded-full bg-background text-primary hover:bg-background/80" title={t("contact.social.youtube")}>
-                  <a href="https://youtube.com" target="_blank"><YoutubeIcon /></a>
-                </Button>
+                </div>
               </div>
             </div>
-            {/* Contact form section */}
-            <div className="bg-card w-full lg:w-1/2 rounded-2xl shadow-lg p-6 border border-border">
-              <h2 className="text-xl font-semibold mb-4 text-foreground">
-                {t("contact.form.title")}
-              </h2>
-              <form onSubmit={handleSubmit} noValidate>
-                {/* Name field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="name"
-                    className="block font-medium mb-1 text-foreground"
-                  >
-                    {t("contact.form.nameLabel")} <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${errors.name ? "border-destructive" : "border-input"
-                      } bg-background`}
-                    placeholder={t("contact.form.namePlaceholder")}
-                  />
-                  {errors.name && (
-                    <p className="text-destructive text-sm mt-1">
-                      {errors.name}
-                    </p>
-                  )}
-                </div>
-                {/* Email field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="email"
-                    className="block font-medium mb-1 text-foreground"
-                  >
-                    {t("contact.form.emailLabel")} <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${errors.email ? "border-destructive" : "border-input"
-                      } bg-background`}
-                    placeholder={t("contact.form.emailPlaceholder")}
-                  />
-                  {errors.email && (
-                    <p className="text-destructive text-sm mt-1">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-                {/* Message field */}
-                <div className="mb-4">
-                  <label
-                    htmlFor="message"
-                    className="block font-medium mb-1 text-foreground"
-                  >
-                    {t("contact.form.messageLabel")} <span className="text-destructive">*</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${errors.message ? "border-destructive" : "border-input"
-                      } bg-background`}
-                    placeholder={t("contact.form.messagePlaceholder")}
-                    rows={5}
-                  />
-                  {errors.message && (
-                    <p className="text-destructive text-sm mt-1">
-                      {errors.message}
-                    </p>
-                  )}
-                </div>
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  className="bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90 transition-colors font-semibold disabled:opacity-50"
-                  disabled={submitted}
-                >
-                  {submitted ? t("contact.form.submitting") : t("contact.form.submit")}
-                </button>
-              </form>
+
+            <div className="rounded-xl overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.231437889702!2d106.8000503152608!3d10.8697559922586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x317527587e9ad5bf%3A0xafa66f9c8be3c91!2sUniversity%20of%20Information%20Technology%20-%20VNUHCM!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s"
+                width="100%"
+                height="300"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                className="rounded-xl shadow-md"
+                title="Location Map"
+              ></iframe>
             </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="bg-white p-8 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+              {t("contact.form.title")}
+            </h2>
+
+            <form onSubmit={handleSubmit} noValidate className="space-y-6">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("contact.form.nameLabel")} <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder={t("contact.form.namePlaceholder")}
+                  className={`w-full px-4 py-3 rounded-lg border transition ${errors.name
+                    ? "border-destructive focus:ring-2 focus:ring-destructive focus:border-destructive"
+                    : "border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary"
+                    }`}
+                />
+                {errors.name && (
+                  <p className="text-destructive text-sm mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("contact.form.emailLabel")} <span className="text-destructive">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder={t("contact.form.emailPlaceholder")}
+                  className={`w-full px-4 py-3 rounded-lg border transition ${errors.email
+                    ? "border-destructive focus:ring-2 focus:ring-destructive focus:border-destructive"
+                    : "border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary"
+                    }`}
+                />
+                {errors.email && (
+                  <p className="text-destructive text-sm mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("contact.form.messageLabel")} <span className="text-destructive">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  rows={5}
+                  placeholder={t("contact.form.messagePlaceholder")}
+                  className={`w-full px-4 py-3 rounded-lg border transition ${errors.message
+                    ? "border-destructive focus:ring-2 focus:ring-destructive focus:border-destructive"
+                    : "border-gray-300 focus:ring-2 focus:ring-primary focus:border-primary"
+                    }`}
+                ></textarea>
+                {errors.message && (
+                  <p className="text-destructive text-sm mt-1">{errors.message}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitted}
+                className="w-full bg-primary hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>{submitted ? t("contact.form.submitting") : t("contact.form.submit")}</span>
+                <Send className="w-5 h-5" />
+              </button>
+            </form>
           </div>
         </div>
       </main>

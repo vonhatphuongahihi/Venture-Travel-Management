@@ -52,7 +52,6 @@ export default function ItineraryMap({
         const fetchDetailedRoute = async () => {
             setIsLoadingRoute(true);
             try {
-                console.log('🔵 Fetching route for tourId:', tourId);
                 const response = await RouteAPI.getTourRoute(tourId);
                 console.log('🟢 Route API Response:', response);
 
@@ -89,6 +88,7 @@ export default function ItineraryMap({
             center: [lng, lat],
             zoom: 14,
             duration: 1500,
+            essential: true,
         });
 
         if (onStopClick) {
@@ -120,23 +120,53 @@ export default function ItineraryMap({
         // Add pickup point marker
         if (pickUpGeom && pickUpGeom[0] !== 0 && pickUpGeom[1] !== 0) {
             const el = document.createElement('div');
-            el.className = 'start-end-marker';
+            el.className = 'pickup-marker';
+            el.style.cursor = 'pointer';
             el.innerHTML = `
-        <div style="
-          width: 48px;
-          height: 48px;
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5), 0 2px 4px rgba(0,0,0,0.2);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          color: white;
-          font-size: 20px;
-        ">📍</div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5), 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+          ">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="pickup-label" style="
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-weight: bold;
+            color: #10b981;
+            font-size: 14px;
+            white-space: nowrap;
+            pointer-events: none;
+          ">
+            ${pickUpPoint || 'Điểm đón'}
+          </div>
+        </div>
       `;
+
+            // Add click handler to zoom to pickup point
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (mapInstanceRef.current) {
+                    mapInstanceRef.current.flyTo({
+                        center: [pickUpGeom[0], pickUpGeom[1]],
+                        zoom: 14,
+                        duration: 1500,
+                    });
+                }
+            });
 
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([pickUpGeom[0], pickUpGeom[1]])
@@ -156,7 +186,7 @@ export default function ItineraryMap({
             const isActive = activeMarker === stop.stopOrder;
 
             el.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="position: relative; display: inline-block;">
           <div class="marker-circle" data-stop-order="${stop.stopOrder}" style="
             width: 44px;
             height: 44px;
@@ -173,22 +203,41 @@ export default function ItineraryMap({
             cursor: pointer;
             transition: all 0.3s ease;
             transform: ${isActive ? 'scale(1.15)' : 'scale(1)'};
+            position: relative;
+            z-index: 2;
           ">
             ${stop.stopOrder}
           </div>
-          <div class="marker-label" data-stop-order="${stop.stopOrder}" style="
-            display: ${isActive ? 'block' : 'none'};
-            background: white;
-            padding: 6px 12px;
+          <div class="marker-tooltip" data-stop-order="${stop.stopOrder}" style="
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 10px;
             border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            font-weight: bold;
-            color: #26B8ED;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 500;
             white-space: nowrap;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            margin-bottom: 4px;
           ">
             ${stop.attractionName}
+            <div style="
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 0;
+              height: 0;
+              border-left: 5px solid transparent;
+              border-right: 5px solid transparent;
+              border-top: 5px solid rgba(0, 0, 0, 0.85);
+            "></div>
           </div>
         </div>
       `;
@@ -196,8 +245,24 @@ export default function ItineraryMap({
             // Store element reference
             markerElementsRef.current.set(stop.stopOrder, el);
 
+            // Add hover handlers to show/hide tooltip
+            const tooltip = el.querySelector('.marker-tooltip') as HTMLElement;
+            const circle = el.querySelector('.marker-circle') as HTMLElement;
+
+            if (circle && tooltip) {
+                circle.addEventListener('mouseenter', () => {
+                    tooltip.style.opacity = '1';
+                });
+
+                circle.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = '0';
+                });
+            }
+
             // Add click handler to marker
-            el.addEventListener('click', () => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
                 setActiveMarker(stop.stopOrder);
                 handleStopClick([lng, lat]);
             });
@@ -303,17 +368,22 @@ export default function ItineraryMap({
             });
         }
 
-        // Fit bounds to show all markers
+        // Fit bounds to show all markers - only if map is not currently moving
         if (allCoordinates.length > 0) {
-            const bounds = new mapboxgl.LngLatBounds();
-            allCoordinates.forEach(coord => {
-                bounds.extend(coord as [number, number]);
-            });
+            // Check if map is currently animating/moving
+            const isMoving = mapInstanceRef.current.isMoving();
+            if (!isMoving) {
+                const bounds = new mapboxgl.LngLatBounds();
+                allCoordinates.forEach(coord => {
+                    bounds.extend(coord as [number, number]);
+                });
 
-            mapInstanceRef.current.fitBounds(bounds, {
-                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                maxZoom: 15,
-            });
+                mapInstanceRef.current.fitBounds(bounds, {
+                    padding: { top: 50, bottom: 50, left: 50, right: 50 },
+                    maxZoom: 15,
+                    duration: 0, // Instant to prevent conflicts with click handlers
+                });
+            }
         }
     };
 
@@ -389,15 +459,11 @@ export default function ItineraryMap({
     useEffect(() => {
         markerElementsRef.current.forEach((el, stopOrder) => {
             const circle = el.querySelector('.marker-circle') as HTMLElement;
-            const label = el.querySelector('.marker-label') as HTMLElement;
             if (circle) {
                 const isActive = activeMarker === stopOrder;
                 circle.style.background = isActive ? 'white' : '#26B8ED';
                 circle.style.color = isActive ? '#26B8ED' : 'white';
                 circle.style.transform = isActive ? 'scale(1.15)' : 'scale(1)';
-                if (label) {
-                    label.style.display = isActive ? 'block' : 'none';
-                }
             }
         });
     }, [activeMarker]);

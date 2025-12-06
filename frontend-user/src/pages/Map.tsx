@@ -184,6 +184,7 @@ const Map = () => {
           }
 
           return {
+            id: attraction.id,
             name: attraction.name,
             description: attraction.description || attraction.address || "",
             region,
@@ -232,18 +233,16 @@ const Map = () => {
       <Header />
       {/*Title*/}
       <div
-        className={`flex flex-col text-center justify-center font-['Inter'] transition-all duration-1000 delay-200 ${
-          isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
+        className={`flex flex-col text-center justify-center font-['Inter'] transition-all duration-1000 delay-200 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
       >
         <h2 className="text-2xl md:text-3xl font-bold">{t("map.title")}</h2>
         <p className="text-[#7b8b9d] text-lg mt-4">{t("map.description")}</p>
       </div>
       {/*Main*/}
       <div
-        className={`flex self-center w-4/5 h-full justify-between transition-all duration-1000 delay-200 ${
-          isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
+        className={`flex self-center w-4/5 h-full justify-between transition-all duration-1000 delay-200 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
       >
         <div className="flex flex-col space-y-4">
           {/*Ô chọn Lớp bản đồ*/}
@@ -253,11 +252,10 @@ const Map = () => {
               <p className="font-bold font-['Inter']">{t("map.mapLayers")}</p>
             </div>
             <Button
-              className={`${
-                currentLayer == "tour"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentLayer == "tour"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentLayer("tour")}
             >
               <div className="flex space-x-2 justify-center align-center">
@@ -271,11 +269,10 @@ const Map = () => {
               </div>
             </Button>
             <Button
-              className={`${
-                currentLayer == "destination"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentLayer == "destination"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentLayer("destination")}
             >
               <div className="flex space-x-2 justify-center align-center">
@@ -298,11 +295,10 @@ const Map = () => {
               <p className="font-bold font-['Inter']">{t("map.region")}</p>
             </div>
             <Button
-              className={`${
-                currentArea == "all"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentArea == "all"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("all")}
             >
               <p className="font-['Inter']">{t("map.all")}</p>
@@ -313,11 +309,10 @@ const Map = () => {
               </div>
             </Button>
             <Button
-              className={`${
-                currentArea == "north"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentArea == "north"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("north")}
             >
               <p className="font-normal font-['Inter']">{t("map.north")}</p>
@@ -328,11 +323,10 @@ const Map = () => {
               </div>
             </Button>
             <Button
-              className={`${
-                currentArea == "centre"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentArea == "centre"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("centre")}
             >
               <p className="font-normal font-['Inter']">{t("map.central")}</p>
@@ -343,11 +337,10 @@ const Map = () => {
               </div>
             </Button>
             <Button
-              className={`${
-                currentArea == "south"
-                  ? "text-white bg-primary"
-                  : "text-black bg-white hover:bg-gray-200"
-              } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
+              className={`${currentArea == "south"
+                ? "text-white bg-primary"
+                : "text-black bg-white hover:bg-gray-200"
+                } flex justify-between w-full px-2 py-1 rounded font-['Inter'] font-medium`}
               onClick={() => setCurrentArea("south")}
             >
               <p className="font-normal font-['Inter']">{t("map.south")}</p>
@@ -360,11 +353,10 @@ const Map = () => {
           </div>
         </div>
         <div
-          className={`w-[900px] h-[600px] rounded-[12px] ${
-            isPageLoaded
-              ? "opacity-100 translate-y-0"
-              : "opacity-0 translate-y-8"
-          }`}
+          className={`w-[900px] h-[600px] rounded-[12px] ${isPageLoaded
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-8"
+            }`}
         >
           <InteractiveMap
             area={currentArea}
@@ -378,9 +370,8 @@ const Map = () => {
       </div>
 
       <div
-        className={`transition-all duration-1000 delay-400 ${
-          isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
+        className={`transition-all duration-1000 delay-400 ${isPageLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
       >
         <Footer />
       </div>

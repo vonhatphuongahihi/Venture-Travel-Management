@@ -618,6 +618,7 @@
     "map": {
         "title": "BẢN ĐỒ DU LỊCH TƯƠNG TÁC",
         "description": "Khám phá các tour và điểm đến trên bản đồ Việt Nam.",
+        "loading": "Đang tải bản đồ...",
         "mapLayers": "Lớp bản đồ",
         "tours": "Tours",
         "destinations": "Điểm đến",
@@ -625,7 +626,9 @@
         "all": "Tất cả",
         "north": "Miền Bắc",
         "central": "Miền Trung",
-        "south": "Miền Nam"
+        "south": "Miền Nam",
+        "viewDetails": "Xem chi tiết",
+        "viewAttraction": "Xem điểm đến"
     },
     "reviewCard": {
         "quality": "Chất lượng",

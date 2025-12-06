@@ -600,6 +600,7 @@
   "map": {
     "title": "INTERACTIVE TRAVEL MAP",
     "description": "Explore tours and destinations on Vietnam map.",
+    "loading": "Loading map...",
     "mapLayers": "Map Layers",
     "tours": "Tours",
     "destinations": "Destinations",
@@ -607,7 +608,9 @@
     "all": "All",
     "north": "Northern",
     "central": "Central",
-    "south": "Southern"
+    "south": "Southern",
+    "viewDetails": "View Details",
+    "viewAttraction": "View Destination"
   },
   "reviewCard": {
     "quality": "Quality",

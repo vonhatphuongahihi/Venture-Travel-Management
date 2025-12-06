@@ -314,13 +314,25 @@
         },
         "errors": {
             "nameRequired": "Vui lòng nhập tên.",
+            "nameMinLength": "Tên phải có ít nhất 2 ký tự.",
+            "nameMaxLength": "Tên không được vượt quá 100 ký tự.",
             "emailRequired": "Vui lòng nhập email.",
             "emailInvalid": "Định dạng email không hợp lệ.",
-            "messageRequired": "Vui lòng nhập tin nhắn."
+            "messageRequired": "Vui lòng nhập tin nhắn.",
+            "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự.",
+            "messageMaxLength": "Tin nhắn không được vượt quá 1000 ký tự."
         },
         "toast": {
             "success": "Gửi tin nhắn thành công!",
-            "error": "Gửi tin nhắn thất bại. Vui lòng thử lại sau."
+            "error": "Gửi tin nhắn thất bại. Vui lòng thử lại sau.",
+            "nameRequired": "Vui lòng nhập tên của bạn.",
+            "nameMinLength": "Tên phải có ít nhất 2 ký tự.",
+            "nameMaxLength": "Tên không được vượt quá 100 ký tự.",
+            "emailRequired": "Vui lòng nhập email của bạn.",
+            "emailInvalid": "Định dạng email không hợp lệ.",
+            "messageRequired": "Vui lòng nhập tin nhắn của bạn.",
+            "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự. Vui lòng nhập thêm nội dung.",
+            "messageMaxLength": "Tin nhắn không được vượt quá 1000 ký tự."
         }
     },
     "terms": {

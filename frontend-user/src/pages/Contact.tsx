@@ -40,13 +40,32 @@ const Contact: React.FC = () => {
   // Validate form fields
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!form.name.trim()) newErrors.name = t("contact.errors.nameRequired");
+
+    // Name validation
+    if (!form.name.trim()) {
+      newErrors.name = t("contact.errors.nameRequired");
+    } else if (form.name.trim().length < 2) {
+      newErrors.name = t("contact.errors.nameMinLength");
+    } else if (form.name.trim().length > 100) {
+      newErrors.name = t("contact.errors.nameMaxLength");
+    }
+
+    // Email validation
     if (!form.email.trim()) {
       newErrors.email = t("contact.errors.emailRequired");
     } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.email)) {
       newErrors.email = t("contact.errors.emailInvalid");
     }
-    if (!form.message.trim()) newErrors.message = t("contact.errors.messageRequired");
+
+    // Message validation
+    if (!form.message.trim()) {
+      newErrors.message = t("contact.errors.messageRequired");
+    } else if (form.message.trim().length < 10) {
+      newErrors.message = t("contact.errors.messageMinLength");
+    } else if (form.message.trim().length > 1000) {
+      newErrors.message = t("contact.errors.messageMaxLength");
+    }
+
     return newErrors;
   };
 
@@ -62,15 +81,86 @@ const Contact: React.FC = () => {
     try {
       setSubmitted(true);
       await sendContactMessage.mutateAsync({
-        name: form.name,
-        email: form.email,
-        message: form.message,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        message: form.message.trim(),
       });
 
       showToast(t("contact.toast.success"), "success");
       setForm({ name: "", email: "", message: "" });
-    } catch (error) {
-      showToast(t("contact.toast.error"), "error");
+      setErrors({});
+    } catch (error: any) {
+      // Parse backend validation error
+      const backendError = error?.response?.data?.error || "";
+      const errorMessage = error?.response?.data?.message || "";
+
+      // Map backend errors to form fields
+      const fieldErrors: { [key: string]: string } = {};
+      let toastMessage = t("contact.toast.error");
+
+      if (backendError) {
+        const errorLower = backendError.toLowerCase();
+
+        // Check for name errors
+        if (errorLower.includes("name") || errorLower.includes("tên")) {
+          if (errorLower.includes("required") || errorLower.includes("bắt buộc")) {
+            fieldErrors.name = t("contact.errors.nameRequired");
+            toastMessage = t("contact.toast.nameRequired");
+          } else if (errorLower.includes("min") || errorLower.includes("ít nhất")) {
+            fieldErrors.name = t("contact.errors.nameMinLength");
+            toastMessage = t("contact.toast.nameMinLength");
+          } else if (errorLower.includes("max") || errorLower.includes("vượt quá")) {
+            fieldErrors.name = t("contact.errors.nameMaxLength");
+            toastMessage = t("contact.toast.nameMaxLength");
+          } else {
+            fieldErrors.name = backendError;
+            toastMessage = backendError;
+          }
+        }
+        // Check for email errors
+        else if (errorLower.includes("email")) {
+          if (errorLower.includes("required") || errorLower.includes("bắt buộc")) {
+            fieldErrors.email = t("contact.errors.emailRequired");
+            toastMessage = t("contact.toast.emailRequired");
+          } else if (errorLower.includes("valid") || errorLower.includes("hợp lệ")) {
+            fieldErrors.email = t("contact.errors.emailInvalid");
+            toastMessage = t("contact.toast.emailInvalid");
+          } else {
+            fieldErrors.email = backendError;
+            toastMessage = backendError;
+          }
+        }
+        // Check for message errors
+        else if (errorLower.includes("message") || errorLower.includes("tin nhắn")) {
+          if (errorLower.includes("required") || errorLower.includes("bắt buộc")) {
+            fieldErrors.message = t("contact.errors.messageRequired");
+            toastMessage = t("contact.toast.messageRequired");
+          } else if (errorLower.includes("min") || errorLower.includes("ít nhất")) {
+            fieldErrors.message = t("contact.errors.messageMinLength");
+            toastMessage = t("contact.toast.messageMinLength");
+          } else if (errorLower.includes("max") || errorLower.includes("vượt quá")) {
+            fieldErrors.message = t("contact.errors.messageMaxLength");
+            toastMessage = t("contact.toast.messageMaxLength");
+          } else {
+            fieldErrors.message = backendError;
+            toastMessage = backendError;
+          }
+        }
+        // Generic validation error
+        else {
+          toastMessage = backendError || errorMessage || t("contact.toast.error");
+        }
+      } else if (errorMessage) {
+        toastMessage = errorMessage;
+      }
+
+      // Set field errors if any
+      if (Object.keys(fieldErrors).length > 0) {
+        setErrors(fieldErrors);
+      }
+
+      // Show toast with specific error message
+      showToast(toastMessage, "error");
     } finally {
       setSubmitted(false);
     }

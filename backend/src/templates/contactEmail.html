@@ -1,133 +1,352 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tin nhắn liên hệ mới - Venture Travel</title>
-  </head>
-  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif">
-    <div style="max-width: 600px; margin: 0 auto">
-      <div style="background: #26b8ed; padding: 30px; text-align: center">
-        <h1 style="color: white; margin: 0; font-size: 28px">Venture</h1>
-        <p style="color: white; margin: 10px 0 0 0; font-size: 16px">
-          Tin nhắn liên hệ mới
-        </p>
-      </div>
+<html lang="vi">
 
-      <div style="padding: 30px; background: #f8f9fa">
-        <h2 style="color: #333; margin-top: 0">
-          📩 Bạn có tin nhắn mới từ khách hàng
-        </h2>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Tin nhắn liên hệ mới - Venture Travel</title>
+  <!--[if mso]>
+    <style type="text/css">
+      body, table, td {font-family: Arial, sans-serif !important;}
+    </style>
+    <![endif]-->
+</head>
 
-        <div
-          style="
-            background: #d1ecf1;
-            border: 1px solid #bee5eb;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-          "
-        >
-          <p style="color: #0c5460; margin: 0; font-weight: bold">
-            ℹ️ Thông tin người gửi
-          </p>
-        </div>
+<body style="
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f9fafb;
+      line-height: 1.6;
+    ">
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+    style="background-color: #f9fafb; padding: 48px 16px">
+    <tr>
+      <td align="center">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="672"
+          style="max-width: 672px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
+          <!-- Header Card -->
+          <tr>
+            <td style="
+                  background: linear-gradient(to right, #0ea5e9 0%, #0284c7 100%);
+                  padding: 40px 24px;
+                  text-align: center;
+                ">
+              <h1 style="
+                    color: #ffffff;
+                    margin: 0 0 8px 0;
+                    font-size: 30px;
+                    font-weight: 700;
+                    letter-spacing: 0.025em;
+                  ">
+                Venture Travel
+              </h1>
+              <p style="
+                    color: #e0f2fe;
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 400;
+                  ">
+                Tin nhắn liên hệ mới
+              </p>
+            </td>
+          </tr>
 
-        <div
-          style="
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-            border: 1px solid #dee2e6;
-          "
-        >
-          <p style="color: #333; margin: 10px 0; line-height: 1.8">
-            <strong style="color: #26b8ed">👤 Tên người gửi:</strong><br />
-            <span style="color: #666">{{username}}</span>
-          </p>
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 32px 24px">
+              <!-- Notification Card -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="
+                    background: linear-gradient(to right, #f0f9ff 0%, #e0f2fe 100%);
+                    border-left: 4px solid #0ea5e9;
+                    border-radius: 8px;
+                    margin-bottom: 32px;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                  ">
+                <tr>
+                  <td style="padding: 20px">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                        <td width="24" style="vertical-align: middle; padding-right: 12px">
+                          <span style="font-size: 20px; color: #075985">📩</span>
+                        </td>
+                        <td style="vertical-align: middle">
+                          <p style="
+                                color: #075985;
+                                margin: 0;
+                                font-size: 16px;
+                                font-weight: 600;
+                              ">
+                            Bạn có tin nhắn mới từ khách hàng
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-          <p style="color: #333; margin: 10px 0; line-height: 1.8">
-            <strong style="color: #26b8ed">📧 Email:</strong><br />
-            <span style="color: #666">{{email}}</span>
-          </p>
-        </div>
+              <!-- Sender Info Card -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 32px;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    overflow: hidden;
+                  ">
+                <!-- Card Header -->
+                <tr>
+                  <td style="
+                        background: linear-gradient(to right, #f0f9ff 0%, #e0f2fe 100%);
+                        padding: 16px 20px;
+                        border-bottom: 1px solid #e5e7eb;
+                      ">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                        <td width="20" style="vertical-align: middle; padding-right: 12px">
+                          <span style="font-size: 16px; color: #075985">ℹ️</span>
+                        </td>
+                        <td style="vertical-align: middle">
+                          <p style="
+                                color: #075985;
+                                margin: 0;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                              ">
+                            Thông tin người gửi
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-        <div
-          style="
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-          "
-        >
-          <p style="color: #856404; margin: 0; font-weight: bold">
-            💬 Nội dung tin nhắn
-          </p>
-        </div>
+                <!-- Card Body -->
+                <tr>
+                  <td style="padding: 24px">
+                    <!-- Name Row -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                        <td width="40" style="vertical-align: top; padding-right: 16px">
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="40" height="40"
+                            style="background-color: #e0f2fe; border-radius: 50%">
+                            <tr>
+                              <td align="center" valign="middle">
+                                <span style="font-size: 18px; color: #0284c7">👤</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td style="vertical-align: top">
+                          <p style="
+                                color: #6b7280;
+                                margin: 0 0 4px 0;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                              ">
+                            Tên người gửi
+                          </p>
+                          <p style="
+                                color: #1f2937;
+                                margin: 0;
+                                font-size: 16px;
+                                font-weight: 500;
+                              ">
+                            {{username}}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
 
-        <div
-          style="
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-            border: 1px solid #dee2e6;
-          "
-        >
-          <p
-            style="
-              color: #666;
-              line-height: 1.8;
-              margin: 0;
-              white-space: pre-wrap;
-              word-wrap: break-word;
-            "
-          >
-            {{message}}
-          </p>
-        </div>
+                    <!-- Email Row -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+                      style="margin-top: 24px">
+                      <tr>
+                        <td width="40" style="vertical-align: top; padding-right: 16px">
+                          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="40" height="40"
+                            style="background-color: #e0f2fe; border-radius: 50%">
+                            <tr>
+                              <td align="center" valign="middle">
+                                <span style="font-size: 18px; color: #0284c7">📧</span>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td style="vertical-align: top">
+                          <p style="
+                                color: #6b7280;
+                                margin: 0 0 4px 0;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                              ">
+                            Email
+                          </p>
+                          <a href="mailto:{{email}}" style="
+                                color: #0ea5e9;
+                                text-decoration: none;
+                                font-size: 16px;
+                                font-weight: 500;
+                                word-break: break-all;
+                              ">
+                            {{email}}
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-        <div style="text-align: center; margin: 30px 0">
-          <a
-            href="mailto:{{email}}"
-            style="
-              background: #26b8ed;
-              color: white;
-              padding: 15px 30px;
-              text-decoration: none;
-              border-radius: 25px;
-              font-weight: bold;
-              display: inline-block;
-            "
-          >
-            Trả lời Email
-          </a>
-        </div>
+              <!-- Message Content Card -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                    margin-bottom: 32px;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                    overflow: hidden;
+                  ">
+                <!-- Card Header -->
+                <tr>
+                  <td style="
+                        background: linear-gradient(to right, #fefce8 0%, #fef9c3 100%);
+                        padding: 16px 20px;
+                        border-bottom: 1px solid #e5e7eb;
+                      ">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                        <td width="20" style="vertical-align: middle; padding-right: 12px">
+                          <span style="font-size: 16px; color: #854d0e">💬</span>
+                        </td>
+                        <td style="vertical-align: middle">
+                          <p style="
+                                color: #854d0e;
+                                margin: 0;
+                                font-size: 12px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                              ">
+                            Nội dung tin nhắn
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
 
-        <p
-          style="
-            color: #999;
-            font-size: 12px;
-            line-height: 1.6;
-            margin-top: 30px;
-            text-align: center;
-          "
-        >
-          Email này được gửi từ hệ thống liên hệ của Venture Travel<br />
-          Thời gian nhận: {{timestamp}}
-        </p>
-      </div>
+                <!-- Card Body -->
+                <tr>
+                  <td style="padding: 24px">
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="
+                          background-color: #f9fafb;
+                          border-left: 3px solid #0ea5e9;
+                          border-radius: 4px;
+                        ">
+                      <tr>
+                        <td style="padding: 16px 20px">
+                          <p style="
+                                color: #374151;
+                                margin: 0;
+                                font-size: 15px;
+                                line-height: 1.75;
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                              ">
+                            {{message}}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
 
-      <div style="background: #343a40; padding: 20px; text-align: center">
-        <p style="color: #adb5bd; margin: 0; font-size: 14px">
-          © 2024 Venture Travel. Tất cả quyền được bảo lưu.
-        </p>
-        <p style="color: #adb5bd; margin: 5px 0 0 0; font-size: 12px">
-          Email này được gửi tự động từ hệ thống quản lý liên hệ.
-        </p>
-      </div>
-    </div>
-  </body>
+              <!-- Action Button -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 32px">
+                    <a href="mailto:{{email}}" style="
+                          background: linear-gradient(to right, #0ea5e9 0%, #0284c7 100%);
+                          color: #ffffff;
+                          padding: 12px 32px;
+                          text-decoration: none;
+                          border-radius: 8px;
+                          font-weight: 600;
+                          font-size: 15px;
+                          display: inline-block;
+                          box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3), 0 4px 6px -2px rgba(14, 165, 233, 0.2);
+                        ">
+                      ✉️ Trả lời Email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Footer Info -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="
+                    background-color: #f9fafb;
+                    border-top: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                  ">
+                <tr>
+                  <td style="padding: 24px 20px; text-align: center">
+                    <p style="
+                          color: #4b5563;
+                          margin: 0 0 8px 0;
+                          font-size: 14px;
+                          line-height: 1.6;
+                        ">
+                      Email này được gửi tự động từ hệ thống liên hệ của
+                      <strong style="color: #0ea5e9">Venture Travel</strong>
+                    </p>
+                    <p style="
+                          color: #9ca3af;
+                          margin: 0;
+                          font-size: 12px;
+                        ">
+                      Thời gian nhận: <strong style="font-weight: 500">{{timestamp}}</strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="
+                  background: linear-gradient(to right, #111827 0%, #1f2937 100%);
+                  padding: 32px 24px;
+                  text-align: center;
+                ">
+              <p style="
+                    color: #d1d5db;
+                    margin: 0 0 8px 0;
+                    font-size: 14px;
+                    font-weight: 500;
+                  ">
+                © 2025 Venture Travel. Tất cả quyền được bảo lưu.
+              </p>
+              <p style="
+                    color: #9ca3af;
+                    margin: 0;
+                    font-size: 12px;
+                  ">
+                Email này được gửi tự động từ hệ thống quản lý liên hệ.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+
 </html>

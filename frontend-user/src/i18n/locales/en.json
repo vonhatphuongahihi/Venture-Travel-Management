@@ -241,7 +241,9 @@
     "viewMoreTours": "View More Tours",
     "loading": "Loading...",
     "errorLoading": "Unable to load tour list",
-    "noTours": "No tours available"
+    "noTours": "No tours available",
+    "searchResults": "Search Results",
+    "toursFound": "tours found"
   },
   "aboutUs": {
     "title": "About VENTURE",

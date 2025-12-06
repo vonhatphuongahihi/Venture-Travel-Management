@@ -241,7 +241,9 @@
         "viewMoreTours": "Xem thêm tours",
         "loading": "Đang tải...",
         "errorLoading": "Không thể tải danh sách tour",
-        "noTours": "Chưa có tour nào"
+        "noTours": "Chưa có tour nào",
+        "searchResults": "Kết quả tìm kiếm",
+        "toursFound": "tour được tìm thấy"
     },
     "aboutUs": {
         "title": "Về VENTURE",

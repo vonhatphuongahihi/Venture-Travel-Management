@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAttraction } from "@/services/attraction/attractionHook";
 import { Attraction, Tour, Review } from "@/global.types";
@@ -22,6 +22,11 @@ export function AttractionPage() {
   const navigate = useNavigate();
 
   const { data: attraction, isLoading, isError } = useAttraction(slug || "");
+
+  // Scroll to top when component mounts or slug changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [slug]);
 
   if (isLoading) {
     return (

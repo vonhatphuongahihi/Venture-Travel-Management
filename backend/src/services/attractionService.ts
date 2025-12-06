@@ -82,9 +82,9 @@ export class AttractionService {
       const avgRating =
         attraction.attractionReviews.length > 0
           ? attraction.attractionReviews.reduce(
-              (sum: number, review: any) => sum + review.rate,
-              0
-            ) / attraction.attractionReviews.length
+            (sum: number, review: any) => sum + review.rate,
+            0
+          ) / attraction.attractionReviews.length
           : 0;
 
       return {
@@ -105,9 +105,9 @@ export class AttractionService {
         reviewCount: attraction.attractionReviews.length,
         coordinates: attraction.point
           ? {
-              lat: attraction.point.latitude,
-              lon: attraction.point.longitude,
-            }
+            lat: attraction.point.latitude,
+            lon: attraction.point.longitude,
+          }
           : null,
         createdAt: attraction.createdAt,
         updatedAt: attraction.updatedAt,
@@ -253,9 +253,9 @@ export class AttractionService {
     const avgRating =
       attraction.attractionReviews.length > 0
         ? attraction.attractionReviews.reduce(
-            (sum: number, review: any) => sum + review.rate,
-            0
-          ) / attraction.attractionReviews.length
+          (sum: number, review: any) => sum + review.rate,
+          0
+        ) / attraction.attractionReviews.length
         : 0;
 
     // Get unique tours with full details
@@ -271,15 +271,15 @@ export class AttractionService {
 
         // Calculate tour rating
         const tourAvgRating =
-          tour.tourReviews.length > 0
-            ? tour.tourReviews.reduce(
-                (sum: number, review: any) => sum + review.rate,
-                0
-              ) / tour.tourReviews.length
+          (tour.tourReviews || []).length > 0
+            ? (tour.tourReviews || []).reduce(
+              (sum: number, review: any) => sum + (review.rate || 0),
+              0
+            ) / (tour.tourReviews || []).length
             : 0;
 
         // Get location from first tour stop with province
-        const locationStop = tour.tourStops.find(
+        const locationStop = (tour.tourStops || []).find(
           (ts: any) => ts.attraction?.province?.name
         );
         const location = locationStop?.attraction?.province?.name || "";
@@ -295,8 +295,8 @@ export class AttractionService {
           allTicketPrices.length > 0 ? Math.min(...allTicketPrices) : 0;
 
         // Calculate max participants and available spots
-        const maxParticipants = tour.ticketTypes.reduce(
-          (sum: number, tt: any) => sum + tt.quantity,
+        const maxParticipants = (tour.ticketTypes || []).reduce(
+          (sum: number, tt: any) => sum + (tt.quantity || 0),
           0
         );
 
@@ -304,12 +304,12 @@ export class AttractionService {
         const totalBooked = tour.ticketTypes.reduce((sum: number, tt: any) => {
           return (
             sum +
-            tt.bookings.reduce((bookingSum: number, booking: any) => {
+            (tt.bookings || []).reduce((bookingSum: number, booking: any) => {
               return (
                 bookingSum +
-                booking.booking_details.reduce(
+                (booking.booking_details || []).reduce(
                   (detailSum: number, detail: any) =>
-                    detailSum + detail.quantity,
+                    detailSum + (detail.quantity || 0),
                   0
                 )
               );
@@ -398,9 +398,9 @@ export class AttractionService {
       })),
       coordinates: attraction.point
         ? {
-            lat: attraction.point.latitude,
-            lon: attraction.point.longitude,
-          }
+          lat: attraction.point.latitude,
+          lon: attraction.point.longitude,
+        }
         : null,
       createdAt: attraction.createdAt,
       updatedAt: attraction.updatedAt,

@@ -20,7 +20,7 @@ const TourCard: React.FC<any> = ({ tour }: any) => {
             )}
             <div className="h-[168px] flex">
                 <img
-                    src={"https://placehold.co/600x400?text=Hello+World"}
+                    src={tour.images[0] ? tour.images[0] : "https://placehold.co/600x400?text=Hello+World"}
                     alt=""
                     className="h-full w-full object-cover rounded-t-md"
                 />
@@ -32,7 +32,7 @@ const TourCard: React.FC<any> = ({ tour }: any) => {
 
                 <div className="flex items-center text-gray-500 text-xs gap-1">
                     <MapPin className="w-3 h-3" />
-                    {tour.province}
+                    Việt Nam
                 </div>
 
                 <p className="text-xs text-gray-600 line-clamp-2">{tour.about}</p>
@@ -55,8 +55,8 @@ const TourCard: React.FC<any> = ({ tour }: any) => {
                 </div>
 
                 {/* Rating & Actions */}
-                <div className="flex items-center justify-between mt-2 text-sm">
-                    <span className="text-gray-700">Rating: ⭐ {tour.rating.toFixed(1)}/5</span>
+                <div className="flex items-center justify-between mt-auto text-sm">
+                    <span className="text-gray-700">Rating: ⭐ {tour.avgRating.toFixed(1)}/5</span>
                     <div className="flex gap-2">
                         <button className="p-1 rounded hover:bg-gray-100">
                             <Edit className="w-4 h-4 text-gray-600" />

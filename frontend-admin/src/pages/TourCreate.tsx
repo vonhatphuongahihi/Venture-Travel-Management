@@ -19,7 +19,11 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import TicketFormModal from "@/components/tour-create/TicketFormModal";
-import { useCreateTour, useGetTourFormMetadata } from "@/services/tours/tourHook";
+import {
+    useCreateTour,
+    useGetTourFormMetadata,
+    useUploadTourImages,
+} from "@/services/tours/tourHook";
 import { Spinner } from "@/components/ui/spinner";
 import type { Attraction, CreateTourRequest } from "@/types/tour";
 import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
@@ -82,7 +86,7 @@ type MapboxGeocodingFeature = {
         name: string;
         full_address?: string;
         place_formatted?: string;
-        coordinates?: {
+        coordinates: {
             longitude: number;
             latitude: number;
         };
@@ -133,15 +137,39 @@ const TourCreate = () => {
         getValues,
     } = useForm<TourFormValues>({
         defaultValues: {
-            cancellationPolicy: "",
-            expectations: "",
+            cancellationPolicy:
+                '<p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Để được hoàn đủ tiền, bạn phải hủy ít nhất 24 giờ trước thời gian trải nghiệm bắt đầu.</span></p><ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Nếu bạn hủy ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm, số tiền bạn đã thanh toán sẽ không được hoàn lại.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Mọi thay đổi được thực hiện ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm sẽ không được chấp nhận.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Thời gian giới hạn dựa trên giờ địa phương của trải nghiệm.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu nó bị hủy do thời tiết xấu, bạn sẽ được chọn một ngày khác hoặc được hoàn tiền đầy đủ.</span></li></ol>',
+            expectations:
+                '<p><strong style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Dừng Tại</strong><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">: Cổng Ngọ (Cửa Ngọ Môn), Hoàng Thành, Huế Việt Nam</span></p><p><br></p><p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Gặp hướng dẫn viên du lịch của bạn tại điểm tập trung,</span></p><p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Đi bộ đến cổng Ngọ Môn để khám phá ý nghĩa biểu tượng của Ngọ Môn - cánh cổng lớn được sử dụng cho các nghi lễ hoàng gia và các sự kiện lớn trong triều Nguyễn.</span></p><p><br></p><p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Thời lượng: 10 phút</span></p><p><br></p><p><strong style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Dừng chân tại</strong><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">: Điện Thái Hòa, Hoàng Thành Tử Cấm Thành - Hoàng Thành, Huế 520000 Việt Nam</span></p><p><br></p><p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Bước vào bên trong đại sảnh quan trọng nhất của Hoàng thành, nơi các hoàng đế tổ chức các buổi triều đình và lễ đăng quang hoành tráng. Chiêm ngưỡng kiến ​​trúc trang nhã và tìm hiểu về các nghi lễ hoàng gia.</span></p>',
             tourStops: [
                 {
-                    attractionId: "",
-                    notes: "",
-                    details: "",
+                    attractionId: "ATT_HUE_001",
+                    notes: "Dừng: 2 giờ - Đã bao gồm phí vào cửa",
+                    details:
+                        "Chỗ ở của các hoàng đế nhà Nguyễn là trong Hoàng thành, chiếm một khu vực rộng lớn có tường bao quanh phía bắc sông. Quần thể Cố đô Huế được triều Nguyễn xây dựng từ năm 1805 đến năm 1945, hiện là một trong những di tích của Cố đô Huế – Di sản văn hóa thế giới, thu hút nhiều sự quan tâm của du khách.",
+                },
+                {
+                    attractionId: "ATT_HUE_002",
+                    notes: "Dừng: 1 giờ - Đã bao gồm phí vào cửa",
+                    details:
+                        "Chùa Thiên Mụ được xây dựng vào năm 1601 giữa một dòng sông và một rừng thông, chùa Thiên Mụ (“Chùa Thiên Mụ”) ở Huế là một trong những công trình tôn giáo cổ nhất và đẹp nhất cả nước",
                 },
             ],
+            name: "Khám phá Hoàng thành Huế",
+            about: "Huế mộng Huế mơ, Huế nên thơ trữ tình luôn là một trong những điểm đến hàng đầu của du khách thập phương. Nếu bạn có khung thời gian eo hẹp nhưng vẫn muốn khám phá hết những nét đặc trưng của Cố Đô Huế, hãy để chúng tôi dẫn bạn tham quan những di tích lịch sử, công trình kiến trúc Hoàng cung trong tour 01 ngày siêu đặc sắc này nhé!",
+            ageRange: "Tuổi 2 - 90",
+            maxGroupSize: 5,
+            duration: "2 tiếng 30 phút",
+            languages: ["Tiếng Việt", "Tiếng Anh"],
+            categories: ["Nghệ thuật & Văn hoá", "Tour theo chủ đề"],
+            highlights: "",
+            inclusions: "Vé vào cổng Imperial City",
+            exclusions: "Các bữa ăn không được đề cập trong lựa chọn\nTip cho hướng dẫn (tùy chọn)",
+            additionalInfomation:
+                '<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Xác nhận sẽ được nhận tại thời điểm đặt phòng</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Không có vấn đề về tim hoặc các tình trạng bệnh lý nghiêm trọng khác</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Hầu hết du khách có thể tham gia</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Chúng tôi không bao gồm phí vào cửa vì bạn có thể muốn mua VÉ COMBO với giá trị tốt hơn cho Thành cổ và Lăng mộ.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu bị hủy do thời tiết xấu, bạn sẽ được chọn vào ngày khác hoặc được hoàn đủ tiền</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Chuyến tham quan/hoạt động này sẽ có tối đa 8 khách du lịch</span></li></ol>',
+            pickupPoint: "Thuận Hòa, Huế, Huế, Vietnam",
+            pickupAreaRadius: 1000,
+            pickupDetails: "Có quầy bán vé trước cổng. Hướng dẫn viên sẽ đợi bạn ở đây",
         },
     });
 
@@ -159,6 +187,12 @@ const TourCreate = () => {
     const [selectedPickUpAddress, setSelectedPickUpAddress] =
         useState<Option<MapboxGeocodingFeature> | null>(null);
 
+    const [selectedEndPointAddress, setSelectedEndPointAddress] =
+        useState<Option<MapboxGeocodingFeature> | null>(null);
+
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const [isCreatingTour, setIsCreatingTour] = useState(false);
     const {
         data: metadata,
         isLoading: loadingMetadata,
@@ -166,13 +200,20 @@ const TourCreate = () => {
     } = useGetTourFormMetadata();
 
     // Create tour hook
-    const createTour = useCreateTour();
+    const { mutateAsync: createTour } = useCreateTour();
 
-    const onSubmitTour = (data: TourFormValues) => {
-        setStep(2);
-        setTourData(data);
-        console.log(data);
-        console.log(selectedPickUpAddress);
+    const { mutateAsync: uploadTourImages } = useUploadTourImages();
+
+    const onSubmitTour = async (data: TourFormValues) => {
+        try {
+            setStep(2);
+            setTourData(data);
+            console.log(data);
+            console.log(selectedPickUpAddress);
+            console.log(selectedEndPointAddress);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -226,39 +267,53 @@ const TourCreate = () => {
 
     // console.log(metadata);
 
-    const finishTour = () => {
-        console.log(tourData);
-        console.log(tickets);
+    const finishTour = async () => {
+        try {
+            console.log(tourData);
+            console.log(tickets);
+            setIsCreatingTour(true);
+            const uploadedImages = await uploadTourImages(selectedFiles);
 
-        // if (tourData && tickets) {
-        //     const payload: CreateTourRequest = {
-        //         name: tourData.name,
-        //         about: tourData.about,
-        //             ageRange: tourData.ageRange,
-        //             maxGroupSize: tourData.maxGroupSize,
-        //             duration: tourData.duration,
-        //             languages: tourData.languages,
-        //             categories: tourData.categories,
-        //             highlights: tourData.highlights?.split("\n"),
-        //             inclusions: tourData.inclusions.split("\n"),
-        //             exclusions: tourData.exclusions.split("\n"),
-        //             expectations: tourData.expectations,
-        //             cancellationPolicy: tourData.cancellationPolicy,
-        //             pickupPoint: tourData.pickupPoint,
-        //             pickupDetails: tourData.pickupDetails,
-        //             pickupAreaRadius: tourData.pickupAreaRadius,
-        //             endPoint: tourData.endPoint,
-        //             startDate: new Date("2025-01-01"),
-        //             endDate: new Date("2025-12-31"),
-        //             images: [],
-        //             tourStops: tourData.tourStops,
-        //             ticketTypes: tickets
-        //     };
-        // }
+            const imgUrls = uploadedImages.images.map((img) => img.url);
+
+            if (tourData && tickets && selectedPickUpAddress?.data?.properties.coordinates) {
+                const payload: CreateTourRequest = {
+                    name: tourData.name,
+                    about: tourData.about,
+                    ageRange: tourData.ageRange,
+                    maxGroupSize: Number(tourData.maxGroupSize),
+                    duration: tourData.duration,
+                    languages: tourData.languages,
+                    categories: tourData.categories,
+                    highlights: tourData.highlights?.split("\n"),
+                    inclusions: tourData.inclusions.split("\n"),
+                    exclusions: tourData.exclusions.split("\n"),
+                    expectations: tourData.expectations,
+                    cancellationPolicy: tourData.cancellationPolicy,
+                    pickupPoint: tourData.pickupPoint,
+                    pickupPointCoordinates: selectedPickUpAddress?.data?.properties.coordinates,
+                    pickupDetails: tourData.pickupDetails,
+                    pickupAreaRadius: tourData.pickupAreaRadius,
+                    endPoint: tourData.endPoint,
+                    endPointCoordinates: selectedEndPointAddress?.data?.properties.coordinates,
+                    startDate: new Date("2025-01-01"),
+                    endDate: new Date("2025-12-31"),
+                    images: imgUrls,
+                    tourStops: tourData.tourStops,
+                    ticketTypes: tickets,
+                    additionalInformation: tourData.additionalInfomation,
+                };
+
+                await createTour(payload);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsCreatingTour(false);
+        }
     };
 
     const TourCreateStep1 = () => {
-        // Hàm gọi Mapbox Geocoding API v6
         const fetchMapboxPlaces = async (query: string): Promise<MapboxGeocodingFeature[]> => {
             if (!query || query.trim().length < 3) return [];
 
@@ -284,7 +339,6 @@ const TourCreate = () => {
             }
         };
 
-        // Map từ MapboxFeatureV6 sang Option
         const mapMapboxToOption = (
             feature: MapboxGeocodingFeature
         ): Option<MapboxGeocodingFeature> => ({
@@ -332,15 +386,9 @@ const TourCreate = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate("/tours")}
-                            className="px-4 py-1 border rounded-md hover:bg-gray-200"
+                            className="px-4 py-1 border text-lg rounded-md hover:bg-gray-200"
                         >
                             Hủy
-                        </button>
-                        <button
-                            onClick={handleSubmit(onSubmitTour)}
-                            className="px-4 py-1 border rounded-md bg-primary hover:bg-primary/70 text-white"
-                        >
-                            Lưu
                         </button>
                     </div>
                 </div>
@@ -391,6 +439,7 @@ const TourCreate = () => {
                                         label={"Số lượng người tối đa"}
                                         name={"maxGroupSize"}
                                         register={register}
+                                        type="number"
                                         errors={errors}
                                         // validationRules={{
                                         //     required: "Số lượng người tối đa là bắt buộc",
@@ -400,7 +449,7 @@ const TourCreate = () => {
                                     ></FormInput>
                                     <FormInput
                                         label={"Thời lượng tour"}
-                                        name={"name"}
+                                        name={"duration"}
                                         register={register}
                                         errors={errors}
                                         // validationRules={{
@@ -498,7 +547,13 @@ const TourCreate = () => {
                                     placeholder="Thông tin bổ sung..."
                                     control={control}
                                 ></TextEditor>
-                                <ImageUploader label="Ảnh tour"></ImageUploader>
+                                <ImageUploader
+                                    label="Ảnh tour"
+                                    maxFiles={10}
+                                    maxSizeMB={5}
+                                    value={selectedFiles}
+                                    onChange={setSelectedFiles}
+                                ></ImageUploader>
                             </div>
                         </div>
                     </div>
@@ -620,7 +675,7 @@ const TourCreate = () => {
                                                     }}
                                                     onSelect={(option) => {
                                                         // ✅ Lưu cả name
-                                                        setSelectedPickUpAddress(option);
+                                                        setSelectedEndPointAddress(option);
                                                         setValue(`endPoint`, option.label);
                                                     }}
                                                     error={error?.message}
@@ -843,6 +898,11 @@ const TourCreate = () => {
             <div className="px-[60px] py-2">
                 {step === 1 && <TourCreateStep1></TourCreateStep1>}
                 {step === 2 && <TourCreateStep2></TourCreateStep2>}
+                {isCreatingTour && (
+                    <div className="flex min-h-[70vh] items-center justify-center">
+                        <Spinner className="size-10 text-primary"></Spinner>
+                    </div>
+                )}
             </div>
         </Layout>
     );

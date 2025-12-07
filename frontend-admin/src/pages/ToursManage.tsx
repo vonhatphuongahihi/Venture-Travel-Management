@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { Plus, Search } from "lucide-react";
@@ -29,65 +29,10 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
-const tours = [
-    {
-        id: "tour-1",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-    {
-        id: "tour-2",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-    {
-        id: "tour-3",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-    {
-        id: "tour-4",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-    {
-        id: "tour-5",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-    {
-        id: "tour-6",
-        name: "Tour Ninh Bình cả ngày từ Hà Nội đến Hoa Lư, Tam Cốc & Hang Múa",
-        province: "Hà Nội",
-        about: "Thoát khỏi không gian ồn ào của thành phố Hà Nội, và hít thở không khí trong lành trong chuyến tham",
-        categories: ["Tour thiên nhiên", "Tour ngắm cảnh", "Tour lịch sử"],
-        isActive: true,
-        rating: 4.8,
-    },
-];
-
 import SelectItem from "@/components/tours-manage/SelectItem";
 import TourCard from "@/components/tours-manage/TourCard";
+import { usegetTours } from "@/services/tours/tourHook";
+import { Spinner } from "@/components/ui/spinner";
 const ToursManage = () => {
     const navigate = useNavigate();
     const sortOptionList = [
@@ -98,8 +43,8 @@ const ToursManage = () => {
     ];
 
     const tourCategoryOptionList = [
-        { label: "Tour Thiên nhiên", value: "100" },
-        { label: "Tour Ngắm cảnh", value: "101" },
+        { label: "Thiên nhiên", value: "100" },
+        { label: "Ngắm cảnh", value: "101" },
         { label: "Nghệ thuật & Văn hoá", value: "102" },
         { label: "Tour dưới nước", value: "103" },
         { label: "Tour trên đất liền", value: "104" },
@@ -110,9 +55,13 @@ const ToursManage = () => {
         { label: "Tour bằng xe buýt", value: "109" },
     ];
 
+    const { data, isLoading } = usegetTours();
+
     const [sort, setSort] = useState(sortOptionList[0].value);
     const [search, setSearch] = useState("");
     const [searched, setSearched] = useState(false);
+    const [selectedCategoriesTemp, setSelectedCategoriesTemp] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     const handleSearch = () => {
         if (search.trim() === "") {
@@ -122,11 +71,33 @@ const ToursManage = () => {
         }
     };
 
-    const [currentPage, setCurrentPage] = useState(1);
+    const [page, setPage] = useState(1);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    if (isLoading || !data)
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Spinner className="size-10 text-primary"></Spinner>
+            </div>
+        );
+
+    const filteredTours = data.tours
+        .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+        .filter((tour) =>
+            selectedCategories.length === 0
+                ? true
+                : tour.categories.some((cate) => selectedCategories.includes(cate))
+        )
+        .sort((a, b) => {
+            if (sort === "price") return a.minPrice - b.minPrice;
+            if (sort === "popular") return b.totalBookings - a.totalBookings;
+            if (sort === "rating") return b.avgRating - a.avgRating;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+    const pageSize = 6;
+    const totalPages = Math.ceil(filteredTours.length / pageSize);
+
+    const paginatedTours = filteredTours.slice((page - 1) * pageSize, page * pageSize);
     return (
         <Layout title="Quản lý tour">
             <div className="p-4 mb-[50px]">
@@ -205,7 +176,29 @@ const ToursManage = () => {
                                                         key={index}
                                                         className="flex items-center gap-2"
                                                     >
-                                                        <Checkbox id={cate?.value} />
+                                                        <Checkbox
+                                                            checked={selectedCategoriesTemp.includes(
+                                                                cate.label
+                                                            )}
+                                                            onCheckedChange={(checked) => {
+                                                                if (checked) {
+                                                                    setSelectedCategoriesTemp(
+                                                                        (prev) => [
+                                                                            ...prev,
+                                                                            cate.label,
+                                                                        ]
+                                                                    );
+                                                                } else {
+                                                                    setSelectedCategoriesTemp(
+                                                                        (prev) =>
+                                                                            prev.filter(
+                                                                                (v) =>
+                                                                                    v !== cate.label
+                                                                            )
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
                                                         <Label htmlFor="international">
                                                             {cate?.label}
                                                         </Label>
@@ -215,9 +208,18 @@ const ToursManage = () => {
                                         </div>
 
                                         <SheetFooter className="mt-4 flex items-center sm:justify-between flex-row">
-                                            <button className=" bg-gray-100 rounded-md px-4 py-2">
-                                                Áp dụng
-                                            </button>
+                                            <SheetClose asChild>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedCategories(
+                                                            selectedCategoriesTemp
+                                                        );
+                                                    }}
+                                                    className="bg-gray-100 rounded-md px-4 py-2"
+                                                >
+                                                    Áp dụng
+                                                </button>
+                                            </SheetClose>
                                             <SheetClose asChild>
                                                 <button className="bg-gray-100 rounded-md px-4 py-2">
                                                     Đóng
@@ -231,53 +233,46 @@ const ToursManage = () => {
                     </div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-4">
-                    {tours.map((tour, index) => (
+                    {paginatedTours.map((tour, index) => (
                         <TourCard tour={tour} key={index}></TourCard>
                     ))}
                 </div>
                 <div className="mt-10">
-                    <Pagination className="justify-end">
+                    <Pagination>
                         <PaginationContent>
+                            {/* Prev */}
                             <PaginationItem>
-                                <PaginationPrevious
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (currentPage > 1) handlePageChange(currentPage - 1);
-                                    }}
-                                />
+                                <PaginationPrevious onClick={() => page > 1 && setPage(page - 1)} />
                             </PaginationItem>
 
-                            {Array.from({ length: 3 }, (_, i) => i + 1).map((page) => (
-                                <PaginationItem key={page}>
-                                    <PaginationLink
-                                        href="#"
-                                        isActive={page === currentPage}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handlePageChange(page);
-                                        }}
-                                        className={cn(
-                                            "rounded-md px-3 py-1 transition-colors text-primary border border-primary ",
-                                            page === currentPage
-                                                ? "bg-primary text-white hover:bg-primary/70 hover:text-white"
-                                                : "bg-white hover:text-primary hover:bg-primary/10"
-                                        )}
-                                    >
-                                        {page}
-                                    </PaginationLink>
-                                </PaginationItem>
-                            ))}
+                            {/* Danh sách số trang */}
+                            {[...Array(totalPages)].map((_, i) => {
+                                const pageNumber = i + 1;
+                                return (
+                                    <PaginationItem key={page}>
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={page === pageNumber}
+                                            onClick={() => setPage(pageNumber)}
+                                            className={cn(
+                                                "rounded-md px-3 py-1 transition-colors text-primary border border-primary ",
+                                                page === pageNumber
+                                                    ? "bg-primary text-white hover:bg-primary/70 hover:text-white"
+                                                    : "bg-white hover:text-primary hover:bg-primary/10"
+                                            )}
+                                        >
+                                            {page}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                );
+                            })}
 
                             {3 > 5 && <PaginationEllipsis />}
 
+                            {/* Next */}
                             <PaginationItem>
                                 <PaginationNext
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (currentPage < 3) handlePageChange(currentPage + 1);
-                                    }}
+                                    onClick={() => page < totalPages && setPage(page + 1)}
                                 />
                             </PaginationItem>
                         </PaginationContent>

@@ -1,6 +1,5 @@
 import { axiosClient } from "@/configs/axiosClient";
-import type { ApiResponse, CreateTourRequest, TourFormMetadata } from "@/types/tour";
-
+import type { ApiResponse, CreateTourRequest, TourFilters, TourFormMetadata, TourListResponse } from "@/types/tour";
 
 export class TourAPI {
     static basePath = "/admin/tours";
@@ -22,5 +21,30 @@ export class TourAPI {
         return response.data.data;
     }
 
-}
+    static uploadTourImages = async (
+        files: File[]
+    ): Promise<{
+        images: Array<{ url: string; publicId: string }>;
+    }> => {
+        const formData = new FormData();
 
+        files.forEach((file) => {
+            formData.append("images", file);
+        });
+
+        const response = await axiosClient.post(`${this.basePath}/images`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+
+        return response.data.data;
+    };
+
+    static  getTours = async (filters?: TourFilters): Promise<TourListResponse> => {
+        const response = await axiosClient.get<ApiResponse<TourListResponse>>(this.basePath, {
+            params: filters,
+        });
+        return response.data.data;
+    }
+}

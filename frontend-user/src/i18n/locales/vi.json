@@ -54,8 +54,17 @@
             "passwordMismatch": "Mật khẩu xác nhận không khớp",
             "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
             "passwordRequirements": "Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số"
-        }
-    },
+            }
+            ,
+            "forgotPassword": {
+                "title": "Quên mật khẩu",
+                "description": "Nhập email của bạn để nhận email xác thực",
+                "emailRequired": "Vui lòng nhập email",
+                "sendResetLink": "Gửi email xác thực",
+                "sending": "Đang gửi...",
+                "success": "Email xác thực đã được gửi đến email của bạn!"
+            }
+        },
     "profile": {
         "title": "Thông tin Tài khoản",
         "myProfile": "Hồ sơ của tôi",
@@ -182,6 +191,7 @@
         "fullRefund": "để được hoàn tiền đầy đủ",
         "itinerary": "Hành trình",
         "reviewsTitle": "Đánh giá",
+        "reviewRequiresBooking": "Bạn phải đặt và hoàn tất tour này mới có thể đánh giá.",
         "filter": "Bộ lọc",
         "postedOn": "Đăng vào"
     },

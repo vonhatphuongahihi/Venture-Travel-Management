@@ -19,7 +19,11 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import TicketFormModal from "@/components/tour-create/TicketFormModal";
-import { useCreateTour, useGetTourFormMetadata } from "@/services/tours/tourHook";
+import {
+    useCreateTour,
+    useGetTourFormMetadata,
+    useUploadTourImages,
+} from "@/services/tours/tourHook";
 import { Spinner } from "@/components/ui/spinner";
 import type { Attraction, CreateTourRequest } from "@/types/tour";
 import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
@@ -82,7 +86,7 @@ type MapboxGeocodingFeature = {
         name: string;
         full_address?: string;
         place_formatted?: string;
-        coordinates?: {
+        coordinates: {
             longitude: number;
             latitude: number;
         };
@@ -133,13 +137,11 @@ const TourCreate = () => {
         getValues,
     } = useForm<TourFormValues>({
         defaultValues: {
-            cancellationPolicy: "",
-            expectations: "",
             tourStops: [
                 {
                     attractionId: "",
                     notes: "",
-                    details: "",
+                    details: ""
                 },
             ],
         },
@@ -159,6 +161,12 @@ const TourCreate = () => {
     const [selectedPickUpAddress, setSelectedPickUpAddress] =
         useState<Option<MapboxGeocodingFeature> | null>(null);
 
+    const [selectedEndPointAddress, setSelectedEndPointAddress] =
+        useState<Option<MapboxGeocodingFeature> | null>(null);
+
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const [isCreatingTour, setIsCreatingTour] = useState(false);
     const {
         data: metadata,
         isLoading: loadingMetadata,
@@ -166,13 +174,20 @@ const TourCreate = () => {
     } = useGetTourFormMetadata();
 
     // Create tour hook
-    const createTour = useCreateTour();
+    const { mutateAsync: createTour } = useCreateTour();
 
-    const onSubmitTour = (data: TourFormValues) => {
-        setStep(2);
-        setTourData(data);
-        console.log(data);
-        console.log(selectedPickUpAddress);
+    const { mutateAsync: uploadTourImages } = useUploadTourImages();
+
+    const onSubmitTour = async (data: TourFormValues) => {
+        try {
+            setStep(2);
+            setTourData(data);
+            console.log(data);
+            console.log(selectedPickUpAddress);
+            console.log(selectedEndPointAddress);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -226,39 +241,53 @@ const TourCreate = () => {
 
     // console.log(metadata);
 
-    const finishTour = () => {
-        console.log(tourData);
-        console.log(tickets);
+    const finishTour = async () => {
+        try {
+            console.log(tourData);
+            console.log(tickets);
+            setIsCreatingTour(true);
+            const uploadedImages = await uploadTourImages(selectedFiles);
 
-        // if (tourData && tickets) {
-        //     const payload: CreateTourRequest = {
-        //         name: tourData.name,
-        //         about: tourData.about,
-        //             ageRange: tourData.ageRange,
-        //             maxGroupSize: tourData.maxGroupSize,
-        //             duration: tourData.duration,
-        //             languages: tourData.languages,
-        //             categories: tourData.categories,
-        //             highlights: tourData.highlights?.split("\n"),
-        //             inclusions: tourData.inclusions.split("\n"),
-        //             exclusions: tourData.exclusions.split("\n"),
-        //             expectations: tourData.expectations,
-        //             cancellationPolicy: tourData.cancellationPolicy,
-        //             pickupPoint: tourData.pickupPoint,
-        //             pickupDetails: tourData.pickupDetails,
-        //             pickupAreaRadius: tourData.pickupAreaRadius,
-        //             endPoint: tourData.endPoint,
-        //             startDate: new Date("2025-01-01"),
-        //             endDate: new Date("2025-12-31"),
-        //             images: [],
-        //             tourStops: tourData.tourStops,
-        //             ticketTypes: tickets
-        //     };
-        // }
+            const imgUrls = uploadedImages.images.map((img) => img.url);
+
+            if (tourData && tickets && selectedPickUpAddress?.data?.properties.coordinates) {
+                const payload: CreateTourRequest = {
+                    name: tourData.name,
+                    about: tourData.about,
+                    ageRange: tourData.ageRange,
+                    maxGroupSize: Number(tourData.maxGroupSize),
+                    duration: tourData.duration,
+                    languages: tourData.languages,
+                    categories: tourData.categories,
+                    highlights: tourData.highlights?.split("\n"),
+                    inclusions: tourData.inclusions.split("\n"),
+                    exclusions: tourData.exclusions.split("\n"),
+                    expectations: tourData.expectations,
+                    cancellationPolicy: tourData.cancellationPolicy,
+                    pickupPoint: tourData.pickupPoint,
+                    pickupPointCoordinates: selectedPickUpAddress?.data?.properties.coordinates,
+                    pickupDetails: tourData.pickupDetails,
+                    pickupAreaRadius: tourData.pickupAreaRadius,
+                    endPoint: tourData.endPoint,
+                    endPointCoordinates: selectedEndPointAddress?.data?.properties.coordinates,
+                    startDate: new Date("2025-01-01"),
+                    endDate: new Date("2025-12-31"),
+                    images: imgUrls,
+                    tourStops: tourData.tourStops,
+                    ticketTypes: tickets,
+                    additionalInformation: tourData.additionalInfomation,
+                };
+
+                await createTour(payload);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsCreatingTour(false);
+        }
     };
 
     const TourCreateStep1 = () => {
-        // Hàm gọi Mapbox Geocoding API v6
         const fetchMapboxPlaces = async (query: string): Promise<MapboxGeocodingFeature[]> => {
             if (!query || query.trim().length < 3) return [];
 
@@ -284,7 +313,6 @@ const TourCreate = () => {
             }
         };
 
-        // Map từ MapboxFeatureV6 sang Option
         const mapMapboxToOption = (
             feature: MapboxGeocodingFeature
         ): Option<MapboxGeocodingFeature> => ({
@@ -332,15 +360,9 @@ const TourCreate = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate("/tours")}
-                            className="px-4 py-1 border rounded-md hover:bg-gray-200"
+                            className="px-4 py-1 border text-lg rounded-md hover:bg-gray-200"
                         >
                             Hủy
-                        </button>
-                        <button
-                            onClick={handleSubmit(onSubmitTour)}
-                            className="px-4 py-1 border rounded-md bg-primary hover:bg-primary/70 text-white"
-                        >
-                            Lưu
                         </button>
                     </div>
                 </div>
@@ -391,6 +413,7 @@ const TourCreate = () => {
                                         label={"Số lượng người tối đa"}
                                         name={"maxGroupSize"}
                                         register={register}
+                                        type="number"
                                         errors={errors}
                                         // validationRules={{
                                         //     required: "Số lượng người tối đa là bắt buộc",
@@ -400,7 +423,7 @@ const TourCreate = () => {
                                     ></FormInput>
                                     <FormInput
                                         label={"Thời lượng tour"}
-                                        name={"name"}
+                                        name={"duration"}
                                         register={register}
                                         errors={errors}
                                         // validationRules={{
@@ -498,7 +521,13 @@ const TourCreate = () => {
                                     placeholder="Thông tin bổ sung..."
                                     control={control}
                                 ></TextEditor>
-                                <ImageUploader label="Ảnh tour"></ImageUploader>
+                                <ImageUploader
+                                    label="Ảnh tour"
+                                    maxFiles={10}
+                                    maxSizeMB={5}
+                                    value={selectedFiles}
+                                    onChange={setSelectedFiles}
+                                ></ImageUploader>
                             </div>
                         </div>
                     </div>
@@ -620,7 +649,7 @@ const TourCreate = () => {
                                                     }}
                                                     onSelect={(option) => {
                                                         // ✅ Lưu cả name
-                                                        setSelectedPickUpAddress(option);
+                                                        setSelectedEndPointAddress(option);
                                                         setValue(`endPoint`, option.label);
                                                     }}
                                                     error={error?.message}
@@ -843,6 +872,11 @@ const TourCreate = () => {
             <div className="px-[60px] py-2">
                 {step === 1 && <TourCreateStep1></TourCreateStep1>}
                 {step === 2 && <TourCreateStep2></TourCreateStep2>}
+                {isCreatingTour && (
+                    <div className="flex min-h-[70vh] items-center justify-center">
+                        <Spinner className="size-10 text-primary"></Spinner>
+                    </div>
+                )}
             </div>
         </Layout>
     );

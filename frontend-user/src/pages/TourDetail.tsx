@@ -46,6 +46,7 @@ import { tourService } from "@/services/tour.service";
 import { reviewService } from "@/services/review.service";
 import ReviewDialog from "@/pages/BookingHistory/ReviewDialog";
 import ShareDialog from "@/components/detail/ShareDialog";
+import { bookingService } from "@/services/booking.service";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAPI from "@/services/userAPI";
 import { useToast } from "@/contexts/ToastContext";
@@ -443,9 +444,33 @@ const TourDetailPage = () => {
   });
   const [puOpen, setPUOpen] = useState(false);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
+  const [canReview, setCanReview] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      if (!isAuthenticated || !id) {
+        if (mounted) setCanReview(false);
+        return;
+      }
+
+      try {
+        const bookings = await bookingService.getUserBookings();
+        const ok = bookings.some((b: any) => (b.tourId === id || b.tourId === id) && b.status === 'completed');
+        if (mounted) setCanReview(ok);
+      } catch (err) {
+        console.error('Error checking bookings for review permission', err);
+        if (mounted) setCanReview(false);
+      }
+    };
+
+    check();
+
+    return () => { mounted = false; };
+  }, [isAuthenticated, id]);
 
   const handleLikeReview = async (reviewId: string) => {
     try {
@@ -525,8 +550,22 @@ const TourDetailPage = () => {
               <p className="font-['Inter']">{t("tourDetail.share")}</p>
             </Button>
             <Button
-              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0"
-              onClick={handleWriteReview}
+              className={`bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0 ${!canReview ? 'opacity-60 cursor-not-allowed' : ''}`}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  showToast(t('tourDetail.loginRequired'), 'error');
+                  navigate('/login');
+                  return;
+                }
+
+                if (!canReview) {
+                  showToast(t('tourDetail.reviewRequiresBooking'), 'error');
+                  return;
+                }
+
+                setOpenReviewDialog(true);
+              }}
+              disabled={!canReview}
             >
               <PenLine size={16} />
               <p className="font-['Inter']">{t("tourDetail.writeReview")}</p>

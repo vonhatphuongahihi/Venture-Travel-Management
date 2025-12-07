@@ -21,6 +21,8 @@ export class TourController {
 
             const tour = await tourService.createTour(tourData);
 
+            console.log("Tạo tour thành công");
+
             return res.status(201).json({
                 success: true,
                 message: "Tạo tour thành công",
@@ -50,6 +52,49 @@ export class TourController {
             return res.status(500).json({
                 success: false,
                 message: "Lỗi khi lấy metadata",
+            });
+        }
+    }
+
+    async getTours(req: Request, res: Response) {
+        try {
+            const { categories, search } = req.query;
+
+            let categoriesArray: string[] = [];
+            if (categories) {
+                if (typeof categories === "string") {
+                    try {
+                        // Thử parse JSON array
+                        if (categories.startsWith("[") && categories.endsWith("]")) {
+                            categoriesArray = JSON.parse(categories);
+                        } else {
+                            // Hoặc xử lý comma-separated string
+                            categoriesArray = categories
+                                .split(",")
+                                .map((item) => item.trim())
+                                .filter((item) => item.length > 0);
+                        }
+                    } catch (error) {
+                        console.warn("Failed to parse categories:", error);
+                        categoriesArray = [];
+                    }
+                } else if (Array.isArray(categories)) {
+                    categoriesArray = categories.filter((item) => typeof item === "string");
+                }
+            }
+            const result = await tourService.getTours({
+                categories: categoriesArray,
+                search: search as string,
+            });
+            return res.json({
+                success: true,
+                data: result,
+            });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({
+                success: false,
+                message: "Lỗi khi lấy tour",
             });
         }
     }

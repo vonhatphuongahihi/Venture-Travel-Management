@@ -12,7 +12,6 @@ import reviewRoutes from "./reviewRoutes";
 import routeRoutes from "./routeRoutes";
 import tourRoutes from "./tourRoutes";
 import uploadRoutes from "./uploadRoutes";
-import adminAttractionRoutes from "./adminAttractionRoutes";
 import adminTourRoutes from "./adminTourRoutes"
 import userRoutes from "./userRoutes";
 import bookingRoutes from "./bookingRoutes";

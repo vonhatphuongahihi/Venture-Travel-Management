@@ -62,6 +62,15 @@ export interface VerifyEmailRequest {
     token: string;
 }
 
+export interface ForgotPasswordRequest {
+    email: string;
+}
+
+export interface ForgotPasswordResponse {
+    success: boolean;
+    message: string;
+}
+
 // User specific types
 export interface UpdateProfileRequest {
     name?: string;

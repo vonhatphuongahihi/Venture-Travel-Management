@@ -21,6 +21,24 @@ class AxiosClient {
       },
       withCredentials: props?.withCredentials ?? true,
     });
+    this.instance.interceptors.request.use(
+      (config) => {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+        
+        // Nếu là FormData thì xóa header Content-Type để browser tự set
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
+        }
+        
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
   }
 }
 

@@ -104,14 +104,12 @@ const TicketFormModal = ({
     }, [editingTicket, reset]);
 
     const onSubmit = (data: TicketData) => {
-        const finalTicket: TicketData = {
-            ...data,
-        };
+        const { quantity, ...rest} = data
 
         if (editingTicket) {
-            if (onUpdateTicket) onUpdateTicket({ ...finalTicket, id: editingTicket.id });
+            if (onUpdateTicket) onUpdateTicket({ quantity: Number(quantity), ...rest, id: editingTicket.id });
         } else {
-            if (onAddTicket) onAddTicket(finalTicket);
+            if (onAddTicket) onAddTicket(data);
         }
         reset();
 
@@ -147,7 +145,7 @@ const TicketFormModal = ({
                         errors={errors}
                         validationRules={{
                             required: "Vui lòng nhập số lượng",
-                            min: { value: 1, message: "Số lượng phải > 0" },
+                            min: { value: 1, message: "Số lượng phải lớn hơn 0" },
                         }}
                         placeholder="Nhập số lượng vé"
                     ></FormInput>

@@ -94,7 +94,6 @@ const BookingHistory = () => {
       await bookingService.cancelBooking(bookingId);
       showToast(t('bookingHistory.cancelSuccess'), "success");
 
-      // Refresh bookings list
       const data = await bookingService.getUserBookings();
       const mappedBookings: any[] = data.map((booking) => ({
         id: booking.bookingId,
@@ -116,7 +115,6 @@ const BookingHistory = () => {
     }
   };
 
-  // Check authentication on component mount
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -124,7 +122,6 @@ const BookingHistory = () => {
     }
   }, [user, navigate]);
 
-  // Fetch bookings from API
   useEffect(() => {
     const fetchBookings = async () => {
       if (!user) return;
@@ -135,20 +132,12 @@ const BookingHistory = () => {
       try {
         const data = await bookingService.getUserBookings();
 
-        // Map API data to component format
         const mappedBookings = data.map((booking) => ({
           ...booking,
           tourImage: booking.tourImage || halongImg,
         }));
 
         setBookings(mappedBookings);
-
-        // Check if there's a new booking from navigation state
-        if (location.state?.newBooking) {
-          showToast(t('bookingHistory.bookSuccess'), "success");
-          // Clear navigation state
-          window.history.replaceState({}, document.title);
-        }
       } catch (err: unknown) {
         console.error("Error fetching bookings:", err);
         const errorMessage = (err as any)?.response?.data?.message || t('bookingHistory.failedToLoad');
@@ -160,9 +149,19 @@ const BookingHistory = () => {
     };
 
     fetchBookings();
-  }, [user, location.state, showToast, t]);
+  }, [user]);
 
-  // Filter tours based on selected filter
+  useEffect(() => {
+    if (location.state?.newBooking) {
+      showToast(t('bookingHistory.bookSuccess'), "success");
+      try {
+        window.history.replaceState({}, document.title);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [location.key]);
+
   const filteredBookings =
     selectedFilter === "all"
       ? bookings

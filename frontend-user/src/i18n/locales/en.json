@@ -54,6 +54,14 @@
       "passwordMismatch": "Passwords do not match",
       "passwordMinLength": "Password must be at least 8 characters",
       "passwordRequirements": "Password must contain at least 8 characters, 1 uppercase, 1 lowercase and 1 number"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email to receive a password reset link",
+      "emailRequired": "Please enter your email",
+      "sendResetLink": "Send Reset Link",
+      "sending": "Sending...",
+      "success": "Password reset link has been sent to your email!"
     }
   },
   "profile": {
@@ -182,6 +190,7 @@
     "fullRefund": "for full refund",
     "itinerary": "Itinerary",
     "reviewsTitle": "Reviews",
+    "reviewRequiresBooking": "You must have completed this tour booking to write a review.",
     "filter": "Filter",
     "postedOn": "Posted on"
   },

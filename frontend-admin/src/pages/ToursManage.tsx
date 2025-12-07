@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { Plus, Search } from "lucide-react";
@@ -88,6 +88,7 @@ const tours = [
 
 import SelectItem from "@/components/tours-manage/SelectItem";
 import TourCard from "@/components/tours-manage/TourCard";
+import { usegetTours } from "@/services/tours/tourHook";
 const ToursManage = () => {
     const navigate = useNavigate();
     const sortOptionList = [
@@ -110,9 +111,12 @@ const ToursManage = () => {
         { label: "Tour bằng xe buýt", value: "109" },
     ];
 
+    const { data, isLoading } = usegetTours();
+
     const [sort, setSort] = useState(sortOptionList[0].value);
     const [search, setSearch] = useState("");
     const [searched, setSearched] = useState(false);
+    const [category, setCategory] = useState("");
 
     const handleSearch = () => {
         if (search.trim() === "") {
@@ -122,11 +126,24 @@ const ToursManage = () => {
         }
     };
 
-    const [currentPage, setCurrentPage] = useState(1);
+    const [page, setPage] = useState(1);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
+    if (isLoading || !data) return <div></div>;
+
+    const filteredTours = data.tours
+        .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
+        .filter((t) => (category ? t.categories.includes(category) : true))
+        .sort((a, b) => {
+            if (sort === "price") return a.minPrice - b.minPrice;
+            if (sort === "popular") return b.totalBookings - a.totalBookings;
+            if (sort === "rating") return b.avgRating - a.avgRating;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+    const pageSize = 6;
+    const totalPages = Math.ceil(filteredTours.length / pageSize);
+
+    const paginatedTours = filteredTours.slice((page - 1) * pageSize, page * pageSize);
     return (
         <Layout title="Quản lý tour">
             <div className="p-4 mb-[50px]">
@@ -231,53 +248,46 @@ const ToursManage = () => {
                     </div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-4">
-                    {tours.map((tour, index) => (
+                    {paginatedTours.map((tour, index) => (
                         <TourCard tour={tour} key={index}></TourCard>
                     ))}
                 </div>
                 <div className="mt-10">
-                    <Pagination className="justify-end">
+                    <Pagination>
                         <PaginationContent>
+                            {/* Prev */}
                             <PaginationItem>
-                                <PaginationPrevious
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (currentPage > 1) handlePageChange(currentPage - 1);
-                                    }}
-                                />
+                                <PaginationPrevious onClick={() => page > 1 && setPage(page - 1)} />
                             </PaginationItem>
 
-                            {Array.from({ length: 3 }, (_, i) => i + 1).map((page) => (
-                                <PaginationItem key={page}>
-                                    <PaginationLink
-                                        href="#"
-                                        isActive={page === currentPage}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handlePageChange(page);
-                                        }}
-                                        className={cn(
-                                            "rounded-md px-3 py-1 transition-colors text-primary border border-primary ",
-                                            page === currentPage
-                                                ? "bg-primary text-white hover:bg-primary/70 hover:text-white"
-                                                : "bg-white hover:text-primary hover:bg-primary/10"
-                                        )}
-                                    >
-                                        {page}
-                                    </PaginationLink>
-                                </PaginationItem>
-                            ))}
+                            {/* Danh sách số trang */}
+                            {[...Array(totalPages)].map((_, i) => {
+                                const pageNumber = i + 1;
+                                return (
+                                    <PaginationItem key={page}>
+                                        <PaginationLink
+                                            href="#"
+                                            isActive={page === pageNumber}
+                                            onClick={() => setPage(pageNumber)}
+                                            className={cn(
+                                                "rounded-md px-3 py-1 transition-colors text-primary border border-primary ",
+                                                page === pageNumber
+                                                    ? "bg-primary text-white hover:bg-primary/70 hover:text-white"
+                                                    : "bg-white hover:text-primary hover:bg-primary/10"
+                                            )}
+                                        >
+                                            {page}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                );
+                            })}
 
                             {3 > 5 && <PaginationEllipsis />}
-
+                            
+                            {/* Next */}
                             <PaginationItem>
                                 <PaginationNext
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (currentPage < 3) handlePageChange(currentPage + 1);
-                                    }}
+                                    onClick={() => page < totalPages && setPage(page + 1)}
                                 />
                             </PaginationItem>
                         </PaginationContent>

@@ -488,7 +488,7 @@ export class TourService {
                 data: {
                     tourId,
                     name: ticketType.name,
-                    quantity: ticketType.quantity,
+                    quantity: Number(ticketType.quantity),
                     notes: ticketType.notes,
                 },
             });
@@ -637,45 +637,111 @@ export class TourService {
             priceCategories,
         };
     }
-    /**
-     * Lấy thông tin tour theo ID với đầy đủ relations
-     */
-    // async getTourById(tourId: string) {
-    //     const tour = await this.prisma.tour.findUnique({
-    //         where: { tourId },
-    //         include: {
-    //             province: true,
-    //             tourStops: {
-    //                 include: {
-    //                     attraction: true,
-    //                 },
-    //                 orderBy: {
-    //                     stopOrder: "asc",
-    //                 },
-    //             },
-    //             ticketTypes: {
-    //                 include: {
-    //                     ticketPrices: {
-    //                         include: {
-    //                             priceCategory: true,
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //         },
-    //     });
-
-    //     if (!tour) {
-    //         throw new Error("Tour không tồn tại");
-    //     }
-
-    //     return tour;
-    // }
 
     private handleError(error: any): Error {
         if (error instanceof Error) {
             return error;
         }
         return new Error("Đã xảy ra lỗi khi xử lý tour");
+    }
+
+    async getTours(params: { categories?: string[]; search?: string }) {
+        const { categories, search } = params;
+
+        // Build where clause
+        const where: any = {};
+
+        if (categories && categories.length > 0) {
+            where.OR = categories.map((category) => ({
+                categories: {
+                    has: category,
+                },
+            }));
+        }
+
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: "insensitive" } },
+                { about: { contains: search, mode: "insensitive" } },
+            ];
+        }
+
+        const total = await this.prisma.tour.count({ where });
+
+        let tours = await this.prisma.tour.findMany({
+            where,
+            select: {
+                tourId: true,
+                name: true,
+                images: true,
+                about: true,
+                createdAt: true,
+                isActive: true,
+                categories: true,
+                _count: {
+                    select: {
+                        tourReviews: true,
+                    },
+                },
+                ticketTypes: {
+                    select: {
+                        _count: {
+                            select: {
+                                bookings: true,
+                            },
+                        },
+                        ticketPrices: {
+                            orderBy: {
+                                price: "asc",
+                            },
+                            take: 1,
+                        },
+                    },
+                },
+                tourReviews: {
+                    select: {
+                        rate: true,
+                    },
+                },
+            },
+        });
+
+        const processedTours = tours.map((tour) => {
+            // Tính tổng số booking
+            const totalBookings = tour.ticketTypes.reduce((sum, tt) => sum + tt._count.bookings, 0);
+
+            // Tính điểm trung bình
+            const avgRating =
+                tour.tourReviews.length > 0
+                    ? tour.tourReviews.reduce((sum, r) => sum + r.rate, 0) / tour.tourReviews.length
+                    : 0;
+
+            // Lấy giá thấp nhất hiện tại
+            const currentPrices = tour.ticketTypes
+                .flatMap((t) => t.ticketPrices)
+                .map((p) => p?.price || 0)
+                .filter((p) => p > 0);
+
+            const minPrice = currentPrices.length > 0 ? Math.min(...currentPrices) : 0;
+
+            return {
+                tourId: tour.tourId,
+                name: tour.name,
+                images: tour.images,
+                about: tour.about,
+                categories: tour.categories,
+                createdAt: tour.createdAt,
+                isActive: tour.isActive,
+                avgRating,
+                totalBookings,
+                minPrice,
+                reviewCount: tour._count.tourReviews,
+            };
+        });
+
+        return {
+            tours: processedTours,
+            total,
+        };
     }
 }

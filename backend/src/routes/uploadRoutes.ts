@@ -21,12 +21,6 @@ router.post(
     UploadController.uploadReviewImages
 );
 
-router.post(
-    '/tour',
-    authenticateToken,
-    uploadMultiple('images', 10),
-    UploadController.uploadTourImages
-);
 
 export default router;
 

@@ -6,6 +6,7 @@ import {
   updateProfileSchema,
   updateUserStatusSchema,
   toggleFavoriteTourSchema,
+  changePasswordSchema,
   validateQuery,
   validateRequest,
 } from "@/middleware/validation";
@@ -35,12 +36,18 @@ router.post(
   UserController.toggleFavoriteTour
 );
 router.get("/favorites", authenticateToken, UserController.getFavoriteTours);
+router.put(
+  "/password",
+  authenticateToken,
+  validateRequest(changePasswordSchema),
+  UserController.changePassword
+);
 
 router.patch(
   "/:id/status",
   validateRequest(updateUserStatusSchema),
   UserController.updateUserStatus
 );
-router.delete("/:id", UserController.deleteUser);
+router.delete("/:id", authenticateToken, UserController.deleteUser);
 
 export default router;

@@ -8,21 +8,25 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Review } from "@/global.types";
+import { AttractionReview, Review } from "@/global.types";
 import { Star } from "lucide-react";
 import React from "react";
 import { Button } from "../ui/button";
 
 interface AttractionReviewsSectionProps {
-  reviews: Review[];
+  reviews: AttractionReview[];
   averageRating: number;
   totalReviews: number;
+  canWrite?: boolean;
+  onWrite?: () => void;
 }
 
 function AttractionReviewsSection({
   reviews,
   averageRating,
   totalReviews,
+  canWrite = false,
+  onWrite,
 }: AttractionReviewsSectionProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
@@ -63,7 +67,14 @@ function AttractionReviewsSection({
 
   return (
     <div className="py-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Đánh giá</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-900">Đánh giá</h2>
+        {canWrite && (
+          <Button variant="ghost" onClick={() => onWrite && onWrite()}>
+            Viết đánh giá
+          </Button>
+        )}
+      </div>
 
       {/* Rating Overview */}
       <div className="flex flex-col lg:flex-row justify-between gap-8">
@@ -106,7 +117,7 @@ function AttractionReviewsSection({
               key={index}
               className="flex-none w-[380px] lg:basis-1/3"
             >
-              <ReviewCard review={review} />
+              <ReviewCard review={review} reviewType="attraction" />
             </CarouselItem>
           ))}
         </CarouselContent>

@@ -46,12 +46,15 @@ import { tourService } from "@/services/tour.service";
 import { reviewService } from "@/services/review.service";
 import ReviewDialog from "@/pages/BookingHistory/ReviewDialog";
 import ShareDialog from "@/components/detail/ShareDialog";
+import { bookingService } from "@/services/booking.service";
 import { useAuth } from "@/contexts/AuthContext";
 import UserAPI from "@/services/userAPI";
 import { useToast } from "@/contexts/ToastContext";
 import RequireSignIn from "@/components/detail/RequireSignIn";
+import { useTranslation } from "react-i18next";
 
 const TourDetailPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, token, isAuthenticated } = useAuth();
@@ -87,7 +90,7 @@ const TourDetailPage = () => {
 
   const fetch = async (refreshReviews = false) => {
     if (!id) {
-      setError('Tour ID không hợp lệ');
+      setError(t('tourDetail.invalidTourId'));
       setLoading(false);
       return;
     }
@@ -103,7 +106,7 @@ const TourDetailPage = () => {
       const tourData = await tourService.getTourById(id);
 
       if (!tourData) {
-        setError('Không tìm thấy tour');
+        setError(t('tourDetail.tourNotFound'));
         setLoading(false);
         return;
       }
@@ -205,7 +208,7 @@ const TourDetailPage = () => {
       }
     } catch (error) {
       console.error('Error fetching tour detail:', error);
-      setError('Không thể tải thông tin tour');
+      setError(t('tourDetail.loadError'));
     } finally {
       setLoading(false);
     }
@@ -221,7 +224,7 @@ const TourDetailPage = () => {
         window.scrollTo({ top: 0, behavior: "auto" });
       });
     } else {
-      setError('Tour ID không hợp lệ');
+      setError(t('tourDetail.invalidTourId'));
       setLoading(false);
     }
   }, [id]);
@@ -272,13 +275,13 @@ const TourDetailPage = () => {
   };
   const handleSave = async () => {
     if (!user || !token) {
-      showToast('Vui lòng đăng nhập để lưu tour yêu thích', 'error');
+      showToast(t('tourDetail.loginRequired'), 'error');
       navigate('/login');
       return;
     }
 
     if (!id) {
-      showToast('Tour ID không hợp lệ', 'error');
+      showToast(t('tourDetail.invalidTourId'), 'error');
       return;
     }
 
@@ -290,16 +293,16 @@ const TourDetailPage = () => {
         setIsFavorite(response.data.isFavorite);
         showToast(
           response.data.isFavorite
-            ? 'Đã thêm vào danh sách yêu thích'
-            : 'Đã xóa khỏi danh sách yêu thích',
+            ? t('tourDetail.addedToFavorites')
+            : t('tourDetail.removedFromFavorites'),
           'success'
         );
       } else {
-        showToast(response.message || 'Thất bại khi lưu tour', 'error');
+        showToast(response.message || t('tourDetail.saveError'), 'error');
       }
     } catch (error) {
       console.error('Error saving favorite tour:', error);
-      showToast('Thất bại khi lưu tour', 'error');
+      showToast(t('tourDetail.saveError'), 'error');
     } finally {
       setIsSavingFavorite(false);
     }
@@ -352,10 +355,10 @@ const TourDetailPage = () => {
   ///////////////////// Navigation /////////////////////
   const [sectionChosen, setSectionChosen] = useState("overview");
   const tabs = [
-    { id: "overview", label: "Tổng quan" },
-    { id: "details", label: "Chi tiết" },
-    { id: "itinerary", label: "Hành trình" },
-    { id: "reviews", label: "Đánh giá" },
+    { id: "overview", label: t("tourDetail.tabs.overview") },
+    { id: "details", label: t("tourDetail.tabs.details") },
+    { id: "itinerary", label: t("tourDetail.tabs.itinerary") },
+    { id: "reviews", label: t("tourDetail.tabs.reviews") },
   ];
   const [showStickyNav, setShowStickyNav] = useState(false);
   useEffect(() => {
@@ -419,31 +422,55 @@ const TourDetailPage = () => {
   }
 
   ///////////////////// Reviews /////////////////////
-  const [filter, setFilter] = useState("Gần đây nhất");
+  const [filter, setFilter] = useState(t("tourDetail.reviewFilters.mostRecent"));
   const options = [
-    "Gần đây nhất",
-    "Được thích nhiều nhất",
-    "Nhiều sao nhất",
-    "Ít sao nhất",
+    t("tourDetail.reviewFilters.mostRecent"),
+    t("tourDetail.reviewFilters.mostLiked"),
+    t("tourDetail.reviewFilters.highestRated"),
+    t("tourDetail.reviewFilters.lowestRated"),
   ];
   const filteredReviews = [...reviews].sort((a, b) => {
     switch (filter) {
-      case "Nhiều sao nhất":
+      case t("tourDetail.reviewFilters.highestRated"):
         return b.rate - a.rate;
-      case "Ít sao nhất":
+      case t("tourDetail.reviewFilters.lowestRated"):
         return a.rate - b.rate;
-      case "Được thích nhiều nhất":
+      case t("tourDetail.reviewFilters.mostLiked"):
         return b.likesCount - a.likesCount;
-      case "Gần đây nhất":
+      case t("tourDetail.reviewFilters.mostRecent"):
       default:
         return b.createdAt.getTime() - a.createdAt.getTime();
     }
   });
   const [puOpen, setPUOpen] = useState(false);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
+  const [canReview, setCanReview] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSavingFavorite, setIsSavingFavorite] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      if (!isAuthenticated || !id) {
+        if (mounted) setCanReview(false);
+        return;
+      }
+
+      try {
+        const bookings = await bookingService.getUserBookings();
+        const ok = bookings.some((b: any) => (b.tourId === id || b.tourId === id) && b.status === 'completed');
+        if (mounted) setCanReview(ok);
+      } catch (err) {
+        console.error('Error checking bookings for review permission', err);
+        if (mounted) setCanReview(false);
+      }
+    };
+
+    check();
+
+    return () => { mounted = false; };
+  }, [isAuthenticated, id]);
 
   const handleLikeReview = async (reviewId: string) => {
     try {
@@ -478,7 +505,7 @@ const TourDetailPage = () => {
         <Header />
         <div className="mt-24 px-4 md:px-8 w-full flex flex-col items-center justify-center h-96">
           <p className="text-red-500 text-xl mb-4">{error}</p>
-          <Button onClick={() => navigate('/')}>Về trang chủ</Button>
+          <Button onClick={() => navigate('/')}>{t("tourDetail.backToHome")}</Button>
         </div>
         <Footer />
       </div>
@@ -489,8 +516,8 @@ const TourDetailPage = () => {
       <div className="flex flex-col w-full items-center min-h-screen">
         <Header />
         <div className="mt-24 px-4 md:px-8 w-full flex flex-col items-center justify-center h-96">
-          <p className="text-gray-500 text-xl mb-4">Không tìm thấy tour</p>
-          <Button onClick={() => navigate('/')}>Về trang chủ</Button>
+          <p className="text-gray-500 text-xl mb-4">{t("tourDetail.tourNotFound")}</p>
+          <Button onClick={() => navigate('/')}>{t("tourDetail.backToHome")}</Button>
         </div>
         <Footer />
       </div>
@@ -511,7 +538,7 @@ const TourDetailPage = () => {
           <div className="flex items-center space-x-2">
             <RatingDisplay rating={rating} />
             <p className="text-black font-light font-['Inter']">
-              ({reviews.length} đánh giá)
+              ({reviews.length} {t("tourDetail.reviews")})
             </p>
           </div>
           <div className="flex items-center space-x-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
@@ -520,14 +547,28 @@ const TourDetailPage = () => {
               onClick={handleShare}
             >
               <Share2 size={16} />
-              <p className="font-['Inter']">Chia sẻ</p>
+              <p className="font-['Inter']">{t("tourDetail.share")}</p>
             </Button>
             <Button
-              className="bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0"
-              onClick={handleWriteReview}
+              className={`bg-gray-100 text-primary hover:bg-gray-200 flex items-center space-x-1 shrink-0 ${!canReview ? 'opacity-60 cursor-not-allowed' : ''}`}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  showToast(t('tourDetail.loginRequired'), 'error');
+                  navigate('/login');
+                  return;
+                }
+
+                if (!canReview) {
+                  showToast(t('tourDetail.reviewRequiresBooking'), 'error');
+                  return;
+                }
+
+                setOpenReviewDialog(true);
+              }}
+              disabled={!canReview}
             >
               <PenLine size={16} />
-              <p className="font-['Inter']">Đánh giá</p>
+              <p className="font-['Inter']">{t("tourDetail.writeReview")}</p>
             </Button>
             <Button
               className={`${isFavorite
@@ -541,11 +582,11 @@ const TourDetailPage = () => {
               <p className="font-['Inter']">
                 {isSavingFavorite
                   ? isFavorite
-                    ? "Đang bỏ lưu..."
-                    : "Đang lưu..."
+                    ? t("tourDetail.unsaving")
+                    : t("tourDetail.saving")
                   : isFavorite
-                    ? "Đã lưu"
-                    : "Lưu"}
+                    ? t("tourDetail.saved")
+                    : t("tourDetail.save")}
               </p>
             </Button>
           </div>
@@ -635,7 +676,7 @@ const TourDetailPage = () => {
               {/* Price + button */}
               <div className="flex items-center gap-4">
                 <span className="font-semibold hidden lg:inline">
-                  Chỉ từ 3,000,000 ₫
+                  {t("tourDetail.startingFrom")} 3,000,000 ₫
                 </span>
                 <Button
                   className="bg-primary font-semibold border-2 border-black text-white px-4 py-2 rounded-full hover:bg-primary/50"
@@ -648,7 +689,7 @@ const TourDetailPage = () => {
                     }
                   }}
                 >
-                  Đặt chỗ ngay
+                  {t("tourDetail.bookNow")}
                 </Button>
               </div>
             </div>
@@ -679,7 +720,7 @@ const TourDetailPage = () => {
                 className="rounded-lg mt-2 md:mt-6 px-4 md:px-8 py-6 font-['Inter'] bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100"
               >
                 <h2 className="text-2xl font-bold mb-6 text-gray-900">
-                  Về chuyến đi
+                  {t("tourDetail.aboutTrip")}
                 </h2>
                 <p className="text-justify text-gray-700 font-normal leading-relaxed text-base mb-6">
                   {tour.description}
@@ -691,8 +732,8 @@ const TourDetailPage = () => {
                       <Smile className="w-5 h-5 text-primary shrink-0" />
                     </div>
                     <span className="text-gray-700">
-                      <strong className="text-gray-900">Độ tuổi: </strong>
-                      {`${tour.age} tuổi`}
+                      <strong className="text-gray-900">{t("tourDetail.age")}: </strong>
+                      {`${tour.age} ${t("tourDetail.yearsOld")}`}
                     </span>
                   </div>
 
@@ -701,8 +742,8 @@ const TourDetailPage = () => {
                       <Users className="w-5 h-5 text-primary shrink-0" />
                     </div>
                     <span className="text-gray-700">
-                      <strong className="text-gray-900">Giới hạn nhóm:</strong>{" "}
-                      Tối đa {tour.maxGroup} người/nhóm
+                      <strong className="text-gray-900">{t("tourDetail.groupLimit")}:</strong>{" "}
+                      {t("tourDetail.maxPeople", { count: tour.maxGroup })}
                     </span>
                   </div>
 
@@ -711,7 +752,7 @@ const TourDetailPage = () => {
                       <Clock className="w-5 h-5 text-primary shrink-0" />
                     </div>
                     <span className="text-gray-700">
-                      <strong className="text-gray-900">Thời lượng:</strong>{" "}
+                      <strong className="text-gray-900">{t("tourDetail.duration")}:</strong>{" "}
                       {tour.duration}
                     </span>
                   </div>
@@ -721,7 +762,7 @@ const TourDetailPage = () => {
                       <Languages className="w-5 h-5 text-primary shrink-0" />
                     </div>
                     <span className="text-gray-700">
-                      <strong className="text-gray-900">Hướng dẫn viên:</strong>{" "}
+                      <strong className="text-gray-900">{t("tourDetail.tourGuide")}:</strong>{" "}
                       {tour.languages}
                     </span>
                   </div>
@@ -757,7 +798,7 @@ const TourDetailPage = () => {
             >
               <div className="lg:sticky lg:top-24 min-h-[360px] h-auto bg-white rounded-2xl shadow-2xl shadow-primary/10 border-2 border-primary/20 hover:shadow-primary/20 transition-shadow duration-300">
                 <div className="flex items-center font-semibold font-xl bg-gradient-to-r from-primary to-primary/90 w-full h-16 text-white rounded-t-2xl px-6 py-4">
-                  <p className="font-bold text-xl">Chọn ngày và số lượng</p>
+                  <p className="font-bold text-xl">{t("tourDetail.selectDateAndQuantity")}</p>
                 </div>
                 {/*Date and travellers*/}
                 <div className="py-5 px-4 w-full flex flex-col sm:flex-row lg:flex-row justify-between gap-4">
@@ -783,7 +824,7 @@ const TourDetailPage = () => {
                   <div className="mx-4 mt-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl border-2 border-primary/20">
                     <div className="flex items-center justify-between">
                       <span className="text-gray-700 font-semibold">
-                        Tổng cộng:
+                        {t("tourDetail.total")}:
                       </span>
                       <span className="text-2xl font-bold text-primary">
                         {totalPrice.toLocaleString("vi-VN")} ₫
@@ -796,7 +837,7 @@ const TourDetailPage = () => {
                     <Button
                       onClick={() => {
                         if (!isValidTickets(userTicket)) {
-                          showToast("Vui lòng chọn số lượng hành khách", "error");
+                          showToast(t("tourDetail.selectPassengers"), "error");
                           return;
                         }
                         // Đã chọn vé + đăng nhập -> đi
@@ -815,7 +856,7 @@ const TourDetailPage = () => {
                     >
                       <Ticket size={24} />
                       <p className="text-lg md:text-xl font-semibold">
-                        Đặt chỗ ngay
+                        {t("tourDetail.bookNow")}
                       </p>
                     </Button> :
                     <RequireSignIn
@@ -831,8 +872,7 @@ const TourDetailPage = () => {
                 <div className="px-5 flex items-start text-xs gap-2 pb-5 pt-4">
                   <CalendarCog className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <p className="text-gray-600 leading-relaxed">
-                    <PoilcyModal cancelPolicy={tour.cancelPolicy} /> – Hủy bất
-                    cứ lúc nào trước{" "}
+                    <PoilcyModal cancelPolicy={tour.cancelPolicy} /> – {t("tourDetail.cancelBefore")}{" "}
                     <span className="font-medium text-primary">
                       {formatDate(
                         new Date(
@@ -840,7 +880,7 @@ const TourDetailPage = () => {
                         )
                       )}
                     </span>{" "}
-                    để được hoàn tiền đầy đủ.
+                    {t("tourDetail.fullRefund")}.
                   </p>
                 </div>
               </div>
@@ -855,7 +895,7 @@ const TourDetailPage = () => {
             className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100 mt-6"
           >
             <h2 className="text-2xl font-['Inter'] font-bold mb-6 text-gray-900">
-              Hành trình
+              {t("tourDetail.itinerary")}
             </h2>
             <Itinerary
               tourId={id}
@@ -873,7 +913,7 @@ const TourDetailPage = () => {
             className="h-full w-full rounded-lg p-4 md:p-8 bg-gradient-to-br from-white to-gray-50/50 shadow-sm border border-gray-100 mt-6"
           >
             <h2 className="text-2xl font-bold font-['Inter'] mb-6 text-gray-900">
-              Đánh giá
+              {t("tourDetail.reviewsTitle")}
             </h2>
             <div className="w-full flex flex-col lg:flex-row justify-between items-start gap-8">
               {/* Filter & Reviews List */}
@@ -882,7 +922,7 @@ const TourDetailPage = () => {
                 <div className="flex flex-col sm:flex-row w-full justify-between items-start sm:items-center gap-4 sm:gap-0">
                   <div className="flex text-lg font-semibold items-center space-x-2">
                     <Filter size={16} />
-                    <p>Bộ lọc</p>
+                    <p>{t("tourDetail.filter")}</p>
                   </div>
                   <ReviewFilter
                     value={filter}
@@ -913,7 +953,7 @@ const TourDetailPage = () => {
                               {review.userName}
                             </p>
                             <p className="italic text-xs md:text-sm text-gray-500">
-                              Đăng vào {formatDate(review.createdAt)}
+                              {t("tourDetail.postedOn")} {formatDate(review.createdAt)}
                             </p>
                           </div>
                         </div>
@@ -968,7 +1008,7 @@ const TourDetailPage = () => {
                 <div className="flex items-center justify-center space-x-2">
                   <RatingDisplay rating={rating} />
                   <p className="text-black font-light font-['Inter']">
-                    ({reviews.length} đánh giá)
+                    ({reviews.length} {t("tourDetail.reviews")})
                   </p>
                 </div>
                 <div className="space-y-2 w-full max-w-[250px]">

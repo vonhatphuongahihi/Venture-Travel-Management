@@ -3,8 +3,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Register = () => {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<"login" | "register">("register");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -26,24 +28,24 @@ const Register = () => {
     e.preventDefault();
 
     if (!username || !email || !password || !confirm) {
-      showToast('Vui lòng nhập đầy đủ thông tin', 'error');
+      showToast(t('auth.register.fillAllFields'), 'error');
       return;
     }
 
     if (password !== confirm) {
-      showToast('Mật khẩu xác nhận không khớp', 'error');
+      showToast(t('auth.register.passwordMismatch'), 'error');
       return;
     }
 
     if (password.length < 8) {
-      showToast('Mật khẩu phải có ít nhất 8 ký tự', 'error');
+      showToast(t('auth.register.passwordMinLength'), 'error');
       return;
     }
 
     // Validate password strength
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(password)) {
-      showToast('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường và 1 số', 'error');
+      showToast(t('auth.register.passwordRequirements'), 'error');
       return;
     }
 
@@ -56,7 +58,7 @@ const Register = () => {
       });
 
       if (result.success) {
-        showToast('Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.', 'success');
+        showToast(t('auth.register.success'), 'success');
         navigate('/login');
       } else {
         showToast(result.message, 'error');
@@ -100,7 +102,7 @@ const Register = () => {
                 className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${tab === "login" ? "text-white" : "text-slate-600"
                   }`}
               >
-                Đăng nhập
+                {t('auth.login.title')}
               </button>
               <button
                 onClick={() => {
@@ -110,58 +112,58 @@ const Register = () => {
                 className={`relative z-10 flex-1 text-sm font-medium py-2 rounded-full transition-colors duration-300 ${tab === "register" ? "text-white" : "text-slate-600"
                   }`}
               >
-                Đăng ký
+                {t('auth.register.title')}
               </button>
             </div>
 
             {/* Form */}
             <form onSubmit={handleRegister}>
               <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Tên người dùng
+                {t('auth.register.username')}
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Nhập tên người dùng"
+                placeholder={t('auth.register.usernamePlaceholder')}
                 required
               />
 
               <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Email
+                {t('auth.register.email')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Nhập email"
+                placeholder={t('auth.register.emailPlaceholder')}
                 required
               />
 
               <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Mật khẩu
+                {t('auth.register.password')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Nhập mật khẩu (ít nhất 8 ký tự)"
+                placeholder={t('auth.register.passwordPlaceholder')}
                 required
                 minLength={8}
               />
 
               <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Nhập lại mật khẩu
+                {t('auth.register.confirmPassword')}
               </label>
               <input
                 type="password"
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 className="w-full mb-4 rounded-full border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Nhập lại mật khẩu"
+                placeholder={t('auth.register.confirmPasswordPlaceholder')}
                 required
               />
 
@@ -171,14 +173,14 @@ const Register = () => {
                 disabled={isLoading}
                 className="w-full rounded-full bg-primary text-white py-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Đang đăng ký...' : 'Đăng ký'}
+                {isLoading ? t('auth.register.registering') : t('auth.register.registerButton')}
               </button>
             </form>
 
             {/* Hoặc */}
             <div className="flex items-center gap-3 my-6">
               <div className="flex-1 h-px bg-border" />
-              <div className="text-xs text-slate-400">Hoặc đăng ký bằng</div>
+              <div className="text-xs text-slate-400">{t('auth.register.orRegisterWith')}</div>
               <div className="flex-1 h-px bg-border" />
             </div>
 
@@ -193,13 +195,13 @@ const Register = () => {
                 alt="google"
                 className="h-4"
               />
-              {isLoading ? 'Đang xử lý...' : 'Tiếp tục với Google'}
+              {isLoading ? t('auth.register.processing') : t('auth.register.continueWithGoogle')}
             </button>
 
             <p className="text-center text-sm text-slate-500 mt-6">
-              Bạn đã có tài khoản?{" "}
+              {t('auth.register.hasAccount')}{" "}
               <Link to="/login" className="text-primary underline">
-                Đăng nhập
+                {t('auth.register.loginLink')}
               </Link>
             </p>
           </div>

@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { BookingProvider } from "./contexts/BookingContext";
 import SplashScreen from "./components/SplashScreen";
+import "./i18n/config";
 import AboutUs from "./pages/AboutUs";
 import { AttractionPage } from "./pages/AttractionPage";
 import BookingHistory from "./pages/BookingHistory/BookingHistory";
@@ -31,6 +32,7 @@ import TermOfUse from "./pages/TermOfUse";
 import TourDetail from "./pages/TourDetail";
 import VerifyEmail from "./pages/VerifyEmail";
 import FavoriteTour from "./pages/FavoriteTour";
+import Settings from "./pages/Settings";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const queryClient = new QueryClient();
@@ -77,6 +79,7 @@ const App = () => {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/booking-history" element={<BookingHistory />} />
                     <Route path="/favorite-tours" element={<FavoriteTour />} />
+                    <Route path="/settings" element={<Settings />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

@@ -118,14 +118,14 @@ export class ProvinceController {
 
       const formattedTours = result.data.map((tour: any) => {
         // Calculate min price
-        const prices = tour.ticketTypes.flatMap((tt: any) => 
+        const prices = tour.ticketTypes.flatMap((tt: any) =>
           tt.ticketPrices ? tt.ticketPrices.map((tp: any) => tp.price) : []
         );
         const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
 
         // Calculate avg rating
-        const totalRating = tour.reviews.reduce((acc: number, r: any) => acc + r.rate, 0);
-        const avgRating = tour.reviews.length > 0 ? totalRating / tour.reviews.length : 0;
+        const totalRating = tour.tourReviews.reduce((acc: number, r: any) => acc + r.rate, 0);
+        const avgRating = tour.tourReviews.length > 0 ? totalRating / tour.tourReviews.length : 0;
 
         // Parse duration (assuming format like "2 days 1 night" or similar)
         // This is a basic parser, adjust regex based on actual data format
@@ -136,24 +136,24 @@ export class ProvinceController {
         if (dayMatch) durationDays = parseInt(dayMatch[1]);
         if (nightMatch) durationNights = parseInt(nightMatch[1]);
         if (!dayMatch && !nightMatch && tour.duration) {
-             // Fallback if just a number is provided or different format
-             const num = parseInt(tour.duration);
-             if (!isNaN(num)) durationDays = num;
+          // Fallback if just a number is provided or different format
+          const num = parseInt(tour.duration);
+          if (!isNaN(num)) durationDays = num;
         }
 
         // Determine status
         let status = 'upcoming';
         const now = new Date();
         if (tour.startDate && tour.endDate) {
-            const start = new Date(tour.startDate);
-            const end = new Date(tour.endDate);
-            if (now >= start && now <= end) {
-                status = 'ongoing';
-            } else if (now > end) {
-                status = 'completed';
-            }
+          const start = new Date(tour.startDate);
+          const end = new Date(tour.endDate);
+          if (now >= start && now <= end) {
+            status = 'ongoing';
+          } else if (now > end) {
+            status = 'completed';
+          }
         } else if (tour.isActive) {
-             status = 'ongoing'; // Default if no dates but active
+          status = 'ongoing'; // Default if no dates but active
         }
 
         return {
@@ -165,15 +165,15 @@ export class ProvinceController {
           duration: tour.duration, // Raw duration string
           location: tour.pickupPoint || '', // Mapped to location
           rating: parseFloat(avgRating.toFixed(1)),
-          reviewCount: tour.reviews.length, // Mapped to reviewCount
+          reviewCount: tour.tourReviews.length, // Mapped to reviewCount
           category: tour.categories && tour.categories.length > 0 ? tour.categories[0] : 'General', // Mapped to category
           status: status,
           maxParticipants: tour.maxGroupSize,
           availableSpots: tour.maxGroupSize, // Placeholder, ideally calculated from bookings
-          
+
           // Keep existing fields if needed by other components, or remove if strictly following the list
-          name: tour.name, 
-          review_count: tour.reviews.length,
+          name: tour.name,
+          review_count: tour.tourReviews.length,
           duration_days: durationDays,
           duration_nights: durationNights,
           start_point: tour.pickup ? {
@@ -234,11 +234,11 @@ export class ProvinceController {
         description: attraction.description,
         category: attraction.category,
         rating:
-          attraction.reviews.length > 0
-            ? attraction.reviews.reduce((acc, r) => acc + r.rate, 0) /
-              attraction.reviews.length
+          attraction.attractionReviews.length > 0
+            ? attraction.attractionReviews.reduce((acc: number, r: any) => acc + r.rate, 0) /
+            attraction.attractionReviews.length
             : 0,
-        reviewCount: attraction.reviews.length,
+        reviewCount: attraction.attractionReviews.length,
       }));
 
       res

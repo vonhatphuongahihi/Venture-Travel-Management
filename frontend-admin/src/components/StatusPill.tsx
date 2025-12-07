@@ -1,10 +1,22 @@
-import type { BookingStatus } from '../types'
+// Backend có thể trả về: pending, completed, canceled, cancelled, processing
+// Frontend chỉ dùng: pending, confirmed, cancelled
+type BackendStatus = "pending" | "completed" | "canceled" | "cancelled" | "processing";
+type FrontendStatus = "pending" | "confirmed" | "cancelled";
 
-export function StatusPill({ status }: { status: BookingStatus }) {
+function normalizeStatus(status: string): FrontendStatus {
+  if (status === "completed") return "confirmed";
+  if (status === "canceled" || status === "cancelled") return "cancelled";
+  if (status === "processing") return "pending";
+  return status as FrontendStatus;
+}
+
+export function StatusPill({ status }: { status: BackendStatus | string }) {
+  const normalizedStatus = normalizeStatus(status);
+  
   const label =
-    status === 'completed'
+    normalizedStatus === 'confirmed'
       ? 'Hoàn tất'
-      : status === 'pending'
+      : normalizedStatus === 'pending'
       ? 'Đang xử lý'
       : 'Huỷ'
 
@@ -12,9 +24,9 @@ export function StatusPill({ status }: { status: BookingStatus }) {
     <span
       className={
         `inline-flex h-7 w-28 items-center justify-center rounded-full text-sm font-semibold ` +
-        (status === 'completed'
+        (normalizedStatus === 'confirmed'
           ? 'bg-[#00B69B] text-white'
-          : status === 'pending'
+          : normalizedStatus === 'pending'
           ? 'bg-[#FCBE2D] text-white'
           : 'bg-[#FD5454] text-white')
       }

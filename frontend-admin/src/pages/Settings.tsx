@@ -577,6 +577,7 @@ export default function Settings() {
                   <input
                     type={showOldPassword ? "text" : "password"}
                     value={passwordData.oldPassword}
+                    autoComplete="off"
                     onChange={(e) =>
                       setPasswordData((prev) => ({ ...prev, oldPassword: e.target.value }))
                     }

@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import AttractionHeroSection from "@/components/attraction/AttractionHeroSection.tsx";
 import AttractionReviewsSection from "@/components/attraction/AttractionReviewsSection.tsx";
 import AttractionToursSection from "@/components/attraction/AttractionToursSection.tsx";
+import NearbyDestinationsSection from "@/components/attraction/NearbyDestinationsSection";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,54 +12,48 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { mockAttractions } from "@/data/attractions";
-import { mockReviews } from "@/data/reviews";
-import { mockTours } from "@/data/tours";
-import { Attraction, Review, Tour } from "@/global.types";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { bookingService } from "@/services/booking.service";
+import { useToast } from "@/contexts/ToastContext";
+import { useAttraction } from "@/services/attraction/attractionHook";
+import { Attraction, Tour, Review } from "@/global.types";
 
 export function AttractionPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [attraction, setAttraction] = useState<Attraction | null>(null);
-  const [tours, setTours] = useState<Tour[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
+  const [canReviewAttraction, setCanReviewAttraction] = React.useState(false);
+  const { data: attraction, isLoading, isError } = useAttraction(slug || "");
 
-  useEffect(() => {
-    // Simulate API call
-    const fetchAttractionData = async () => {
+  // Check if user has a completed booking of any tour that includes this attraction
+  React.useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      if (!isAuthenticated || !attraction) {
+        if (mounted) setCanReviewAttraction(false);
+        return;
+      }
+
       try {
-        setLoading(true);
-        // In real app, fetch from API based on slug
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading
-
-        const foundAttraction = mockAttractions.find(
-          (attraction) => attraction.slug === slug
-        );
-
-        if (!foundAttraction) {
-          navigate("/404");
-          return;
-        }
-
-        setAttraction(foundAttraction);
-        setTours(mockTours);
-        setReviews(mockReviews);
-      } catch (error) {
-        console.error("Error fetching attraction data:", error);
-        navigate("/404");
-      } finally {
-        setLoading(false);
-        window.scrollTo({ top: 0, behavior: "instant" });
+        const bookings = await bookingService.getUserBookings();
+        const completedTourIds = bookings.filter((b: any) => b.status === 'completed').map((b: any) => b.tourId);
+        const visits = (attraction.tours || []).some((t: any) => completedTourIds.includes(t.id || t.tourId || ''));
+        if (mounted) setCanReviewAttraction(visits);
+      } catch (err) {
+        console.error('Error checking attraction review permission', err);
+        if (mounted) setCanReviewAttraction(false);
       }
     };
 
-    fetchAttractionData();
-  }, [slug, navigate]);
+    check();
 
-  if (loading) {
+    return () => { mounted = false; };
+  }, [isAuthenticated, attraction]);
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
@@ -70,7 +65,7 @@ export function AttractionPage() {
     );
   }
 
-  if (!attraction) {
+  if (isError || !attraction) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
@@ -85,10 +80,10 @@ export function AttractionPage() {
   const breadcrumbItems = [
     { label: "Trang chủ", href: "/" },
     {
-      label: attraction.location.province,
-      href: `/province/${attraction.location.slug}`,
+      label: attraction.province.name,
+      href: `/province/${attraction.provinceId}`,
     },
-    { label: attraction.name, href: `/attraction/${attraction.slug}` },
+    { label: attraction.name, href: `/attraction/${attraction.id}` },
   ];
 
   return (
@@ -127,11 +122,28 @@ export function AttractionPage() {
 
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4">
-          <AttractionToursSection tours={tours} />
+          <AttractionToursSection tours={attraction.tours || []} />
           <AttractionReviewsSection
-            reviews={reviews}
-            averageRating={attraction.reviewInfo.rating}
-            totalReviews={attraction.reviewInfo.count}
+            reviews={attraction.attractionReviews || []}
+            averageRating={attraction.rating || 0}
+            totalReviews={attraction.reviewCount || 0}
+            canWrite={canReviewAttraction}
+            onWrite={() => {
+              if (!isAuthenticated) {
+                showToast('Vui lòng đăng nhập để đánh giá.', 'error');
+                navigate('/login');
+                return;
+              }
+
+              navigate('/booking-history');
+              showToast('Chọn tour đã hoàn thành để đánh giá địa điểm này.', 'info');
+            }}
+          />
+          <NearbyDestinationsSection
+            provinceId={attraction.provinceId}
+            currentAttractionId={attraction.id}
+            category={attraction.category}
+            provinceCoordinates={attraction.province.coordinates}
           />
         </div>
       </main>

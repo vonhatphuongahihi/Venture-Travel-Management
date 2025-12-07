@@ -4,7 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { X, MapPin, Star, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useProvinceToursInfinite } from "@/hooks/useProvince";
+import { useProvinceToursInfinite } from "@/services/province/provinceHook";
 import { Tour } from "@/global.types";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/utils/formatters";
@@ -37,7 +37,11 @@ interface FeaturedToursMapProps {
   onClose: () => void;
 }
 
-export default function FeaturedToursMap({ provinceId, center, onClose }: FeaturedToursMapProps) {
+export default function FeaturedToursMap({
+  provinceId,
+  center,
+  onClose,
+}: FeaturedToursMapProps) {
   const navigate = useNavigate();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
@@ -48,17 +52,14 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [hoveredTourId, setHoveredTourId] = useState<string | null>(null);
-  const [hoverSource, setHoverSource] = useState<'card' | 'marker' | null>(null);
+  const [hoverSource, setHoverSource] = useState<"card" | "marker" | null>(
+    null
+  );
   // const [selectedTourId, setSelectedTourId] = useState<string | null>(null); // Removed persistent selection state
 
   // Fetch tours with infinite scroll
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useProvinceToursInfinite(provinceId, 10);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useProvinceToursInfinite(provinceId, 10);
 
   const tours = useMemo(() => {
     return data?.pages.flatMap((page: any) => page.data) || [];
@@ -95,7 +96,7 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
   const handleMarkerEnter = (tourId: string) => {
     clearHoverTimeout();
     setHoveredTourId(tourId);
-    setHoverSource('marker');
+    setHoverSource("marker");
   };
 
   const handleMarkerLeave = () => {
@@ -111,8 +112,8 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
     if (!map || tours.length === 0) return;
 
     // Clear existing markers and popups
-    Object.values(markersRef.current).forEach(marker => marker.remove());
-    Object.values(popupsRef.current).forEach(popup => popup.remove());
+    Object.values(markersRef.current).forEach((marker) => marker.remove());
+    Object.values(popupsRef.current).forEach((popup) => popup.remove());
     markersRef.current = {};
     popupsRef.current = {};
 
@@ -122,32 +123,33 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
 
       if (lat && lng) {
         const el = document.createElement("div");
-        el.className = "cursor-pointer"; 
+        el.className = "cursor-pointer";
         // Default state: Blue dot
         el.innerHTML = `
           <div class="marker-dot w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg transition-transform duration-300"></div>
         `;
 
-        const marker = new mapboxgl.Marker(el)
-          .setLngLat([lng, lat])
-          .addTo(map);
+        const marker = new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map);
 
         // Hover tooltip - Rich Card
-        const popup = new mapboxgl.Popup({ 
-          offset: 25, 
-          closeButton: false, 
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: false,
           closeOnClick: false,
           maxWidth: "400px",
-          className: "z-50 featured-tour-popup" // Added custom class
-        })
-        .setLngLat([lng, lat]) // IMPORTANT: Set position!
-        .setHTML(`
+          className: "z-50 featured-tour-popup", // Added custom class
+        }).setLngLat([lng, lat]) // IMPORTANT: Set position!
+          .setHTML(`
           <div class="flex p-2 bg-white rounded-xl shadow-md min-w-[320px] gap-3 items-start cursor-pointer hover:bg-gray-50 transition-colors">
             <div class="w-20 h-30 flex-shrink-0 rounded-lg overflow-hidden relative bg-gray-100">
-              <img src="${tour.image || '/placeholder-tour.jpg'}" class="w-full h-full object-cover" alt="${tour.name}" />
+              <img src="${
+                tour.image || "/placeholder-tour.jpg"
+              }" class="w-full h-full object-cover" alt="${tour.name}" />
             </div>
             <div class="flex-1 min-w-0 flex flex-col justify-between h-30 py-0.5">
-              <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight mb-auto">${tour.name}</h3>
+              <h3 class="text-sm font-bold text-gray-900 line-clamp-2 leading-tight mb-auto">${
+                tour.name
+              }</h3>
               
               <div class="flex items-center gap-1 text-[10px] text-gray-500 mt-1">
                 <span class="text-yellow-500 font-bold flex items-center gap-0.5">
@@ -158,7 +160,9 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
               </div>
               
               <div class="mt-1 flex items-center gap-1">
-                <span class="text-base font-bold text-gray-900">${formatCurrency(tour.price)}</span>
+                <span class="text-base font-bold text-gray-900">${formatCurrency(
+                  tour.price
+                )}</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#ef4444" stroke="none" class="lucide lucide-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
             </div>
@@ -168,44 +172,43 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
         // Event listeners for state management
         el.addEventListener("mouseenter", () => handleMarkerEnter(tour.id));
         el.addEventListener("mouseleave", handleMarkerLeave);
-        
+
         // Click to scroll and zoom
         el.addEventListener("click", () => {
-           scrollToCard(tour.id);
-           
-           map.flyTo({
-             center: [lng, lat],
-             zoom: 14,
-             duration: 1500
-           });
+          scrollToCard(tour.id);
+
+          map.flyTo({
+            center: [lng, lat],
+            zoom: 14,
+            duration: 1500,
+          });
         });
 
         markersRef.current[tour.id] = marker;
         popupsRef.current[tour.id] = popup;
       }
     });
-
   }, [tours]);
 
   // Highlight marker and Show Popup on hover
   useEffect(() => {
     const map = mapInstanceRef.current;
-    
+
     Object.entries(markersRef.current).forEach(([id, marker]) => {
       const el = marker.getElement();
       const popup = popupsRef.current[id];
-      
+
       if (id === hoveredTourId) {
         // Change to Pin Style (Blue/Primary)
         el.style.zIndex = "10";
         el.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="#26b8ed" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin drop-shadow-xl transform -translate-y-1/2 transition-all duration-300"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3" fill="white"/></svg>
         `;
-        
+
         // Show Popup ONLY if hover source is marker
-        if (popup && map && hoverSource === 'marker') {
+        if (popup && map && hoverSource === "marker") {
           popup.addTo(map);
-          
+
           // Add listeners to popup element for grace period and click nav
           const popupEl = popup.getElement();
           if (popupEl) {
@@ -217,14 +220,13 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
             };
           }
         }
-        
       } else {
         // Revert to Dot Style
         el.style.zIndex = "1";
         el.innerHTML = `
           <div class="marker-dot w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg transition-transform duration-300"></div>
         `;
-        
+
         // Hide Popup
         if (popup) {
           popup.remove();
@@ -261,12 +263,16 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
   const handleCardHover = (tour: FeaturedTour) => {
     clearHoverTimeout();
     setHoveredTourId(tour.id);
-    setHoverSource('card');
-    if (tour.start_point?.lat && tour.start_point?.long && mapInstanceRef.current) {
+    setHoverSource("card");
+    if (
+      tour.start_point?.lat &&
+      tour.start_point?.long &&
+      mapInstanceRef.current
+    ) {
       mapInstanceRef.current.flyTo({
         center: [tour.start_point.long, tour.start_point.lat],
         zoom: 14,
-        duration: 1500
+        duration: 1500,
       });
     }
   };
@@ -291,11 +297,11 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
       {/* Map Section - Full Screen Background */}
       <div className="absolute inset-0 z-0">
         <div ref={mapContainerRef} className="w-full h-full" />
-        
-        <Button 
-          variant="secondary" 
-          size="icon" 
-          onClick={onClose} 
+
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={onClose}
           className="absolute top-4 right-4 z-20 bg-white shadow-md hover:bg-gray-100 rounded-full w-10 h-10"
         >
           <X className="w-5 h-5" />
@@ -306,7 +312,12 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
       <div className="absolute left-0 top-0 bottom-0 md:left-4 md:top-4 md:bottom-4 w-full md:w-[400px] lg:w-[450px] z-10 bg-white md:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100">
         <div className="p-4 border-b flex items-center justify-between bg-white sticky top-0 z-20">
           <h2 className="text-xl font-bold text-gray-800">Tour nổi bật</h2>
-          <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="md:hidden"
+          >
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -318,9 +329,10 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
               ref={(el) => (cardRefs.current[tour.id] = el)}
               onMouseEnter={() => handleCardHover(tour)}
               onMouseLeave={() => setHoveredTourId(null)}
+              onClick={() => navigate("/tour/" + tour.id)}
               className={cn(
                 "group flex gap-4 p-4 border-b border-gray-100 cursor-pointer transition-colors duration-200",
-                (hoveredTourId === tour.id)
+                hoveredTourId === tour.id
                   ? "bg-blue-50/50"
                   : "bg-white hover:bg-gray-50"
               )}
@@ -336,13 +348,15 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
 
               {/* Content */}
               <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                <h3 className={cn(
-                  "font-medium text-gray-900 line-clamp-2 text-sm leading-snug transition-colors",
-                  hoveredTourId === tour.id ? "text-primary" : ""
-                )}>
+                <h3
+                  className={cn(
+                    "font-medium text-gray-900 line-clamp-2 text-sm leading-snug transition-colors",
+                    hoveredTourId === tour.id ? "text-primary" : ""
+                  )}
+                >
                   {tour.name}
                 </h3>
-                
+
                 <div className="mt-auto space-y-1">
                   {/* Rating & Reviews */}
                   <div className="flex items-center gap-2 text-xs">
@@ -351,7 +365,9 @@ export default function FeaturedToursMap({ provinceId, center, onClose }: Featur
                       <span>{tour.rating || 0}</span>
                     </div>
                     <span className="text-gray-400">•</span>
-                    <span className="text-gray-500">{tour.review_count || 0} đánh giá</span>
+                    <span className="text-gray-500">
+                      {tour.review_count || 0} đánh giá
+                    </span>
                   </div>
 
                   {/* Price */}

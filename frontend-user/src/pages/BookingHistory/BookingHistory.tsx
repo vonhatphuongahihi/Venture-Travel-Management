@@ -1,9 +1,9 @@
-import avatarImg from "@/assets/beach-destination.jpg";
 import halongImg from "@/assets/hero-vietnam-1.jpg";
 import fansipanImg from "@/assets/fansipan.jpg";
 import festivalImg from "@/assets/cultural-festival.jpg";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import UserSidebar from "@/components/UserSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
 import { useEffect, useState } from "react";
@@ -12,10 +12,10 @@ import ReviewDialog from "./ReviewDialog";
 import { bookingService } from "@/services/booking.service";
 import { BookingHistoryItem } from "@/types/tour.types";
 import { Loader2 } from "lucide-react";
-// Import icons cho menu toggle
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const BookingHistory = () => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -27,18 +27,18 @@ const BookingHistory = () => {
   const [bookings, setBookings] = useState<BookingHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // State quản lý đóng mở sidebar trên mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const getStatusText = (status: string) => {
     switch (status) {
       case "completed":
-        return "Hoàn tất";
+        return t('bookingHistory.completed');
       case "processing":
-        return "Đang xử lý";
+        return t('bookingHistory.processing');
       case "cancelled":
-        return "Bị hủy";
+        return t('bookingHistory.cancelled');
       default:
         return status;
     }
@@ -81,20 +81,19 @@ const BookingHistory = () => {
 
   const handleLogout = () => {
     logout();
-    showToast("Đã đăng xuất thành công", "success");
+    showToast(t('settings.logout.success'), "success");
     navigate("/login");
   };
 
   const handleCancelBooking = async (bookingId: string) => {
-    if (!window.confirm("Bạn có chắc chắn muốn hủy tour này không?")) {
+    if (!window.confirm(t('bookingHistory.confirmCancel'))) {
       return;
     }
 
     try {
       await bookingService.cancelBooking(bookingId);
-      showToast("Hủy tour thành công", "success");
-      
-      // Refresh bookings list
+      showToast(t('bookingHistory.cancelSuccess'), "success");
+
       const data = await bookingService.getUserBookings();
       const mappedBookings: any[] = data.map((booking) => ({
         id: booking.bookingId,
@@ -111,12 +110,11 @@ const BookingHistory = () => {
       setBookings(mappedBookings);
     } catch (err: unknown) {
       console.error("Error canceling booking:", err);
-      const errorMessage = (err as any)?.response?.data?.message || "Không thể hủy tour. Vui lòng thử lại.";
+      const errorMessage = (err as any)?.response?.data?.message || t('bookingHistory.cancelFailed');
       showToast(errorMessage, "error");
     }
   };
 
-  // Check authentication on component mount
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -124,7 +122,6 @@ const BookingHistory = () => {
     }
   }, [user, navigate]);
 
-  // Fetch bookings from API
   useEffect(() => {
     const fetchBookings = async () => {
       if (!user) return;
@@ -134,32 +131,16 @@ const BookingHistory = () => {
 
       try {
         const data = await bookingService.getUserBookings();
-        
-        // Map API data to component format
-        const mappedBookings: any[] = data.map((booking) => ({
-          id: booking.bookingId,
-          tourCode: booking.bookingId.substring(0, 4).toUpperCase(),
-          tourName: booking.tourName,
-          bookingDate: booking.bookingDate,
-          startDate: booking.startDate,
-          status: booking.status,
-          totalPrice: booking.totalPrice,
-          participants: booking.participants,
+
+        const mappedBookings = data.map((booking) => ({
+          ...booking,
           tourImage: booking.tourImage || halongImg,
-          tourId: booking.tourId,
         }));
 
         setBookings(mappedBookings);
-
-        // Check if there's a new booking from navigation state
-        if (location.state?.newBooking) {
-          showToast("Đặt tour thành công!", "success");
-          // Clear navigation state
-          window.history.replaceState({}, document.title);
-        }
       } catch (err: unknown) {
         console.error("Error fetching bookings:", err);
-        const errorMessage = (err as any)?.response?.data?.message || "Không thể tải lịch sử đặt tour";
+        const errorMessage = (err as any)?.response?.data?.message || t('bookingHistory.failedToLoad');
         setError(errorMessage);
         showToast(errorMessage, "error");
       } finally {
@@ -168,29 +149,39 @@ const BookingHistory = () => {
     };
 
     fetchBookings();
-  }, [user, location.state, showToast]);
+  }, [user]);
 
-  // Filter tours based on selected filter
+  useEffect(() => {
+    if (location.state?.newBooking) {
+      showToast(t('bookingHistory.bookSuccess'), "success");
+      try {
+        window.history.replaceState({}, document.title);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [location.key]);
+
   const filteredBookings =
     selectedFilter === "all"
       ? bookings
       : bookings.filter((booking) => booking.status === selectedFilter);
 
   const filterOptions = [
-    { value: "all", label: "Tất cả", count: bookings.length },
+    { value: "all", label: t('bookingHistory.all'), count: bookings.length },
     {
       value: "processing",
-      label: "Đang xử lý",
+      label: t('bookingHistory.processing'),
       count: bookings.filter((b) => b.status === "processing").length,
     },
     {
       value: "completed",
-      label: "Hoàn tất",
+      label: t('bookingHistory.completed'),
       count: bookings.filter((b) => b.status === "completed").length,
     },
     {
       value: "cancelled",
-      label: "Bị hủy",
+      label: t('bookingHistory.cancelled'),
       count: bookings.filter((b) => b.status === "cancelled").length,
     },
   ];
@@ -200,105 +191,24 @@ const BookingHistory = () => {
       <Header />
       <div className="text-center mt-8 md:mt-12 mb-8 md:mb-12 px-4">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-          Lịch Sử <span className="text-gradient">Đặt Tour</span>
+          <span className="text-gradient">{t('bookingHistory.title')}</span>
         </h2>
       </div>
 
       <main className="container mx-auto px-4 py-6 md:py-12">
         {/* RESPONSIVE: flex-col trên mobile, flex-row trên desktop (lg) */}
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-          
+
           {/* Sidebar */}
           {/* RESPONSIVE: Width full trên mobile, fixed width trên desktop */}
-          <aside className="w-full lg:w-64 bg-white/80 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 self-start top-20 z-10">
-             {/* Header Sidebar: Click để toggle trên mobile */}
-             <div 
-                className="p-4 flex items-center justify-between cursor-pointer lg:cursor-default"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              >
-                <div className="flex items-center gap-3">
-                  <img
-                    src={user?.profilePhoto || avatarImg}
-                    alt="avatar"
-                    className="h-12 w-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="text-m font-medium">
-                      {user?.name || "Người dùng"}
-                    </div>
-                    <div className="text-xs text-slate-600">Thành viên</div>
-                  </div>
-                </div>
-                {/* Icon toggle chỉ hiện trên mobile/tablet */}
-                <div className="lg:hidden text-slate-400">
-                  {isSidebarOpen ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                </div>
-            </div>
-
-            {/* Menu Nav: Ẩn/Hiện trên mobile dựa vào state, luôn hiện trên desktop */}
-            <div className={`px-4 pb-4 ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
-              <nav className="space-y-2 mt-2">
-                <Link
-                  to="/profile"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Hồ sơ của tôi
-                </Link>
-                <Link
-                  to="#"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Thông báo
-                </Link>
-                <Link
-                  to="/booking-history"
-                  className="block text-m py-2 px-3 rounded-md border text-primary border-primary/50 bg-primary/5"
-                >
-                  Lịch sử đặt tour
-                </Link>
-                <Link
-                  to="#"
-                  className="block text-m text-slate-600 py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Cài đặt
-                </Link>
-              </nav>
-
-              <div className="mt-6 border-t border-border pt-4">
-                <Link
-                  to="/terms"
-                  className="block w-full text-m text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Điều khoản sử dụng
-                </Link>
-                <Link
-                  to="/policy"
-                  className="block w-full text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Chính sách bảo mật
-                </Link>
-                <Link
-                  to="/about"
-                  className="block w-full text-m mt-1 text-slate-600 text-left py-2 px-3 rounded-md hover:bg-primary/10"
-                >
-                  Về VENTURE
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="w-full text-l text-center py-2 px-3 rounded-md mt-6 lg:mt-12 bg-red-50 text-red-600 transform transition-transform duration-500 hover:scale-105 hover:bg-red-500 hover:text-white"
-                >
-                  Đăng xuất
-                </button>
-              </div>
-            </div>
-          </aside>
+          <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="booking-history" />
 
           {/* Main card */}
           <section className="flex-1 min-w-0">
             <div className="bg-white/90 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-4 md:p-8">
-              <h2 className="text-lg font-medium mb-3">Lịch sử đặt tour</h2>
+              <h2 className="text-lg font-medium mb-3">{t('bookingHistory.myBookings')}</h2>
               <p className="text-sm text-slate-600 mb-6">
-                Xem tất cả các tour bạn đã đặt
+                {t('bookingHistory.viewAllBookings')}
               </p>
 
               {/* Filter tabs - Responsive: Scroll ngang trên mobile */}
@@ -307,11 +217,10 @@ const BookingHistory = () => {
                   <button
                     key={option.value}
                     onClick={() => setSelectedFilter(option.value)}
-                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                      selectedFilter === option.value
-                        ? "border-primary text-primary"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
+                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedFilter === option.value
+                      ? "border-primary text-primary"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      }`}
                   >
                     {option.label} ({option.count})
                   </button>
@@ -328,112 +237,112 @@ const BookingHistory = () => {
                   {error}
                 </div>
               ) : (
-              <div className="space-y-4">
-                {filteredBookings.map((booking) => (
-                  <div
-                    key={booking.id}
-                    className="border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md transition-shadow"
-                  >
-                    {/* Tour Code & Status */}
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
-                      <p className="text-xs md:text-sm font-medium text-gray-500 truncate">
-                        #{booking.tourCode} -{" "}
-                        {formatBookingDateTime(booking.bookingDate)}
-                      </p>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium w-fit ${getStatusColor(
-                          booking.status
-                        )}`}
-                      >
-                        {getStatusText(booking.status)}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-4">
-                      {/* Tour Image */}
-                      <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0">
-                        <img
-                          src={booking.tourImage}
-                          alt={booking.tourName}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
+                <div className="space-y-4">
+                  {filteredBookings.map((booking) => (
+                    <div
+                      key={booking.bookingId}
+                      className="border border-gray-200 rounded-lg p-4 md:p-6 hover:shadow-md transition-shadow"
+                    >
+                      {/* Tour Code & Status */}
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
+                        <p className="text-xs md:text-sm font-medium text-gray-500 truncate">
+                          #{booking.bookingId.substring(0, 4).toUpperCase()} -{" "}
+                          {formatBookingDateTime(booking.bookingDate)}
+                        </p>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium w-fit ${getStatusColor(
+                            booking.status
+                          )}`}
+                        >
+                          {getStatusText(booking.status)}
+                        </span>
                       </div>
 
-                      {/* Booking Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="mb-2">
-                          <h3 className="text-base md:text-lg font-semibold text-gray-900 line-clamp-2">
-                            {booking.tourName}
-                          </h3>
+                      <div className="flex gap-4">
+                        {/* Tour Image */}
+                        <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0">
+                          <img
+                            src={booking.tourImage}
+                            alt={booking.tourName}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-4 text-xs md:text-sm text-gray-600 mb-3">
-                          <div>
-                            <span className="font-medium">Ngày đi:</span>{" "}
-                            {formatDate(booking.startDate)}
+                        {/* Booking Details */}
+                        <div className="flex-1 min-w-0">
+                          <div className="mb-2">
+                            <h3 className="text-base md:text-lg font-semibold text-gray-900 line-clamp-2">
+                              {booking.tourName}
+                            </h3>
                           </div>
-                          <div>
-                            <span className="font-medium">Số lượng:</span>{" "}
-                            {booking.participants} người
-                          </div>
-                        </div>
 
-                        {/* Price section - Responsive layout */}
-                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-1">
-                          <div className="text-xs md:text-sm text-gray-500">
-                             Đơn giá: {formatPrice(booking.totalPrice / booking.participants)}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-4 text-xs md:text-sm text-gray-600 mb-3">
+                            <div>
+                              <span className="font-medium">{t('bookingHistory.departureDate')}</span>{" "}
+                              {formatDate(booking.startDate)}
+                            </div>
+                            <div>
+                              <span className="font-medium">{t('bookingHistory.quantity')}</span>{" "}
+                              {booking.participants} {t('bookingHistory.people')}
+                            </div>
                           </div>
-                          <div className="text-left sm:text-right">
-                            <div className="text-sm md:text-base font-bold text-primary">
-                              Tổng: {formatPrice(booking.totalPrice)}
+
+                          {/* Price section - Responsive layout */}
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-1">
+                            <div className="text-xs md:text-sm text-gray-500">
+                              {t('bookingHistory.unitPrice')} {formatPrice(booking.totalPrice / booking.participants)}
+                            </div>
+                            <div className="text-left sm:text-right">
+                              <div className="text-sm md:text-base font-bold text-primary">
+                                {t('bookingHistory.total')} {formatPrice(booking.totalPrice)}
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    {/* Divider line */}
-                    <div className="border-t border-gray-200 mt-2 mb-3"></div>
 
-                    {/* Action Buttons */}
-                    <div className="flex justify-end">
-                      <div className="flex flex-wrap gap-2 justify-end">
-                        {booking.status === "completed" ? (
-                          <button
-                            className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
-                            onClick={() => {
-                              setSelectedBooking(booking);
-                              setOpenReviewDialog(true);
-                            }}
-                          >
-                            Đánh giá tour
-                          </button>
-                        ) : booking.status === "cancelled" ? (
-                          <button className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">
-                            Đặt lại
-                          </button>
-                        ) : null}
-                        
-                        {booking.status === "processing" && (
-                          <button 
-                            className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
-                            onClick={() => handleCancelBooking(booking.id)}
-                          >
-                            Hủy tour
-                          </button>
-                        )}
+                      {/* Divider line */}
+                      <div className="border-t border-gray-200 mt-2 mb-3"></div>
+
+                      {/* Action Buttons */}
+                      <div className="flex justify-end">
+                        <div className="flex flex-wrap gap-2 justify-end">
+                          {booking.status === "completed" ? (
+                            <button
+                              className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors"
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setOpenReviewDialog(true);
+                              }}
+                            >
+                              {t('bookingHistory.reviewTour')}
+                            </button>
+                          ) : booking.status === "cancelled" ? (
+                            <button className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">
+                              {t('bookingHistory.rebook')}
+                            </button>
+                          ) : null}
+
+                          {booking.status === "processing" && (
+                            <button
+                              className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
+                              onClick={() => handleCancelBooking(booking.bookingId)}
+                            >
+                              {t('bookingHistory.cancelTour')}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                  </div>
-                ))}
-                
-                {filteredBookings.length === 0 && (
-                   <div className="text-center py-10 text-gray-500">
-                      Chưa có lịch sử đặt tour nào.
-                   </div>
-                )}
-              </div>
+                    </div>
+                  ))}
+
+                  {filteredBookings.length === 0 && (
+                    <div className="text-center py-10 text-gray-500">
+                      {t('bookingHistory.noBookingsYet')}
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </section>
@@ -442,8 +351,8 @@ const BookingHistory = () => {
 
       <Footer />
 
-      <ReviewDialog 
-        open={openReviewDialog} 
+      <ReviewDialog
+        open={openReviewDialog}
         setOpen={setOpenReviewDialog}
         tourId={selectedBooking?.tourId || selectedBooking?.tourCode}
         tourName={selectedBooking?.tourName}

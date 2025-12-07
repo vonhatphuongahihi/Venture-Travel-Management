@@ -42,7 +42,7 @@ export class ProvinceService {
                   ticketPrices: true
                }
             },
-            reviews: true,
+            tourReviews: true,
             pickup: true
          }
       });
@@ -50,7 +50,7 @@ export class ProvinceService {
       // Helper to get min price
       const getMinPrice = (tour: any) => {
          if (!tour.ticketTypes || tour.ticketTypes.length === 0) return 0;
-         const prices = tour.ticketTypes.flatMap((tt: any) => 
+         const prices = tour.ticketTypes.flatMap((tt: any) =>
             tt.ticketPrices ? tt.ticketPrices.map((tp: any) => tp.price) : []
          );
          return prices.length > 0 ? Math.min(...prices) : 0;
@@ -58,9 +58,9 @@ export class ProvinceService {
 
       // Helper to get avg rating
       const getAvgRating = (tour: any) => {
-         if (!tour.reviews || tour.reviews.length === 0) return 0;
-         const total = tour.reviews.reduce((acc: number, r: any) => acc + r.rate, 0);
-         return total / tour.reviews.length;
+         if (!tour.tourReviews || tour.tourReviews.length === 0) return 0;
+         const total = tour.tourReviews.reduce((acc: number, r: any) => acc + r.rate, 0);
+         return total / tour.tourReviews.length;
       };
 
       // Sort
@@ -100,7 +100,7 @@ export class ProvinceService {
             provinceId: provinceId,
          },
          include: {
-            reviews: true,
+            attractionReviews: true,
          }
       });
       return attractions;

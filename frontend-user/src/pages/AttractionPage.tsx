@@ -12,7 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { bookingService } from "@/services/booking.service";
@@ -28,6 +28,10 @@ export function AttractionPage() {
   const [canReviewAttraction, setCanReviewAttraction] = React.useState(false);
   const { data: attraction, isLoading, isError } = useAttraction(slug || "");
 
+  // Scroll to top when component mounts or slug changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [slug]);
   // Check if user has a completed booking of any tour that includes this attraction
   React.useEffect(() => {
     let mounted = true;

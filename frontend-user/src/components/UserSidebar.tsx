@@ -27,6 +27,11 @@ const UserSidebar: React.FC<UserSidebarProps> = ({ user, isSidebarOpen, setIsSid
               src={user?.profilePhoto || avatarImg}
               alt="avatar"
               className="h-14 w-14 rounded-full object-cover ring-2 ring-white shadow-md"
+              onError={(e) => {
+                if (e.currentTarget.src !== avatarImg) {
+                  e.currentTarget.src = avatarImg;
+                }
+              }}
             />
           </div>
           <div>

@@ -250,7 +250,9 @@
     "viewMoreTours": "View More Tours",
     "loading": "Loading...",
     "errorLoading": "Unable to load tour list",
-    "noTours": "No tours available"
+    "noTours": "No tours available",
+    "searchResults": "Search Results",
+    "toursFound": "tours found"
   },
   "aboutUs": {
     "title": "About VENTURE",
@@ -323,13 +325,25 @@
     },
     "errors": {
       "nameRequired": "Name is required.",
+      "nameMinLength": "Name must be at least 2 characters.",
+      "nameMaxLength": "Name must not exceed 100 characters.",
       "emailRequired": "Email is required.",
       "emailInvalid": "Invalid email format.",
-      "messageRequired": "Message is required."
+      "messageRequired": "Message is required.",
+      "messageMinLength": "Message must be at least 10 characters.",
+      "messageMaxLength": "Message must not exceed 1000 characters."
     },
     "toast": {
       "success": "Message sent successfully!",
-      "error": "Failed to send message. Please try again later."
+      "error": "Failed to send message. Please try again later.",
+      "nameRequired": "Please enter your name.",
+      "nameMinLength": "Name must be at least 2 characters.",
+      "nameMaxLength": "Name must not exceed 100 characters.",
+      "emailRequired": "Please enter your email.",
+      "emailInvalid": "Invalid email format.",
+      "messageRequired": "Please enter your message.",
+      "messageMinLength": "Message must be at least 10 characters. Please add more content.",
+      "messageMaxLength": "Message must not exceed 1000 characters."
     }
   },
   "terms": {
@@ -595,6 +609,7 @@
   "map": {
     "title": "INTERACTIVE TRAVEL MAP",
     "description": "Explore tours and destinations on Vietnam map.",
+    "loading": "Loading map...",
     "mapLayers": "Map Layers",
     "tours": "Tours",
     "destinations": "Destinations",
@@ -602,7 +617,9 @@
     "all": "All",
     "north": "Northern",
     "central": "Central",
-    "south": "Southern"
+    "south": "Southern",
+    "viewDetails": "View Details",
+    "viewAttraction": "View Destination"
   },
   "reviewCard": {
     "quality": "Quality",

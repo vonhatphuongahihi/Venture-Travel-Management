@@ -4,6 +4,11 @@ import { useTranslation } from "react-i18next";
 
 const Footer = () => {
   const { t } = useTranslation();
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="bg-[#E5F8FF] text-primary">
       <div className="container py-12">
@@ -23,15 +28,30 @@ const Footer = () => {
               {t("footer.companyDescription")}
             </p>
             <div className="flex space-x-3">
-              <div className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors">
+              <a
+                href="https://www.facebook.com/phuong.vonhat.tuhy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors"
+              >
                 <Facebook className="h-4 w-4 text-primary" />
-              </div>
-              <div className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors">
+              </a>
+              <a
+                href="https://www.instagram.com/tuhy.sapoche.99"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors"
+              >
                 <Instagram className="h-4 w-4 text-primary" />
-              </div>
-              <div className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors">
+              </a>
+              <a
+                href="https://www.youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-8 h-8 border border-primary/30 rounded-full flex items-center justify-center hover:bg-primary/10 cursor-pointer transition-colors"
+              >
                 <Youtube className="h-4 w-4 text-primary" />
-              </div>
+              </a>
             </div>
           </div>
 
@@ -41,6 +61,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/tour"
+                  onClick={scrollToTop}
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
                   {t("footer.tours")}
@@ -48,15 +69,8 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/destination"
-                  className="text-primary hover:text-[#0891B2] transition-colors"
-                >
-                  {t("footer.destinations")}
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/map"
+                  onClick={scrollToTop}
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
                   {t("footer.map")}
@@ -65,6 +79,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/explore-360"
+                  onClick={scrollToTop}
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
                   {t("footer.explore360")}
@@ -73,6 +88,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/contact"
+                  onClick={scrollToTop}
                   className="text-primary hover:text-[#0891B2] transition-colors"
                 >
                   {t("footer.contact")}
@@ -84,8 +100,16 @@ const Footer = () => {
           <div className="space-y-4 ml-6">
             <h3 className="font-semibold text-lg text-primary">{t("footer.services")}</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">{t("footer.packageTour")}</a></li>
-              <li><a href="#" className="text-primary hover:text-[#0891B2] transition-colors">{t("footer.bookTour")}</a></li>
+              <li>
+                <Link
+                  to="/tour"
+                  onClick={scrollToTop}
+                  className="text-primary hover:text-[#0891B2] transition-colors"
+                >
+                  {t("footer.packageTour")}
+                </Link>
+              </li>
+
             </ul>
           </div>
 
@@ -114,18 +138,21 @@ const Footer = () => {
           <div className="flex space-x-6 text-sm">
             <Link
               to="/terms"
+              onClick={scrollToTop}
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
               {t("footer.terms")}
             </Link>
             <Link
               to="/policy"
+              onClick={scrollToTop}
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
               {t("footer.policy")}
             </Link>
             <Link
-              to="/support"
+              to="/contact"
+              onClick={scrollToTop}
               className="text-primary/70 hover:text-[#0891B2] transition-colors"
             >
               {t("footer.support")}

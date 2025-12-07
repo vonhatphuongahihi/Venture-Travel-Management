@@ -251,7 +251,9 @@
         "viewMoreTours": "Xem thêm tours",
         "loading": "Đang tải...",
         "errorLoading": "Không thể tải danh sách tour",
-        "noTours": "Chưa có tour nào"
+        "noTours": "Chưa có tour nào",
+        "searchResults": "Kết quả tìm kiếm",
+        "toursFound": "tour được tìm thấy"
     },
     "aboutUs": {
         "title": "Về VENTURE",
@@ -324,13 +326,25 @@
         },
         "errors": {
             "nameRequired": "Vui lòng nhập tên.",
+            "nameMinLength": "Tên phải có ít nhất 2 ký tự.",
+            "nameMaxLength": "Tên không được vượt quá 100 ký tự.",
             "emailRequired": "Vui lòng nhập email.",
             "emailInvalid": "Định dạng email không hợp lệ.",
-            "messageRequired": "Vui lòng nhập tin nhắn."
+            "messageRequired": "Vui lòng nhập tin nhắn.",
+            "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự.",
+            "messageMaxLength": "Tin nhắn không được vượt quá 1000 ký tự."
         },
         "toast": {
             "success": "Gửi tin nhắn thành công!",
-            "error": "Gửi tin nhắn thất bại. Vui lòng thử lại sau."
+            "error": "Gửi tin nhắn thất bại. Vui lòng thử lại sau.",
+            "nameRequired": "Vui lòng nhập tên của bạn.",
+            "nameMinLength": "Tên phải có ít nhất 2 ký tự.",
+            "nameMaxLength": "Tên không được vượt quá 100 ký tự.",
+            "emailRequired": "Vui lòng nhập email của bạn.",
+            "emailInvalid": "Định dạng email không hợp lệ.",
+            "messageRequired": "Vui lòng nhập tin nhắn của bạn.",
+            "messageMinLength": "Tin nhắn phải có ít nhất 10 ký tự. Vui lòng nhập thêm nội dung.",
+            "messageMaxLength": "Tin nhắn không được vượt quá 1000 ký tự."
         }
     },
     "terms": {
@@ -614,6 +628,7 @@
     "map": {
         "title": "BẢN ĐỒ DU LỊCH TƯƠNG TÁC",
         "description": "Khám phá các tour và điểm đến trên bản đồ Việt Nam.",
+        "loading": "Đang tải bản đồ...",
         "mapLayers": "Lớp bản đồ",
         "tours": "Tours",
         "destinations": "Điểm đến",
@@ -621,7 +636,9 @@
         "all": "Tất cả",
         "north": "Miền Bắc",
         "central": "Miền Trung",
-        "south": "Miền Nam"
+        "south": "Miền Nam",
+        "viewDetails": "Xem chi tiết",
+        "viewAttraction": "Xem điểm đến"
     },
     "reviewCard": {
         "quality": "Chất lượng",

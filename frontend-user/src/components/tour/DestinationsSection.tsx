@@ -5,9 +5,11 @@ import AttractionAPI, {
   TopDestination,
 } from "@/services/attraction/attractionAPI";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const DestinationsSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [destinations, setDestinations] = useState<TopDestination[]>([]);
@@ -77,9 +79,8 @@ const DestinationsSection = () => {
       <div className="container relative">
         {/* Header */}
         <div
-          className={`text-center mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`text-center mb-12 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <div className="inline-flex items-center gap-2 bg-[#dff6ff] text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Star className="h-4 w-4" />
@@ -95,9 +96,8 @@ const DestinationsSection = () => {
 
         {/* Destination Cards */}
         <div
-          className={`relative mb-8 py-4 transition-all duration-1000 delay-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-          }`}
+          className={`relative mb-8 py-4 transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+            }`}
         >
           {loading ? (
             <div className="flex items-center justify-center py-12">
@@ -128,7 +128,11 @@ const DestinationsSection = () => {
                           : "scale(1) translateY(0px)",
                       zIndex: index === currentIndex ? 10 : 5,
                     }}
-                    onClick={() => setCurrentIndex(index)}
+                    onClick={() => {
+                      setCurrentIndex(index);
+                      navigate(`/attraction/${destination.id}`);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
                   >
                     <img
                       src={destination.image || "/placeholder.svg"}
@@ -189,9 +193,8 @@ const DestinationsSection = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentIndex ? "bg-primary w-8" : "bg-gray-300"
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentIndex ? "bg-primary w-8" : "bg-gray-300"
+                    }`}
                 />
               ))}
             </div>

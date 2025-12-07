@@ -266,7 +266,16 @@ const Profile = () => {
                   <div className="flex justify-center">
                     <div className="text-center relative">
                       <div className="relative inline-block">
-                        <img src={avatarSrc} alt="avatar" className="h-24 w-24 md:h-28 md:w-28 mb-4 md:mb-6 rounded-full object-cover mx-auto block shadow-sm" />
+                        <img
+                          src={avatarSrc}
+                          alt="avatar"
+                          className="h-24 w-24 md:h-28 md:w-28 mb-4 md:mb-6 rounded-full object-cover mx-auto block shadow-sm"
+                          onError={(e) => {
+                            if (e.currentTarget.src !== avatarImg) {
+                              e.currentTarget.src = avatarImg;
+                            }
+                          }}
+                        />
 
                         <button
                           type="button"

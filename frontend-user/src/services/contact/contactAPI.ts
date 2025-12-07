@@ -6,16 +6,12 @@ class ContactAPI {
     email: string;
     message: string;
   }) {
-    try {
-      const result = await apiClient.post<{
-        success: boolean;
-        message: string;
-      }>("/contact", data);
+    const result = await apiClient.post<{
+      success: boolean;
+      message: string;
+    }>("/contact", data);
 
-      return result;
-    } catch (error) {
-      return { success: false, message: (error as Error).message };
-    }
+    return result;
   }
 }
 

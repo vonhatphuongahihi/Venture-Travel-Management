@@ -268,10 +268,10 @@ model AttractionReview {
 
 model Booking {
   bookingId       String          @id @default(uuid()) @map("booking_id")
-  userId          String          @map("user_id")
+  userId          String?         @map("user_id")
   ticketTypeId    String          @map("ticket_type_id")
-  pickupAddress   String          @map("pickup_address")
-  departureDate   DateTime        @map("departure_date") @db.Timestamp(6)
+  pickupAddress   String?         @map("pickup_address")
+  departureDate   DateTime?       @map("departure_date") @db.Timestamp(6)
   name            String
   phone           String
   email           String
@@ -283,7 +283,7 @@ model Booking {
   updatedAt       DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
   bookingDetails  BookingDetail[]
   ticketTypes     TicketType      @relation(fields: [ticketTypeId], references: [ticketTypeId])
-  users           User            @relation(fields: [userId], references: [userId])
+  users           User?           @relation(fields: [userId], references: [userId], onDelete: Restrict)
 
   @@map("bookings")
 }

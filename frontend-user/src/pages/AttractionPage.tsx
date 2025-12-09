@@ -15,47 +15,18 @@ import {
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { bookingService } from "@/services/booking.service";
-import { useToast } from "@/contexts/ToastContext";
 import { useAttraction } from "@/services/attraction/attractionHook";
-import { Attraction, Tour, Review } from "@/global.types";
 
 export function AttractionPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { showToast } = useToast();
-  const [canReviewAttraction, setCanReviewAttraction] = React.useState(false);
   const { data: attraction, isLoading, isError } = useAttraction(slug || "");
 
   // Scroll to top when component mounts or slug changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [slug]);
-  // Check if user has a completed booking of any tour that includes this attraction
-  React.useEffect(() => {
-    let mounted = true;
-    const check = async () => {
-      if (!isAuthenticated || !attraction) {
-        if (mounted) setCanReviewAttraction(false);
-        return;
-      }
-
-      try {
-        const bookings = await bookingService.getUserBookings();
-        const completedTourIds = bookings.filter((b: any) => b.status === 'completed').map((b: any) => b.tourId);
-        const visits = (attraction.tours || []).some((t: any) => completedTourIds.includes(t.id || t.tourId || ''));
-        if (mounted) setCanReviewAttraction(visits);
-      } catch (err) {
-        console.error('Error checking attraction review permission', err);
-        if (mounted) setCanReviewAttraction(false);
-      }
-    };
-
-    check();
-
-    return () => { mounted = false; };
-  }, [isAuthenticated, attraction]);
 
   if (isLoading) {
     return (
@@ -131,16 +102,11 @@ export function AttractionPage() {
             reviews={attraction.attractionReviews || []}
             averageRating={attraction.rating || 0}
             totalReviews={attraction.reviewCount || 0}
-            canWrite={canReviewAttraction}
-            onWrite={() => {
-              if (!isAuthenticated) {
-                showToast('Vui lòng đăng nhập để đánh giá.', 'error');
-                navigate('/login');
-                return;
-              }
-
-              navigate('/booking-history');
-              showToast('Chọn tour đã hoàn thành để đánh giá địa điểm này.', 'info');
+            canWrite={isAuthenticated}
+            attraction={attraction}
+            onReviewSuccess={() => {
+              // Reload attraction data after successful review
+              window.location.reload();
             }}
           />
           <NearbyDestinationsSection

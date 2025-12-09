@@ -2,6 +2,9 @@ import { UpdateProfileRequest, UserService } from "@/services/userService";
 import { AuthenticatedRequest, GetUsersRequest } from "@/types";
 import { ResponseUtils } from "@/utils";
 import { Response } from "express";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export class UserController {
   // Get user profile
@@ -128,7 +131,10 @@ export class UserController {
     }
   }
 
-  static async updateUserStatus(req: AuthenticatedRequest, res: Response): Promise<void> {
+  static async updateUserStatus(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const userId = req.params.id;
       const { isActive } = req.body;
@@ -151,7 +157,10 @@ export class UserController {
     }
   }
 
-  static async deleteUser(req: AuthenticatedRequest, res: Response): Promise<void> {
+  static async deleteUser(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       if (!req.user) {
         res.status(401).json(ResponseUtils.error("User not authenticated"));
@@ -159,10 +168,12 @@ export class UserController {
       }
 
       const userId = req.params.id;
-      
+
       // Users can only delete their own account, or admin can delete any account
       if (req.user.userId !== userId && req.user.role !== "ADMIN") {
-        res.status(403).json(ResponseUtils.error("You can only delete your own account"));
+        res
+          .status(403)
+          .json(ResponseUtils.error("You can only delete your own account"));
         return;
       }
 
@@ -185,7 +196,10 @@ export class UserController {
     }
   }
 
-  static async getUserStatistics(req: AuthenticatedRequest, res: Response): Promise<void> {
+  static async getUserStatistics(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       const result = await UserService.getUserStatistics();
 
@@ -224,7 +238,10 @@ export class UserController {
         return;
       }
 
-      const result = await UserService.toggleFavoriteTour(req.user.userId, tourId);
+      const result = await UserService.toggleFavoriteTour(
+        req.user.userId,
+        tourId
+      );
 
       if (result.success) {
         res.status(200).json(result);
@@ -274,7 +291,10 @@ export class UserController {
   }
 
   // Change password
-  static async changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
+  static async changePassword(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
     try {
       if (!req.user) {
         res.status(401).json(ResponseUtils.error("User not authenticated"));
@@ -282,7 +302,11 @@ export class UserController {
       }
 
       const { oldPassword, newPassword } = req.body;
-      const result = await UserService.changePassword(req.user.userId, oldPassword, newPassword);
+      const result = await UserService.changePassword(
+        req.user.userId,
+        oldPassword,
+        newPassword
+      );
 
       if (result.success) {
         res.status(200).json(result);
@@ -295,6 +319,149 @@ export class UserController {
         .json(
           ResponseUtils.error(
             "Failed to change password",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  // Get user's tour reviews
+  static async getUserTourReviews(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      const reviews = await prisma.tourReview.findMany({
+        where: { userId: req.user.userId },
+        include: {
+          tour: {
+            select: {
+              tourId: true,
+              name: true,
+              images: true,
+            },
+          },
+          user: {
+            select: {
+              userId: true,
+              name: true,
+              profilePhoto: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const formattedReviews = reviews.map((review) => ({
+        reviewId: review.reviewId,
+        user: {
+          id: review.user.userId,
+          name: review.user.name,
+          avatar: review.user.profilePhoto || "/default-avatar.png",
+        },
+        rating: review.rate,
+        content: review.content,
+        images: review.images,
+        likesCount: review.likes?.length || 0,
+        liked: false,
+        date: review.createdAt.toISOString(),
+        updatedAt: review.updatedAt.toISOString(),
+        tour: review.tour,
+      }));
+
+      res
+        .status(200)
+        .json(
+          ResponseUtils.success(
+            "Lấy danh sách đánh giá tour thành công",
+            formattedReviews
+          )
+        );
+    } catch (error) {
+      console.error("🔴 [UserController] Get user tour reviews error:", error);
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to get user tour reviews",
+            error instanceof Error ? error.message : "Unknown error"
+          )
+        );
+    }
+  }
+
+  // Get user's attraction reviews
+  static async getUserAttractionReviews(
+    req: AuthenticatedRequest,
+    res: Response
+  ): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json(ResponseUtils.error("User not authenticated"));
+        return;
+      }
+
+      const reviews = await prisma.attractionReview.findMany({
+        where: { userId: req.user.userId },
+        include: {
+          attraction: {
+            select: {
+              attractionId: true,
+              name: true,
+              images: true,
+            },
+          },
+          user: {
+            select: {
+              userId: true,
+              name: true,
+              profilePhoto: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      const formattedReviews = reviews.map((review) => ({
+        reviewId: review.reviewId,
+        user: {
+          id: review.user.userId,
+          name: review.user.name,
+          avatar: review.user.profilePhoto || "/default-avatar.png",
+        },
+        rating: review.rate,
+        content: review.content,
+        images: review.images,
+        likesCount: review.likes?.length || 0,
+        liked: false,
+        date: review.createdAt.toISOString(),
+        updatedAt: review.updatedAt.toISOString(),
+        attraction: review.attraction,
+      }));
+
+      res
+        .status(200)
+        .json(
+          ResponseUtils.success(
+            "Lấy danh sách đánh giá địa điểm thành công",
+            formattedReviews
+          )
+        );
+    } catch (error) {
+      console.error(
+        "🔴 [UserController] Get user attraction reviews error:",
+        error
+      );
+      res
+        .status(500)
+        .json(
+          ResponseUtils.error(
+            "Failed to get user attraction reviews",
             error instanceof Error ? error.message : "Unknown error"
           )
         );

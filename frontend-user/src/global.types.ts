@@ -12,6 +12,10 @@ export interface ShortTourInfo {
   status: "upcoming" | "ongoing" | "completed";
   maxParticipants: number;
   availableSpots: number;
+  start_point: {
+    lat: number;
+    long: number;
+  };
 }
 
 export interface Tour {
@@ -71,15 +75,18 @@ export interface TourReview {
   userId: string;
   tourId: string;
   rate: number;
+  rating?: number; // API response uses 'rating'
   content: string;
   images: string[];
   createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  date?: string; // API response uses 'date'
+  updatedAt?: string; // ISO date string
   likes: string[];
   // Relations
   tour?: Tour;
   user?: {
-    userId: string;
+    id?: string; // API response uses 'id'
+    userId?: string;
     name: string;
     avatar?: string;
   };
@@ -158,15 +165,18 @@ export interface AttractionReview {
   userId: string;
   attractionId: string;
   rate: number;
+  rating?: number; // API response uses 'rating'
   content: string;
   images: string[];
   createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  date?: string; // API response uses 'date'
+  updatedAt?: string; // ISO date string
   likes: string[];
   // Relations
   attraction?: Attraction;
   user?: {
-    userId: string;
+    id?: string; // API response uses 'id'
+    userId?: string;
     name: string;
     avatar?: string;
   };

@@ -42,6 +42,16 @@ router.put(
   validateRequest(changePasswordSchema),
   UserController.changePassword
 );
+router.get(
+  "/reviews/tours",
+  authenticateToken,
+  UserController.getUserTourReviews
+);
+router.get(
+  "/reviews/attractions",
+  authenticateToken,
+  UserController.getUserAttractionReviews
+);
 
 router.patch(
   "/:id/status",

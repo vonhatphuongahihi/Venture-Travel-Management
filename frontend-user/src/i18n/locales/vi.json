@@ -190,7 +190,9 @@
     "fullRefund": "để được hoàn tiền đầy đủ",
     "itinerary": "Hành trình",
     "reviewsTitle": "Đánh giá",
-    "reviewRequiresBooking": "Bạn phải đặt và hoàn tất tour này mới có thể đánh giá.",
+    "reviewRequiresBooking": "Bạn phải đặt tour này mới có thể đánh giá.",
+    "alreadyReviewed": "Bạn đã đánh giá tour này rồi.",
+    "alreadyReviewedShort": "Đã đánh giá",
     "filter": "Bộ lọc",
     "postedOn": "Đăng vào"
   },

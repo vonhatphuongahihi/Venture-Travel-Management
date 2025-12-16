@@ -134,6 +134,16 @@ export const tourService = {
           };
         }) || [];
 
+        const ticketTypes: any[] = tour.ticketTypes?.map((type: any) => ({
+          ticketTypeId: type.ticketTypeId,
+          tourId: tour.id,
+          name: type.name || 'Vé thường',
+          notes: type.notes || 'Đã bao gồm đón khách',
+          quantity: type.quantity || 20,
+          isActive: type.isActive !== undefined ? type.isActive : true,
+          createdAt: new Date(tour.createdAt || Date.now()),
+        })) || [];
+
         // Map ticket prices
         const ticketPrices: any[] = [];
         tour.ticketTypes?.forEach((type: any) => {
@@ -213,6 +223,7 @@ export const tourService = {
           updatedAt: tour.updatedAt ? new Date(tour.updatedAt) : new Date(),
           createdBy: 'admin', // TODO: Get from tour data
           tourStops,
+          ticketTypes,
           ticketPrices,
           reviews,
           rating: tour.rating || 0,

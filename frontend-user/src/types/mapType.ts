@@ -9,6 +9,7 @@ export interface TourType {
 }
 
 export interface DestinationType {
+  id?: string;
   name: string;
   description: string;
   region: string;

@@ -38,43 +38,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadUserFromStorage = () => {
-      let savedToken = localStorage.getItem('token');
-
-      if (!savedToken) {
-        savedToken = sessionStorage.getItem('token');
-      }
-
-      const savedUser = localStorage.getItem('user');
-      if (savedUser) {
-        try {
-          const user = JSON.parse(savedUser);
-          setUser(user);
-          if (savedToken) {
-            setToken(savedToken);
-          }
-          return true;
-        } catch (error) {
-          localStorage.removeItem('user');
-        }
-      }
-      return false;
-    };
-
-    const userLoaded = loadUserFromStorage();
-    if (userLoaded) {
-      setIsLoading(false);
-      return;
-    }
-
     let savedToken = localStorage.getItem('token');
     if (!savedToken) {
       savedToken = sessionStorage.getItem('token');
     }
 
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setUser(user);
+      } catch (error) {
+        localStorage.removeItem('user');
+      }
+    }
+
     if (savedToken) {
       setToken(savedToken);
-      // Verify token and get user profile
       UserAPI.getProfile(savedToken)
         .then((response) => {
           if (response.success && response.data) {
@@ -86,14 +66,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             localStorage.removeItem('user');
             sessionStorage.removeItem('token');
             setToken(null);
+            setUser(null);
           }
         })
         .catch(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('remember');
-          localStorage.removeItem('user');
-          sessionStorage.removeItem('token');
-          setToken(null);
+          console.error('Failed to refresh user profile from API');
         })
         .finally(() => {
           setIsLoading(false);

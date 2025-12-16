@@ -27,17 +27,6 @@ function AttractionHeroSection({ attraction }: AttractionHeroSectionProps) {
   // Ensure images array exists and has at least the main image
   const images = attraction.images;
 
-  const reviewInfo = useMemo(() => {
-    return {
-      rating:
-        (attraction.attractionReviews || []).reduce(
-          (sum, review) => sum + review.rate,
-          0
-        ) / ((attraction.attractionReviews || []).length || 1),
-      count: (attraction.attractionReviews || []).length,
-    };
-  }, [attraction.attractionReviews]);
-
   useEffect(() => {
     if (textRef.current) {
       // so sánh chiều cao thực tế với chiều cao hiển thị tối đa
@@ -99,7 +88,8 @@ function AttractionHeroSection({ attraction }: AttractionHeroSectionProps) {
               <div className="flex items-center gap-1">
                 <Star className={`h-4 w-4 fill-yellow-400 text-yellow-400`} />
                 <span className="text-sm text-gray-600">
-                  {reviewInfo.rating.toFixed(1)} ({reviewInfo.count} đánh giá)
+                  {attraction.rating.toFixed(1)} ({attraction.reviewCount} đánh
+                  giá)
                 </span>
               </div>
             </div>

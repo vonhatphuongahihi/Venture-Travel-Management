@@ -88,7 +88,7 @@ const ProvincePage = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative h-64 md:h-72">
+      <div className="relative h-64 md:h-96">
         <img
           src={province.image || heroImage}
           alt={province.name}

@@ -13,29 +13,23 @@ export default function TravellerChoose({
       setPriceCategories(userTicket?.priceCategories);
       return;
     }
-    const categories = ticketPrices.map((ut) => ut.categoryId);
-    // Lấy các priceCategory từ categoryId trong ticketPrices (mảng categories)
-    const samplePriceCategories: PriceCategories[] = [
-      {
-        categoryId: "7537ef0a-c7fb-4a05-ab33-f4b2ab4033cf",
-        name: "Người lớn",
-        description: "Trên 140cm",
-        createdAt: new Date("2025-09-01T10:00:00"),
-      },
-      {
-        categoryId: "ef0e08ba-f086-45b9-8976-203dddbcd9ae",
-        name: "Trẻ em",
-        description: "Dưới 140cm",
-        createdAt: new Date("2025-09-01T10:00:00"),
-      },
-    ];
-    setPriceCategories(samplePriceCategories?.map((pc) => {
+
+    const categoryIds = [...new Set(ticketPrices.map(tp => tp.categoryId))];
+
+    const categories: PriceCategories[] = categoryIds.map((categoryId, index) => ({
+      categoryId,
+      name: index === 0 ? "Người lớn" : index === 1 ? "Trẻ em" : `Loại ${index + 1}`,
+      description: index === 0 ? "Trên 140cm" : index === 1 ? "Dưới 140cm" : "",
+      createdAt: new Date(),
+    }));
+
+    setPriceCategories(categories?.map((pc) => {
       return {
         ...pc,
         quantity: 1,
       }
     }));
-  }, []);
+  }, [ticketPrices, userTicket?.priceCategories]);
   const addOne = (t) => {
     setPriceCategories((prev) =>
       prev.map((pc) =>
@@ -80,11 +74,11 @@ export default function TravellerChoose({
               <button
                 className="w-6 h-6 bg-primary rounded text-white hover:bg-[#0891B2] disabled:bg-gray-400"
                 disabled={
-                  priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity ===
-                  ticketPrices.find((tp) =>
+                  priceCategories.find((pc) => pc.categoryId === t.categoryId)?.quantity >=
+                  (ticketPrices.find((tp) =>
                     tp.categoryId === t.categoryId &&
                     tp.ticketTypeId === userTicket.currentType?.ticketTypeId
-                  )?.quantity
+                  )?.quantity || 10)
                 }
                 onClick={() => addOne(t)}
               >

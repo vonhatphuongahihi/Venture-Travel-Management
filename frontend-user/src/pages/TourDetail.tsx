@@ -66,6 +66,7 @@ const TourDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState<number>(0);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const [ticketPrices, setTicketPrices] = useState<TicketPrices[]>([]);
   const [userTicket, setUserTicket] = useState({
     currentType: null as TicketType | null,
@@ -143,6 +144,7 @@ const TourDetailPage = () => {
         createdAt: tourData.createdAt,
         updatedAt: tourData.updatedAt,
         createdBy: tourData.createdBy,
+        ticketTypes: tourData.ticketTypes || [],
       } as TourDetail);
 
       if (tourData.tourStops && tourData.tourStops.length > 0) {
@@ -191,6 +193,11 @@ const TourDetailPage = () => {
           setReviews(formattedReviews);
           const avgRating = reviewsData.averageRating || 0;
           setRating(parseFloat(avgRating.toFixed(1)));
+
+          if (user?.userId) {
+            const userHasReviewed = formattedReviews.some(review => review.userId === user.userId);
+            setHasReviewed(userHasReviewed);
+          }
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
@@ -200,7 +207,16 @@ const TourDetailPage = () => {
             ? tourData.reviews.reduce((sum, r) => sum + r.rate, 0) / tourData.reviews.length
             : 0;
           setRating(parseFloat(avgRating.toFixed(1)));
+
+          if (user?.userId) {
+            const userHasReviewed = tourData.reviews.some((review: any) => review.userId === user.userId);
+            setHasReviewed(userHasReviewed);
+          }
         }
+      }
+
+      if (tourData.ticketTypes) {
+        setTicketTypes(tourData.ticketTypes);
       }
 
       if (tourData.ticketPrices) {
@@ -259,6 +275,11 @@ const TourDetailPage = () => {
           setReviews(formattedReviews);
           const avgRating = reviewsData.averageRating || 0;
           setRating(parseFloat(avgRating.toFixed(1)));
+
+          if (user?.userId) {
+            const userHasReviewed = formattedReviews.some(review => review.userId === user.userId);
+            setHasReviewed(userHasReviewed);
+          }
         }
       } catch (error) {
         console.error('Error refreshing reviews:', error);
@@ -445,6 +466,7 @@ const TourDetailPage = () => {
   const [puOpen, setPUOpen] = useState(false);
   const [openReviewDialog, setOpenReviewDialog] = useState(false);
   const [canReview, setCanReview] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
   const [openShareDialog, setOpenShareDialog] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSavingFavorite, setIsSavingFavorite] = useState(false);
@@ -459,8 +481,8 @@ const TourDetailPage = () => {
 
       try {
         const bookings = await bookingService.getUserBookings();
-        const ok = bookings.some((b: any) => (b.tourId === id || b.tourId === id) && b.status === 'completed');
-        if (mounted) setCanReview(ok);
+        const hasBooked = bookings.some((b: any) => (b.tourId === id || b.tourId === id) && b.status !== 'cancelled');
+        if (mounted) setCanReview(hasBooked && !hasReviewed);
       } catch (err) {
         console.error('Error checking bookings for review permission', err);
         if (mounted) setCanReview(false);
@@ -470,7 +492,7 @@ const TourDetailPage = () => {
     check();
 
     return () => { mounted = false; };
-  }, [isAuthenticated, id]);
+  }, [isAuthenticated, id, hasReviewed]);
 
   const handleLikeReview = async (reviewId: string) => {
     try {
@@ -558,6 +580,11 @@ const TourDetailPage = () => {
                   return;
                 }
 
+                if (hasReviewed) {
+                  showToast(t('tourDetail.alreadyReviewed'), 'info');
+                  return;
+                }
+
                 if (!canReview) {
                   showToast(t('tourDetail.reviewRequiresBooking'), 'error');
                   return;
@@ -567,8 +594,10 @@ const TourDetailPage = () => {
               }}
               disabled={!canReview}
             >
-              <PenLine size={16} />
-              <p className="font-['Inter']">{t("tourDetail.writeReview")}</p>
+              {hasReviewed ? <Star size={16} className="fill-yellow-400 text-yellow-400" /> : <PenLine size={16} />}
+              <p className="font-['Inter']">
+                {hasReviewed ? t("tourDetail.alreadyReviewedShort") : t("tourDetail.writeReview")}
+              </p>
             </Button>
             <Button
               className={`${isFavorite
@@ -816,6 +845,7 @@ const TourDetailPage = () => {
                   userTicket={userTicket}
                   setUserTicket={setUserTicket}
                   ticketPrices={ticketPrices}
+                  ticketTypes={ticketTypes}
                   totalPrice={totalPrice}
                 />
 

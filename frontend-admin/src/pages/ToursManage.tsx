@@ -96,7 +96,7 @@ const ToursManage = () => {
 
     const pageSize = 6;
     const totalPages = Math.ceil(filteredTours.length / pageSize);
-
+    console.log(totalPages)
     const paginatedTours = filteredTours.slice((page - 1) * pageSize, page * pageSize);
     return (
         <Layout title="Quản lý tour">
@@ -249,7 +249,7 @@ const ToursManage = () => {
                             {[...Array(totalPages)].map((_, i) => {
                                 const pageNumber = i + 1;
                                 return (
-                                    <PaginationItem key={page}>
+                                    <PaginationItem key={pageNumber}>
                                         <PaginationLink
                                             href="#"
                                             isActive={page === pageNumber}
@@ -261,7 +261,7 @@ const ToursManage = () => {
                                                     : "bg-white hover:text-primary hover:bg-primary/10"
                                             )}
                                         >
-                                            {page}
+                                            {pageNumber}
                                         </PaginationLink>
                                     </PaginationItem>
                                 );

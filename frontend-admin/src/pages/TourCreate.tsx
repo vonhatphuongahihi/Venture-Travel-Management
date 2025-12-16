@@ -27,6 +27,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import type { Attraction, CreateTourRequest } from "@/types/tour";
 import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
+import { useToast } from "@/contexts/ToastContext";
 
 const MAPBOX_TOKEN =
     "pk.eyJ1Ijoibmd1eWVuMDk4MyIsImEiOiJjbWZoaDU5MWYwYnY0Mmlwd28zZm5ha2Z5In0.YXBPUe4baagMkZD2NpbRGA";
@@ -137,6 +138,8 @@ const TourCreate = () => {
         getValues,
     } = useForm<TourFormValues>({
         defaultValues: {
+            cancellationPolicy: `<p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Để được hoàn đủ tiền, bạn phải hủy ít nhất 24 giờ trước thời gian trải nghiệm bắt đầu.</span></p><ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Nếu bạn hủy ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm, số tiền bạn đã thanh toán sẽ không được hoàn lại.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Mọi thay đổi được thực hiện ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm sẽ không được chấp nhận.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Thời gian giới hạn dựa trên giờ địa phương của trải nghiệm.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu nó bị hủy do thời tiết xấu, bạn sẽ được chọn một ngày khác hoặc được hoàn tiền đầy đủ.</span></li></ol>`,
+            additionalInfomation: `<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Xác nhận sẽ được nhận tại thời điểm đặt phòng</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Không khuyến khích cho du khách mang thai</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Không có vấn đề về tim hoặc các tình trạng bệnh lý nghiêm trọng khác</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Hầu hết du khách có thể tham gia</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu bị hủy do thời tiết xấu, bạn sẽ được chọn vào ngày khác hoặc được hoàn đủ tiền</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Chuyến tham quan/hoạt động này sẽ có tối đa 15 khách du lịch</span></li></ol>`,
             tourStops: [
                 {
                     attractionId: "",
@@ -154,7 +157,7 @@ const TourCreate = () => {
 
     const navigate = useNavigate();
 
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState<number | null>(1);
 
     const [tourData, setTourData] = useState<TourFormValues | null>(null);
 
@@ -196,6 +199,9 @@ const TourCreate = () => {
     const [editingTicket, setEditingTicket] = useState<TicketData | null>(null);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [formKey, setFormKey] = useState(0);
+
+    const { showToast } = useToast()
+    const nevigate = useNavigate()
 
     const handleAddTicket = (ticket: TicketData) => {
         setTickets([...tickets, ticket]);
@@ -246,6 +252,7 @@ const TourCreate = () => {
             console.log(tourData);
             console.log(tickets);
             setIsCreatingTour(true);
+            setStep(null)
             const uploadedImages = await uploadTourImages(selectedFiles);
 
             const imgUrls = uploadedImages.images.map((img) => img.url);
@@ -279,8 +286,14 @@ const TourCreate = () => {
                 };
 
                 await createTour(payload);
+
+                showToast("Tạo tour thành công", "success")
+
+                nevigate("/tours")
             }
         } catch (error) {
+            setStep(1)
+            showToast("Tạo tour thất bại", "error")
             console.log(error);
         } finally {
             setIsCreatingTour(false);

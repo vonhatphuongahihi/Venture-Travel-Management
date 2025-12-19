@@ -33,6 +33,7 @@ import TourDetail from "./pages/TourDetail";
 import VerifyEmail from "./pages/VerifyEmail";
 import FavoriteTour from "./pages/FavoriteTour";
 import Settings from "./pages/Settings";
+import MyReviews from "./pages/MyReviews";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 
 const queryClient = new QueryClient();
@@ -61,9 +62,15 @@ const App = () => {
                     <Route path="/map" element={<Map />} />
                     <Route path="/province/:slug" element={<ProvincePage />}>
                       <Route index element={<ExploreProvince />} />
-                      <Route path="tours-activities" element={<ProvinceTours />} />
+                      <Route
+                        path="tours-activities"
+                        element={<ProvinceTours />}
+                      />
                     </Route>
-                    <Route path="/attraction/:slug" element={<AttractionPage />} />
+                    <Route
+                      path="/attraction/:slug"
+                      element={<AttractionPage />}
+                    />
                     <Route path="/about" element={<AboutUs />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/checkout" element={<Checkout />} />
@@ -77,7 +84,11 @@ const App = () => {
                       element={<GoogleAuthSuccess />}
                     />
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/booking-history" element={<BookingHistory />} />
+                    <Route
+                      path="/booking-history"
+                      element={<BookingHistory />}
+                    />
+                    <Route path="/my-reviews" element={<MyReviews />} />
                     <Route path="/favorite-tours" element={<FavoriteTour />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/reset-password" element={<ResetPassword />} />

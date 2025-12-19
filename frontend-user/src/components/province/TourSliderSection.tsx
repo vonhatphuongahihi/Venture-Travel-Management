@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Province, Tour } from "@/global.types";
+import { Province, ShortTourInfo, Tour } from "@/global.types";
 import React from "react";
 import { Link } from "react-router-dom";
 import TourCard from "../tour/TourCard";
@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 
 interface TourSliderSectionProps {
   province: Province;
-  tours: Tour[];
+  tours: ShortTourInfo[];
 }
 
 const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
@@ -59,25 +59,29 @@ const TourSliderSection = ({ province, tours }: TourSliderSectionProps) => {
         </Link>
       </div>
 
-      {tours.length > 0 ? <Carousel
-        opts={{
-          align: "start",
-        }}
-        setApi={setApi}
-        className="w-full"
-      >
-        <CarouselContent className="pt-2">
-          {tours.map((tour, index) => (
-            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-              <Link to={`/tour/${tour.id}`}>
-                <TourCard key={tour.id} {...tour} />
-              </Link>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        {canScrollPrev && <CarouselPrevious />}
-        {canScrollNext && <CarouselNext />}
-      </Carousel> : <p>{t("tourSlider.noTours")}</p>}
+      {tours.length > 0 ? (
+        <Carousel
+          opts={{
+            align: "start",
+          }}
+          setApi={setApi}
+          className="w-full"
+        >
+          <CarouselContent className="pt-2">
+            {tours.map((tour, index) => (
+              <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <Link to={`/tour/${tour.id}`}>
+                  <TourCard key={tour.id} {...tour} />
+                </Link>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          {canScrollPrev && <CarouselPrevious />}
+          {canScrollNext && <CarouselNext />}
+        </Carousel>
+      ) : (
+        <p>{t("tourSlider.noTours")}</p>
+      )}
     </section>
   );
 };

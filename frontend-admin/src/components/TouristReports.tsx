@@ -58,16 +58,16 @@ export function TouristReports() {
   const [topTours, setTopTours] = useState<TopTourData[]>([]);
   const [attractionData, setAttractionData] = useState<BookingByAttractionData[]>([]);
 
-  // Fetch dữ liệu từ API
+  // Fetch dữ liệu ban đầu
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
         setLoading(true);
         const [statsData, monthlyData, statusData, toursData, attractionData] = await Promise.all([
           AdminReportAPI.getReportsStats(),
           AdminReportAPI.getMonthlyData(),
           AdminReportAPI.getTourByStatus(),
-          AdminReportAPI.getTopTours(reportType),
+          AdminReportAPI.getTopTours('popularity'),
           AdminReportAPI.getBookingsByAttraction(),
         ]);
         
@@ -77,14 +77,31 @@ export function TouristReports() {
         setTopTours(toursData);
         setAttractionData(attractionData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching initial data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [reportType]);
+    fetchInitialData();
+  }, []);
+
+  // Fetch lại Top Tours khi thay đổi reportType
+  useEffect(() => {
+    const fetchTopTours = async () => {
+      try {
+        const toursData = await AdminReportAPI.getTopTours(reportType);
+        setTopTours(toursData);
+      } catch (error) {
+        console.error('Error fetching top tours:', error);
+      }
+    };
+
+    // Chỉ fetch khi không phải lần đầu load (tránh duplicate request)
+    if (!loading) {
+      fetchTopTours();
+    }
+  }, [reportType, loading]);
 
   // Chuyển đổi reportType string thành enum
   const handleReportTypeChange = (value: string) => {

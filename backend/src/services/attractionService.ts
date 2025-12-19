@@ -304,16 +304,16 @@ export class AttractionService {
         const totalBooked = tour.ticketTypes.reduce((sum: number, tt: any) => {
           return (
             sum +
-            (tt.bookings || []).reduce((bookingSum: number, booking: any) => {
+            (tt.bookings?.reduce((bookingSum: number, booking: any) => {
               return (
                 bookingSum +
-                (booking.booking_details || []).reduce(
+                (booking.booking_details?.reduce(
                   (detailSum: number, detail: any) =>
                     detailSum + (detail.quantity || 0),
                   0
-                )
+                ) ?? 0)
               );
-            }, 0)
+            }, 0) ?? 0)
           );
         }, 0);
 

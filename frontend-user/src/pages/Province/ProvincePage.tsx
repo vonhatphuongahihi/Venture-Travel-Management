@@ -1,7 +1,10 @@
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { useProvince, useProvinceTours } from "@/hooks/useProvince";
+import {
+  useProvince,
+  useProvinceTours,
+} from "@/services/province/provinceHook";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -85,7 +88,7 @@ const ProvincePage = () => {
       <Header />
 
       {/* Hero Section */}
-      <div className="relative h-64 md:h-72">
+      <div className="relative h-64 md:h-96">
         <img
           src={province.image || heroImage}
           alt={province.name}

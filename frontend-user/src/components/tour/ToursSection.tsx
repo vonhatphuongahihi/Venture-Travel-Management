@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Filter, Star } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { tourService, Tour } from "@/services/tour.service";
 import FilterDialog, { FilterOptions } from "./FilterDialog";
 import { useTranslation } from "react-i18next";
 
 const ToursSection = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
   const [activeFilter, setActiveFilter] = useState("all");
   const [isVisible, setIsVisible] = useState(false);
   const [tours, setTours] = useState<Tour[]>([]);
@@ -36,6 +39,15 @@ const ToursSection = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  // Scroll to tours section when search query is present
+  useEffect(() => {
+    if (searchQuery && sectionRef.current) {
+      setTimeout(() => {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [searchQuery]);
 
   // Fetch categories from API
   useEffect(() => {
@@ -129,6 +141,24 @@ const ToursSection = () => {
           });
         }
 
+        // Apply search query filter
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase().trim();
+          filteredTours = filteredTours.filter((tour) => {
+            const title = (tour.title || "").toLowerCase();
+            const description = (tour.description || "").toLowerCase();
+            const location = (tour.location || "").toLowerCase();
+            const category = (tour.category || "").toLowerCase();
+
+            return (
+              title.includes(query) ||
+              description.includes(query) ||
+              location.includes(query) ||
+              category.includes(query)
+            );
+          });
+        }
+
         setTours(filteredTours);
       } catch (err) {
         console.error('Error fetching tours:', err);
@@ -140,7 +170,7 @@ const ToursSection = () => {
     };
 
     fetchTours();
-  }, [activeFilter, appliedFilters, t]);
+  }, [activeFilter, appliedFilters, searchQuery, t]);
 
   // Build filters from categories - use allTours for accurate counting
   const filters = [
@@ -176,10 +206,13 @@ const ToursSection = () => {
             {t('toursSection.special')}
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            {t('toursSection.title')}
+            {searchQuery ? `${t('toursSection.searchResults')}: "${searchQuery}"` : t('toursSection.title')}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            {t('toursSection.description')}
+            {searchQuery
+              ? `${tours.length} ${t('toursSection.toursFound')}`
+              : t('toursSection.description')
+            }
           </p>
         </div>
 

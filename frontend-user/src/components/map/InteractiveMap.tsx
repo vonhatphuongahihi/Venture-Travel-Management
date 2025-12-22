@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { TourType, DestinationType, EventType, HotelType } from "@/types/mapType";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { useTranslation } from "react-i18next";
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -53,6 +54,7 @@ function InteractiveMap({
   events,
   hotels,
 }: InteractiveMapProps) {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]); // lưu các marker đã vẽ để clear
@@ -266,10 +268,10 @@ function InteractiveMap({
       }
 
       // Vẽ markers sau (nằm trên routes)
-      tours.forEach((t) => {
+      tours.forEach((tour) => {
         // Hiển thị marker tại điểm đầu tiên của tour
-        if (t.coords && t.coords.length > 0) {
-          const [lat, lng] = t.coords[0];
+        if (tour.coords && tour.coords.length > 0) {
+          const [lat, lng] = tour.coords[0];
 
           const el = createCustomMarker(
             "#26B8ED",
@@ -283,7 +285,7 @@ function InteractiveMap({
             offset: 25,
             closeButton: true,
             closeOnClick: true,
-            maxWidth: "320px"
+            maxWidth: "240px"
           })
             .on('open', () => {
               // Close previous popup when opening new one
@@ -317,57 +319,51 @@ function InteractiveMap({
               `<div style="font-family: 'Inter', sans-serif; padding: 0; margin: 0;">
               <div style="
                 width: 100%;
-                height: 180px;
-                background: ${t.image
-                ? `url(${t.image}) center/cover no-repeat`
+                height: 120px;
+                background: ${tour.image
+                ? `url(${tour.image}) center/cover no-repeat`
                 : 'linear-gradient(135deg, #26B8ED 0%, #0891B2 100%)'};
-                border-radius: 8px 8px 0 0;
+                border-radius: 6px 6px 0 0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 48px;
+                font-size: 36px;
                 position: relative;
               ">
-                ${!t.image ? '✈️' : ''}
+                ${!tour.image ? '✈️' : ''}
               </div>
-              <div style="padding: 16px;">
+              <div style="padding: 12px;">
                 <h3 style="
                   color: #26B8ED; 
-                  font-size: 18px; 
+                  font-size: 15px; 
                   font-weight: bold; 
+                  margin: 0 0 6px 0;
+                  line-height: 1.3;
+                ">${tour.name}</h3>
+                <p style="
+                  color: #64748b; 
+                  font-size: 12px; 
                   margin: 0 0 8px 0;
                   line-height: 1.4;
-                ">${t.name}</h3>
-                <p style="
-                  color: #64748b; 
-                  font-size: 13px; 
-                  margin: 0 0 8px 0;
-                  line-height: 1.5;
-                ">${t.location || ''}</p>
-                <p style="
-                  color: #64748b; 
-                  font-size: 13px; 
-                  margin: 0 0 12px 0;
-                  line-height: 1.5;
                   display: -webkit-box;
                   -webkit-line-clamp: 2;
                   -webkit-box-orient: vertical;
                   overflow: hidden;
-                ">${t.description || ""}</p>
-                <a href="/tour/${t.tourId}" style="
+                ">${tour.description || ""}</p>
+                <a href="/tour/${tour.tourId}" style="
                   display: inline-block;
                   color: white;
                   background: #26B8ED;
                   text-decoration: none;
                   font-weight: 600;
-                  font-size: 14px;
-                  padding: 8px 16px;
-                  border-radius: 6px;
+                  font-size: 12px;
+                  padding: 6px 12px;
+                  border-radius: 4px;
                   transition: all 0.3s ease;
                   cursor: pointer;
                   width: 100%;
                   text-align: center;
-                " onmouseover="this.style.background='#0891B2'" onmouseout="this.style.background='#26B8ED'">Xem chi tiết →</a>
+                " onmouseover="this.style.background='#0891B2'" onmouseout="this.style.background='#26B8ED'">${t('map.viewDetails')} →</a>
               </div>
             </div>`
             );
@@ -430,36 +426,50 @@ function InteractiveMap({
             `<div style="font-family: 'Inter', sans-serif; padding: 0; margin: 0;">
             <div style="
               width: 100%;
-              height: 180px;
+              height: 120px;
               background: ${d.image
               ? `url(${d.image}) center/cover no-repeat`
               : 'linear-gradient(135deg, #10b981 0%, #059669 100%)'};
-              border-radius: 8px 8px 0 0;
+              border-radius: 6px 6px 0 0;
               display: flex;
               align-items: center;
               justify-content: center;
-              font-size: 48px;
+              font-size: 36px;
             ">
               ${!d.image ? '📍' : ''}
             </div>
-            <div style="padding: 16px;">
+            <div style="padding: 12px;">
               <h3 style="
                 color: #10b981; 
-                font-size: 18px; 
+                font-size: 15px; 
                 font-weight: bold; 
-                margin: 0 0 8px 0;
-                line-height: 1.4;
+                margin: 0 0 6px 0;
+                line-height: 1.3;
               ">${d.name}</h3>
               <p style="
                 color: #64748b; 
-                font-size: 13px; 
-                margin: 0;
-                line-height: 1.5;
+                font-size: 12px; 
+                margin: 0 0 8px 0;
+                line-height: 1.4;
                 display: -webkit-box;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
               ">${d.address || d.description || ""}</p>
+              ${d.id ? `<a href="/attraction/${d.id}" style="
+                display: inline-block;
+                color: white;
+                background: #10b981;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 4px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+              " onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">${t('map.viewAttraction')} →</a>` : ''}
             </div>
           </div>`
           );

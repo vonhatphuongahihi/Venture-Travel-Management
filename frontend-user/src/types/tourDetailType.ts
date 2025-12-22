@@ -30,6 +30,7 @@ export interface TourDetail {
   createdAt: Date; //createdAt
   updatedAt: Date; //updatedAt
   createdBy: string; //created_by
+  ticketTypes?: TicketType[]; // ticket types for this tour
 }
 
 export interface TourStop {

@@ -61,9 +61,8 @@ export class EmailService {
         return false;
       }
 
-      const verificationUrl = `${
-        process.env.FRONTEND_URL || "http://localhost:8081"
-      }/verify-email?token=${verificationToken}`;
+      const verificationUrl = `${process.env.FRONTEND_URL || "http://localhost:8081"
+        }/verify-email?token=${verificationToken}`;
 
       // Render email template
       const htmlContent = this.renderTemplate("verificationEmail", {
@@ -147,9 +146,8 @@ export class EmailService {
         return false;
       }
 
-      const resetUrl = `${
-        process.env.FRONTEND_URL || "http://localhost:8081"
-      }/reset-password?token=${resetToken}`;
+      const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:8081"
+        }/reset-password?token=${resetToken}`;
 
       // Render email template
       const htmlContent = this.renderTemplate("passwordResetEmail", {
@@ -184,7 +182,7 @@ export class EmailService {
 
       const mailOptions = {
         from: process.env.SMTP_FROM || "Venture <noreply@venture.com>",
-        to: process.env.CONTACT_EMAIL || "contact@venture.com",
+        to: process.env.CONTACT_EMAIL || "vonhatphuongahihi@gmail.com",
         subject: "Tin nhắn liên hệ mới - Venture Travel",
         html: htmlContent,
       };

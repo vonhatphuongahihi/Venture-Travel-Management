@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, Users, Search, Instagram, Facebook, Phone } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-vietnam.jpg";
 import heroImage1 from "@/assets/hero-vietnam-1.jpg";
 import heroImage2 from "@/assets/hero-vietnam-2.jpg";
@@ -9,8 +10,10 @@ import { useTranslation } from "react-i18next";
 
 const HeroSection = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -53,6 +56,26 @@ const HeroSection = () => {
 
   const handleThumbnailClick = (index: number) => {
     setCurrentSlide(index);
+  };
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+
+    if (searchQuery.trim()) {
+      // Navigate to tours page with search query
+      navigate(`/tour?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      // If empty, just navigate to tours section
+      navigate('/tour');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   useEffect(() => {
@@ -108,21 +131,28 @@ const HeroSection = () => {
           </p>
 
           {/* Search Bar */}
-          <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <form
+            onSubmit={handleSearch}
+            className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          >
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder={t("hero.searchPlaceholder")}
                 className="w-full pl-12 pr-28 py-4 rounded-xl bg-white/70 text-gray-900 placeholder-gray-500 font-inter focus:outline-none focus:ring-2 focus:ring-white/50"
               />
               <Button
+                type="submit"
                 className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-xl font-inter font-medium"
               >
                 {t("hero.search")}
               </Button>
             </div>
-          </div>
+          </form>
 
           {/* Stats */}
           <div className={`grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>

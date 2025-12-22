@@ -117,7 +117,7 @@ export class UploadController {
             const uploadPromises = files.map(async (file: Express.Multer.File, index: number) => {
                 const fileName = `tour_${Date.now()}_${index}`;
                 // Upload image to Cloudinary (sử dụng method riêng cho review images)
-                const uploadResult = await cloudinaryService.uploadReviewImage(
+                const uploadResult = await cloudinaryService.uploadTourImage(
                     file.buffer,
                     fileName
                 );

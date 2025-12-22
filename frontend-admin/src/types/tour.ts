@@ -94,7 +94,33 @@ export interface CreateTourRequest {
 }
 
 export interface ApiResponse<T> {
-  success: boolean;
-  message?: string;
-  data: T;
+    success: boolean;
+    message?: string;
+    data: T;
+}
+
+export interface TourFilters {
+    page?: number;
+    limit?: number;
+    categories?: string[]; // Thay đổi: Mảng categories
+    search?: string;
+    sortBy?: "newest" | "popular" | "topRated" | "bestPrice";
+}
+
+export interface TourWithStats {
+    tourId: string;
+    name: string;
+    images: string[];
+    about: string;
+    createdAt: Date;
+    avgRating: number;
+    totalBookings: number;
+    reviewCount: number;
+    categories: string[];
+    minPrice: number;
+}
+
+export interface TourListResponse {
+    tours: TourWithStats[];
+    total: number;
 }

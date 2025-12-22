@@ -1,4 +1,4 @@
-import { AuthResponse, LoginRequest, RegisterRequest, VerifyEmailRequest, VerifyResponse } from '@/types/api';
+import { AuthResponse, LoginRequest, RegisterRequest, VerifyEmailRequest, VerifyResponse, ForgotPasswordRequest, ForgotPasswordResponse } from '@/types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
@@ -96,6 +96,35 @@ class AuthAPI {
       return response.json();
     } catch (error) {
       console.error('Logout API error:', error);
+      return {
+        success: false,
+        message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+      };
+    }
+  }
+
+  // Forgot password
+  static async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          success: false,
+          message: errorData.message || `HTTP Error: ${response.status}`,
+        };
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error('Forgot password API error:', error);
       return {
         success: false,
         message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',

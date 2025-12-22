@@ -301,12 +301,6 @@ const Explore360 = () => {
                             </a>
                         ))}
                     </div>
-
-                    <div className={`text-center transition-all duration-1000 delay-400 ${isMainVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-                        <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl">
-                            {t("explore360.viewMore")}
-                        </Button>
-                    </div>
                 </div>
             </section >
 

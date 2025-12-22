@@ -5,28 +5,16 @@ function TicketTypePicker({
   userTicket,
   setUserTicket,
   ticketPrices,
+  ticketTypes,
   totalPrice,
 }) {
-  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
   const [currentTicketTypes, setCurrentTicketTypes] = useState<TicketType>();
   useEffect(() => {
-    const types = ticketPrices.map((ut) => ut.ticketTypeId);
-    // Lấy các ticketTypes từ ticketTypeId trong ticketPrices (mảng types)
-    const sampleTicketTypes: TicketType[] = [
-      {
-        ticketTypeId: "ab2c9dd9-2638-455f-ad39-622b88681bb8",
-        tourId: "05520fbe-21f9-4e04-9dc1-4ccf19b8614d", // FK -> tours.tour_id
-        name: "Vé thường",
-        notes: "Đã bao gồm đón khách",
-        quantity: 20,
-        isActive: true,
-        createdAt: new Date("2025-09-01T10:00:00"), // ISO timestamp}
-      }
-    ];
-    setTicketTypes(sampleTicketTypes);
-    setCurrentTicketTypes(sampleTicketTypes[0]);
-    setUserTicket({ ...userTicket, currentType: sampleTicketTypes[0] });
-  }, []);
+    if (ticketTypes && ticketTypes.length > 0) {
+      setCurrentTicketTypes(ticketTypes[0]);
+      setUserTicket({ ...userTicket, currentType: ticketTypes[0] });
+    }
+  }, [ticketTypes]);
   return (
     <div className="px-5 w-full flex flex-col justify-between">
       {ticketTypes.map((t, i) => {

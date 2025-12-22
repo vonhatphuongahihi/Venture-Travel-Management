@@ -34,11 +34,11 @@ const BookingHistory = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "completed":
-        return t('bookingHistory.completed');
+        return t("bookingHistory.completed");
       case "processing":
-        return t('bookingHistory.processing');
+        return t("bookingHistory.processing");
       case "cancelled":
-        return t('bookingHistory.cancelled');
+        return t("bookingHistory.cancelled");
       default:
         return status;
     }
@@ -81,20 +81,19 @@ const BookingHistory = () => {
 
   const handleLogout = () => {
     logout();
-    showToast(t('settings.logout.success'), "success");
+    showToast(t("settings.logout.success"), "success");
     navigate("/login");
   };
 
   const handleCancelBooking = async (bookingId: string) => {
-    if (!window.confirm(t('bookingHistory.confirmCancel'))) {
+    if (!window.confirm(t("bookingHistory.confirmCancel"))) {
       return;
     }
 
     try {
       await bookingService.cancelBooking(bookingId);
-      showToast(t('bookingHistory.cancelSuccess'), "success");
+      showToast(t("bookingHistory.cancelSuccess"), "success");
 
-      // Refresh bookings list
       const data = await bookingService.getUserBookings();
       const mappedBookings: any[] = data.map((booking) => ({
         id: booking.bookingId,
@@ -111,12 +110,13 @@ const BookingHistory = () => {
       setBookings(mappedBookings);
     } catch (err: unknown) {
       console.error("Error canceling booking:", err);
-      const errorMessage = (err as any)?.response?.data?.message || t('bookingHistory.cancelFailed');
+      const errorMessage =
+        (err as any)?.response?.data?.message ||
+        t("bookingHistory.cancelFailed");
       showToast(errorMessage, "error");
     }
   };
 
-  // Check authentication on component mount
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -124,7 +124,6 @@ const BookingHistory = () => {
     }
   }, [user, navigate]);
 
-  // Fetch bookings from API
   useEffect(() => {
     const fetchBookings = async () => {
       if (!user) return;
@@ -135,23 +134,17 @@ const BookingHistory = () => {
       try {
         const data = await bookingService.getUserBookings();
 
-        // Map API data to component format
         const mappedBookings = data.map((booking) => ({
           ...booking,
           tourImage: booking.tourImage || halongImg,
         }));
 
         setBookings(mappedBookings);
-
-        // Check if there's a new booking from navigation state
-        if (location.state?.newBooking) {
-          showToast(t('bookingHistory.bookSuccess'), "success");
-          // Clear navigation state
-          window.history.replaceState({}, document.title);
-        }
       } catch (err: unknown) {
         console.error("Error fetching bookings:", err);
-        const errorMessage = (err as any)?.response?.data?.message || t('bookingHistory.failedToLoad');
+        const errorMessage =
+          (err as any)?.response?.data?.message ||
+          t("bookingHistory.failedToLoad");
         setError(errorMessage);
         showToast(errorMessage, "error");
       } finally {
@@ -160,29 +153,39 @@ const BookingHistory = () => {
     };
 
     fetchBookings();
-  }, [user, location.state, showToast, t]);
+  }, [user]);
 
-  // Filter tours based on selected filter
+  useEffect(() => {
+    if (location.state?.newBooking) {
+      showToast(t("bookingHistory.bookSuccess"), "success");
+      try {
+        window.history.replaceState({}, document.title);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [location.key]);
+
   const filteredBookings =
     selectedFilter === "all"
       ? bookings
       : bookings.filter((booking) => booking.status === selectedFilter);
 
   const filterOptions = [
-    { value: "all", label: t('bookingHistory.all'), count: bookings.length },
+    { value: "all", label: t("bookingHistory.all"), count: bookings.length },
     {
       value: "processing",
-      label: t('bookingHistory.processing'),
+      label: t("bookingHistory.processing"),
       count: bookings.filter((b) => b.status === "processing").length,
     },
     {
       value: "completed",
-      label: t('bookingHistory.completed'),
+      label: t("bookingHistory.completed"),
       count: bookings.filter((b) => b.status === "completed").length,
     },
     {
       value: "cancelled",
-      label: t('bookingHistory.cancelled'),
+      label: t("bookingHistory.cancelled"),
       count: bookings.filter((b) => b.status === "cancelled").length,
     },
   ];
@@ -192,24 +195,31 @@ const BookingHistory = () => {
       <Header />
       <div className="text-center mt-8 md:mt-12 mb-8 md:mb-12 px-4">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4">
-          <span className="text-gradient">{t('bookingHistory.title')}</span>
+          <span className="text-gradient">{t("bookingHistory.title")}</span>
         </h2>
       </div>
 
       <main className="container mx-auto px-4 py-6 md:py-12">
         {/* RESPONSIVE: flex-col trên mobile, flex-row trên desktop (lg) */}
         <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-
           {/* Sidebar */}
           {/* RESPONSIVE: Width full trên mobile, fixed width trên desktop */}
-          <UserSidebar user={user} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} handleLogout={handleLogout} activeLink="booking-history" />
+          <UserSidebar
+            user={user}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            handleLogout={handleLogout}
+            activeLink="booking-history"
+          />
 
           {/* Main card */}
           <section className="flex-1 min-w-0">
             <div className="bg-white/90 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-200 p-4 md:p-8">
-              <h2 className="text-lg font-medium mb-3">{t('bookingHistory.myBookings')}</h2>
+              <h2 className="text-lg font-medium mb-3">
+                {t("bookingHistory.myBookings")}
+              </h2>
               <p className="text-sm text-slate-600 mb-6">
-                {t('bookingHistory.viewAllBookings')}
+                {t("bookingHistory.viewAllBookings")}
               </p>
 
               {/* Filter tabs - Responsive: Scroll ngang trên mobile */}
@@ -218,10 +228,11 @@ const BookingHistory = () => {
                   <button
                     key={option.value}
                     onClick={() => setSelectedFilter(option.value)}
-                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedFilter === option.value
-                      ? "border-primary text-primary"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                      }`}
+                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                      selectedFilter === option.value
+                        ? "border-primary text-primary"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
                   >
                     {option.label} ({option.count})
                   </button>
@@ -234,9 +245,7 @@ const BookingHistory = () => {
                   <Loader2 className="animate-spin text-primary" size={48} />
                 </div>
               ) : error ? (
-                <div className="text-center py-10 text-red-500">
-                  {error}
-                </div>
+                <div className="text-center py-10 text-red-500">{error}</div>
               ) : (
                 <div className="space-y-4">
                   {filteredBookings.map((booking) => (
@@ -279,23 +288,32 @@ const BookingHistory = () => {
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 sm:gap-4 text-xs md:text-sm text-gray-600 mb-3">
                             <div>
-                              <span className="font-medium">{t('bookingHistory.departureDate')}</span>{" "}
+                              <span className="font-medium">
+                                {t("bookingHistory.departureDate")}
+                              </span>{" "}
                               {formatDate(booking.startDate)}
                             </div>
                             <div>
-                              <span className="font-medium">{t('bookingHistory.quantity')}</span>{" "}
-                              {booking.participants} {t('bookingHistory.people')}
+                              <span className="font-medium">
+                                {t("bookingHistory.quantity")}
+                              </span>{" "}
+                              {booking.participants}{" "}
+                              {t("bookingHistory.people")}
                             </div>
                           </div>
 
                           {/* Price section - Responsive layout */}
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-1">
                             <div className="text-xs md:text-sm text-gray-500">
-                              {t('bookingHistory.unitPrice')} {formatPrice(booking.totalPrice / booking.participants)}
+                              {t("bookingHistory.unitPrice")}{" "}
+                              {formatPrice(
+                                booking.totalPrice / booking.participants
+                              )}
                             </div>
                             <div className="text-left sm:text-right">
                               <div className="text-sm md:text-base font-bold text-primary">
-                                {t('bookingHistory.total')} {formatPrice(booking.totalPrice)}
+                                {t("bookingHistory.total")}{" "}
+                                {formatPrice(booking.totalPrice)}
                               </div>
                             </div>
                           </div>
@@ -316,31 +334,32 @@ const BookingHistory = () => {
                                 setOpenReviewDialog(true);
                               }}
                             >
-                              {t('bookingHistory.reviewTour')}
+                              {t("bookingHistory.reviewTour")}
                             </button>
                           ) : booking.status === "cancelled" ? (
                             <button className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">
-                              {t('bookingHistory.rebook')}
+                              {t("bookingHistory.rebook")}
                             </button>
                           ) : null}
 
                           {booking.status === "processing" && (
                             <button
                               className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
-                              onClick={() => handleCancelBooking(booking.bookingId)}
+                              onClick={() =>
+                                handleCancelBooking(booking.bookingId)
+                              }
                             >
-                              {t('bookingHistory.cancelTour')}
+                              {t("bookingHistory.cancelTour")}
                             </button>
                           )}
                         </div>
                       </div>
-
                     </div>
                   ))}
 
                   {filteredBookings.length === 0 && (
                     <div className="text-center py-10 text-gray-500">
-                      {t('bookingHistory.noBookingsYet')}
+                      {t("bookingHistory.noBookingsYet")}
                     </div>
                   )}
                 </div>

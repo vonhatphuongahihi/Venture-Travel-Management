@@ -19,10 +19,15 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import TicketFormModal from "@/components/tour-create/TicketFormModal";
-import { useCreateTour, useGetTourFormMetadata } from "@/services/tours/tourHook";
+import {
+    useCreateTour,
+    useGetTourFormMetadata,
+    useUploadTourImages,
+} from "@/services/tours/tourHook";
 import { Spinner } from "@/components/ui/spinner";
 import type { Attraction, CreateTourRequest } from "@/types/tour";
 import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
+import { useToast } from "@/contexts/ToastContext";
 
 const MAPBOX_TOKEN =
     "pk.eyJ1Ijoibmd1eWVuMDk4MyIsImEiOiJjbWZoaDU5MWYwYnY0Mmlwd28zZm5ha2Z5In0.YXBPUe4baagMkZD2NpbRGA";
@@ -82,7 +87,7 @@ type MapboxGeocodingFeature = {
         name: string;
         full_address?: string;
         place_formatted?: string;
-        coordinates?: {
+        coordinates: {
             longitude: number;
             latitude: number;
         };
@@ -133,13 +138,13 @@ const TourCreate = () => {
         getValues,
     } = useForm<TourFormValues>({
         defaultValues: {
-            cancellationPolicy: "",
-            expectations: "",
+            cancellationPolicy: `<p><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Để được hoàn đủ tiền, bạn phải hủy ít nhất 24 giờ trước thời gian trải nghiệm bắt đầu.</span></p><ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Nếu bạn hủy ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm, số tiền bạn đã thanh toán sẽ không được hoàn lại.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Mọi thay đổi được thực hiện ít hơn 24 giờ trước thời gian bắt đầu trải nghiệm sẽ không được chấp nhận.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Thời gian giới hạn dựa trên giờ địa phương của trải nghiệm.</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu nó bị hủy do thời tiết xấu, bạn sẽ được chọn một ngày khác hoặc được hoàn tiền đầy đủ.</span></li></ol>`,
+            additionalInfomation: `<ol><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Xác nhận sẽ được nhận tại thời điểm đặt phòng</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Không khuyến khích cho du khách mang thai</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Không có vấn đề về tim hoặc các tình trạng bệnh lý nghiêm trọng khác</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Hầu hết du khách có thể tham gia</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Trải nghiệm này đòi hỏi thời tiết tốt. Nếu bị hủy do thời tiết xấu, bạn sẽ được chọn vào ngày khác hoặc được hoàn đủ tiền</span></li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span><span style="background-color: oklch(1 0 0); color: oklch(0 0 0);">Chuyến tham quan/hoạt động này sẽ có tối đa 15 khách du lịch</span></li></ol>`,
             tourStops: [
                 {
                     attractionId: "",
                     notes: "",
-                    details: "",
+                    details: ""
                 },
             ],
         },
@@ -152,13 +157,19 @@ const TourCreate = () => {
 
     const navigate = useNavigate();
 
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState<number | null>(1);
 
     const [tourData, setTourData] = useState<TourFormValues | null>(null);
 
     const [selectedPickUpAddress, setSelectedPickUpAddress] =
         useState<Option<MapboxGeocodingFeature> | null>(null);
 
+    const [selectedEndPointAddress, setSelectedEndPointAddress] =
+        useState<Option<MapboxGeocodingFeature> | null>(null);
+
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
+    const [isCreatingTour, setIsCreatingTour] = useState(false);
     const {
         data: metadata,
         isLoading: loadingMetadata,
@@ -166,13 +177,20 @@ const TourCreate = () => {
     } = useGetTourFormMetadata();
 
     // Create tour hook
-    const createTour = useCreateTour();
+    const { mutateAsync: createTour } = useCreateTour();
 
-    const onSubmitTour = (data: TourFormValues) => {
-        setStep(2);
-        setTourData(data);
-        console.log(data);
-        console.log(selectedPickUpAddress);
+    const { mutateAsync: uploadTourImages } = useUploadTourImages();
+
+    const onSubmitTour = async (data: TourFormValues) => {
+        try {
+            setStep(2);
+            setTourData(data);
+            console.log(data);
+            console.log(selectedPickUpAddress);
+            console.log(selectedEndPointAddress);
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -181,6 +199,9 @@ const TourCreate = () => {
     const [editingTicket, setEditingTicket] = useState<TicketData | null>(null);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [formKey, setFormKey] = useState(0);
+
+    const { showToast } = useToast()
+    const nevigate = useNavigate()
 
     const handleAddTicket = (ticket: TicketData) => {
         setTickets([...tickets, ticket]);
@@ -226,39 +247,60 @@ const TourCreate = () => {
 
     // console.log(metadata);
 
-    const finishTour = () => {
-        console.log(tourData);
-        console.log(tickets);
+    const finishTour = async () => {
+        try {
+            console.log(tourData);
+            console.log(tickets);
+            setIsCreatingTour(true);
+            setStep(null)
+            const uploadedImages = await uploadTourImages(selectedFiles);
 
-        // if (tourData && tickets) {
-        //     const payload: CreateTourRequest = {
-        //         name: tourData.name,
-        //         about: tourData.about,
-        //             ageRange: tourData.ageRange,
-        //             maxGroupSize: tourData.maxGroupSize,
-        //             duration: tourData.duration,
-        //             languages: tourData.languages,
-        //             categories: tourData.categories,
-        //             highlights: tourData.highlights?.split("\n"),
-        //             inclusions: tourData.inclusions.split("\n"),
-        //             exclusions: tourData.exclusions.split("\n"),
-        //             expectations: tourData.expectations,
-        //             cancellationPolicy: tourData.cancellationPolicy,
-        //             pickupPoint: tourData.pickupPoint,
-        //             pickupDetails: tourData.pickupDetails,
-        //             pickupAreaRadius: tourData.pickupAreaRadius,
-        //             endPoint: tourData.endPoint,
-        //             startDate: new Date("2025-01-01"),
-        //             endDate: new Date("2025-12-31"),
-        //             images: [],
-        //             tourStops: tourData.tourStops,
-        //             ticketTypes: tickets
-        //     };
-        // }
+            const imgUrls = uploadedImages.images.map((img) => img.url);
+
+            if (tourData && tickets && selectedPickUpAddress?.data?.properties.coordinates) {
+                const payload: CreateTourRequest = {
+                    name: tourData.name,
+                    about: tourData.about,
+                    ageRange: tourData.ageRange,
+                    maxGroupSize: Number(tourData.maxGroupSize),
+                    duration: tourData.duration,
+                    languages: tourData.languages,
+                    categories: tourData.categories,
+                    highlights: tourData.highlights?.split("\n"),
+                    inclusions: tourData.inclusions.split("\n"),
+                    exclusions: tourData.exclusions.split("\n"),
+                    expectations: tourData.expectations,
+                    cancellationPolicy: tourData.cancellationPolicy,
+                    pickupPoint: tourData.pickupPoint,
+                    pickupPointCoordinates: selectedPickUpAddress?.data?.properties.coordinates,
+                    pickupDetails: tourData.pickupDetails,
+                    pickupAreaRadius: tourData.pickupAreaRadius,
+                    endPoint: tourData.endPoint,
+                    endPointCoordinates: selectedEndPointAddress?.data?.properties.coordinates,
+                    startDate: new Date("2025-01-01"),
+                    endDate: new Date("2025-12-31"),
+                    images: imgUrls,
+                    tourStops: tourData.tourStops,
+                    ticketTypes: tickets,
+                    additionalInformation: tourData.additionalInfomation,
+                };
+
+                await createTour(payload);
+
+                showToast("Tạo tour thành công", "success")
+
+                nevigate("/tours")
+            }
+        } catch (error) {
+            setStep(1)
+            showToast("Tạo tour thất bại", "error")
+            console.log(error);
+        } finally {
+            setIsCreatingTour(false);
+        }
     };
 
     const TourCreateStep1 = () => {
-        // Hàm gọi Mapbox Geocoding API v6
         const fetchMapboxPlaces = async (query: string): Promise<MapboxGeocodingFeature[]> => {
             if (!query || query.trim().length < 3) return [];
 
@@ -284,7 +326,6 @@ const TourCreate = () => {
             }
         };
 
-        // Map từ MapboxFeatureV6 sang Option
         const mapMapboxToOption = (
             feature: MapboxGeocodingFeature
         ): Option<MapboxGeocodingFeature> => ({
@@ -332,15 +373,9 @@ const TourCreate = () => {
                     <div className="flex gap-2">
                         <button
                             onClick={() => navigate("/tours")}
-                            className="px-4 py-1 border rounded-md hover:bg-gray-200"
+                            className="px-4 py-1 border text-lg rounded-md hover:bg-gray-200"
                         >
                             Hủy
-                        </button>
-                        <button
-                            onClick={handleSubmit(onSubmitTour)}
-                            className="px-4 py-1 border rounded-md bg-primary hover:bg-primary/70 text-white"
-                        >
-                            Lưu
                         </button>
                     </div>
                 </div>
@@ -391,6 +426,7 @@ const TourCreate = () => {
                                         label={"Số lượng người tối đa"}
                                         name={"maxGroupSize"}
                                         register={register}
+                                        type="number"
                                         errors={errors}
                                         // validationRules={{
                                         //     required: "Số lượng người tối đa là bắt buộc",
@@ -400,7 +436,7 @@ const TourCreate = () => {
                                     ></FormInput>
                                     <FormInput
                                         label={"Thời lượng tour"}
-                                        name={"name"}
+                                        name={"duration"}
                                         register={register}
                                         errors={errors}
                                         // validationRules={{
@@ -498,7 +534,13 @@ const TourCreate = () => {
                                     placeholder="Thông tin bổ sung..."
                                     control={control}
                                 ></TextEditor>
-                                <ImageUploader label="Ảnh tour"></ImageUploader>
+                                <ImageUploader
+                                    label="Ảnh tour"
+                                    maxFiles={10}
+                                    maxSizeMB={5}
+                                    value={selectedFiles}
+                                    onChange={setSelectedFiles}
+                                ></ImageUploader>
                             </div>
                         </div>
                     </div>
@@ -620,7 +662,7 @@ const TourCreate = () => {
                                                     }}
                                                     onSelect={(option) => {
                                                         // ✅ Lưu cả name
-                                                        setSelectedPickUpAddress(option);
+                                                        setSelectedEndPointAddress(option);
                                                         setValue(`endPoint`, option.label);
                                                     }}
                                                     error={error?.message}
@@ -843,6 +885,11 @@ const TourCreate = () => {
             <div className="px-[60px] py-2">
                 {step === 1 && <TourCreateStep1></TourCreateStep1>}
                 {step === 2 && <TourCreateStep2></TourCreateStep2>}
+                {isCreatingTour && (
+                    <div className="flex min-h-[70vh] items-center justify-center">
+                        <Spinner className="size-10 text-primary"></Spinner>
+                    </div>
+                )}
             </div>
         </Layout>
     );

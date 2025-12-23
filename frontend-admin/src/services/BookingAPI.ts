@@ -110,7 +110,7 @@ export class BookingAPI {
       email: payload.email || "",
       total_price: payload.totalPrice || 0,
       special_requests: payload.specialRequests || null,
-      status: payload.status === "confirmed" ? "confirmed" : payload.status === "cancelled" ? "cancelled" : "pending",
+      status: payload.status === "cancelled" || payload.status === "canceled" ? "cancelled" : payload.status || "pending",
       payment_type: payload.paymentType || "unpaid",
       priceCategories: validBookingDetails.map(detail => ({
         categoryId: detail.priceCategory?.categoryId || "",

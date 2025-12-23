@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -37,12 +37,6 @@ type TicketFormModalProps = {
     onCancelEdit: () => void;
     editingTicket?: TicketData | null;
 };
-
-const CATEGORY_OPTIONS = [
-    { name: "Người lớn", categoryId: "adult", description: "Từ 18 đến 60 tuổi" },
-    { name: "Trẻ em", categoryId: "child", description: "Dưới 18 tuổi" },
-    { name: "Người cao tuổi", categoryId: "senior", description: "Trên 60 tuổi" },
-];
 
 const TicketFormModal = ({
     priceCategories,
@@ -104,7 +98,7 @@ const TicketFormModal = ({
     }, [editingTicket, reset]);
 
     const onSubmit = (data: TicketData) => {
-        const { quantity, ...rest} = data
+        const { quantity, ...rest } = data
 
         if (editingTicket) {
             if (onUpdateTicket) onUpdateTicket({ quantity: Number(quantity), ...rest, id: editingTicket.id });
@@ -188,8 +182,8 @@ const TicketFormModal = ({
                                                     {fields
                                                         .map((p) => p.categoryId)
                                                         .includes(cate.categoryId) && (
-                                                        <Check className="ml-auto w-[14px]" />
-                                                    )}
+                                                            <Check className="ml-auto w-[14px]" />
+                                                        )}
                                                 </div>
                                             );
                                         })}

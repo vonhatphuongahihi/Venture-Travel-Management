@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Controller, type UseFormGetValues, type UseFormSetValue } from "react-hook-form";
+import { Controller, type UseFormGetValues } from "react-hook-form";
 import type { Attraction } from "@/types/tour";
 import { Search, X } from "lucide-react";
 
@@ -38,7 +38,7 @@ export const AttractionSelect = ({
     control,
     name,
     error,
-    index,
+    index: _index,
     getValues,
     attractions,
 }: AttractionSelectProps) => {
@@ -123,9 +123,8 @@ export const AttractionSelect = ({
                                 </button>
                                 <input
                                     type="text"
-                                    className={`flex-1 border-none rounded py-2 pr-2 placeholder:text-gray-500  ${
-                                        error ? "border-red-500" : "border-gray-300"
-                                    }`}
+                                    className={`flex-1 border-none rounded py-2 pr-2 placeholder:text-gray-500  ${error ? "border-red-500" : "border-gray-300"
+                                        }`}
                                     placeholder={"Tìm kiếm địa điểm"}
                                     value={selectedOption ? selectedOption.label : query}
                                     onChange={handleInputChange}

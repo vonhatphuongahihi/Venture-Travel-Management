@@ -59,7 +59,7 @@ const ToursManage = () => {
 
     const [sort, setSort] = useState(sortOptionList[0].value);
     const [search, setSearch] = useState("");
-    const [searched, setSearched] = useState(false);
+    const [_searched, setSearched] = useState(false);
     const [selectedCategoriesTemp, setSelectedCategoriesTemp] = useState<string[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 

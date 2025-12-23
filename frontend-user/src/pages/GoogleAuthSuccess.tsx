@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/contexts/ToastContext';
+import UserAPI from '@/services/userAPI';
 
 const GoogleAuthSuccess = () => {
     const [searchParams] = useSearchParams();
@@ -23,24 +24,14 @@ const GoogleAuthSuccess = () => {
 
     const handleGoogleLoginSuccess = async (token: string) => {
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+            // Get user profile with token using UserAPI
+            const response = await UserAPI.getProfile(token);
 
-            // Get user profile with token
-            const response = await fetch(`${API_BASE_URL}/auth/profile`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            const data = await response.json();
-
-            if (data.success && data.data && data.data.user) {
+            if (response.success && response.data) {
                 // Set user and token in storage
                 localStorage.setItem('token', token);
                 localStorage.setItem('remember', 'true');
-                localStorage.setItem('user', JSON.stringify(data.data.user));
+                localStorage.setItem('user', JSON.stringify(response.data));
 
                 // Force page reload to update header with new user data
                 showToast('Đăng nhập Google thành công!', 'success');
@@ -49,7 +40,7 @@ const GoogleAuthSuccess = () => {
                     window.location.replace('/');
                 }, 500);
             } else {
-                showToast('Không thể lấy thông tin người dùng', 'error');
+                showToast(response.message || 'Không thể lấy thông tin người dùng', 'error');
                 setTimeout(() => navigate('/login'), 2000);
             }
         } catch (error) {

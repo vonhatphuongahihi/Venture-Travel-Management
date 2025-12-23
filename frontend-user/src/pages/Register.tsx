@@ -13,6 +13,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const { register, loginWithGoogle, isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -71,7 +72,10 @@ const Register = () => {
   };
 
   const handleGoogleLogin = () => {
+    setIsGoogleLoading(true);
     loginWithGoogle();
+    // Note: loginWithGoogle redirects, so we won't reset this state
+    // but it's fine as the page will navigate away
   };
 
   return (
@@ -187,7 +191,7 @@ const Register = () => {
             {/* Google login */}
             <button
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={isGoogleLoading}
               className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               <img
@@ -195,7 +199,7 @@ const Register = () => {
                 alt="google"
                 className="h-4"
               />
-              {isLoading ? t('auth.register.processing') : t('auth.register.continueWithGoogle')}
+              {isGoogleLoading ? t('auth.register.processing') : t('auth.register.continueWithGoogle')}
             </button>
 
             <p className="text-center text-sm text-slate-500 mt-6">

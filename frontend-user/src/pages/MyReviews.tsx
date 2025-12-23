@@ -59,8 +59,8 @@ const MyReviewsPage = () => {
     type: "tour" | "attraction";
   } | null>(null);
 
-  // State quản lý đóng mở sidebar trên mobile
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // State quản lý đóng mở sidebar trên mobile - mặc định mở để hiển thị trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!user || !token) {

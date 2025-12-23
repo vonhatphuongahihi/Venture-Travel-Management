@@ -48,10 +48,10 @@ export class TourController {
                                     include: {
                                         priceCategory: true,
                                     },
-                                    take: 1, // Get first price as base price
+                                    // Get all prices to calculate minimum
                                 },
                             },
-                            take: 1,
+                            // Get all ticket types to calculate minimum price
                         },
                     },
                     orderBy: {
@@ -70,8 +70,11 @@ export class TourController {
                     ? tour.tourReviews.reduce((sum: number, review: any) => sum + review.rate, 0) / tour.tourReviews.length
                     : 0;
 
-                // Get base price from ticket prices
-                const basePrice = tour.ticketTypes[0]?.ticketPrices[0]?.price || 0;
+                // Calculate min price from all ticket prices (same as provinceController)
+                const prices = tour.ticketTypes.flatMap((tt: any) =>
+                    tt.ticketPrices ? tt.ticketPrices.map((tp: any) => tp.price) : []
+                );
+                const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
 
                 // Determine status based on dates
                 let status: 'upcoming' | 'ongoing' | 'completed' = 'upcoming';
@@ -92,7 +95,7 @@ export class TourController {
                     description: tour.about,
                     image: tour.images && tour.images.length > 0 ? tour.images[0] : '/placeholder.svg',
                     images: tour.images,
-                    price: basePrice,
+                    price: minPrice,
                     duration: tour.duration,
                     location: 'Việt Nam',
                     rating: Math.round(avgRating * 10) / 10,

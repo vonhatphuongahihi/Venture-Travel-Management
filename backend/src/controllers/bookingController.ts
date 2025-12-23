@@ -135,7 +135,7 @@ export const getBooking = async (req: Request, res: Response) => {
     });
     if (!booking)
       return res.status(404).json({ success: false, message: "Booking not found" });
-    
+
     // Format response
     const formattedBooking = {
       bookingId: booking.bookingId,
@@ -391,14 +391,13 @@ export const createBooking = async (req: Request, res: Response) => {
       })),
     };
 
-    res.status(201).json({ success: true, data: formattedBooking });
+    return res.status(201).json({ success: true, data: formattedBooking });
   } catch (err: any) {
     console.error('Create booking error:', err);
     if (err.message.includes('Ticket price not found')) {
       return res.status(400).json({ success: false, message: err.message });
     }
-    res.status(500).json({ success: false, message: err.message });
-
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -555,20 +554,20 @@ export const updateBooking = async (req: Request, res: Response) => {
 
       tour: result.ticketTypes?.tour
         ? {
-            tourId: result.ticketTypes.tour.tourId,
-            name: result.ticketTypes.tour.name,
-            images: result.ticketTypes.tour.images,
-            duration: result.ticketTypes.tour.duration,
-            about: result.ticketTypes.tour.about,
-          }
+          tourId: result.ticketTypes.tour.tourId,
+          name: result.ticketTypes.tour.name,
+          images: result.ticketTypes.tour.images,
+          duration: result.ticketTypes.tour.duration,
+          about: result.ticketTypes.tour.about,
+        }
         : null,
 
       ticketType: result.ticketTypes
         ? {
-            ticketTypeId: result.ticketTypes.ticketTypeId,
-            name: result.ticketTypes.name,
-            notes: result.ticketTypes.notes,
-          }
+          ticketTypeId: result.ticketTypes.ticketTypeId,
+          name: result.ticketTypes.name,
+          notes: result.ticketTypes.notes,
+        }
         : null,
 
       bookingDetails: result.bookingDetails.map((detail) => ({
@@ -579,10 +578,10 @@ export const updateBooking = async (req: Request, res: Response) => {
         ticketTypeName: result.ticketTypes?.name || "",
         priceCategory: detail.ticketPrice.priceCategory
           ? {
-              categoryId: detail.ticketPrice.priceCategory.categoryId,
-              name: detail.ticketPrice.priceCategory.name,
-              description: detail.ticketPrice.priceCategory.description,
-            }
+            categoryId: detail.ticketPrice.priceCategory.categoryId,
+            name: detail.ticketPrice.priceCategory.name,
+            description: detail.ticketPrice.priceCategory.description,
+          }
           : null,
         price: detail.ticketPrice.price,
       })),
@@ -665,10 +664,10 @@ export const cancelBooking = async (req: AuthenticatedRequest, res: Response) =>
       }
     });
 
-    res.json({ success: true, data: updatedBooking });
+    return res.json({ success: true, data: updatedBooking });
   } catch (err: any) {
     console.error('Cancel booking error:', err);
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
@@ -711,7 +710,7 @@ export const getUserBookings = async (req: AuthenticatedRequest, res: Response) 
     const formattedBookings = bookings.map(booking => {
       const participants = booking.bookingDetails.reduce((sum, detail) => sum + detail.quantity, 0);
       const tour = booking.ticketTypes.tour;
-      
+
       return {
         bookingId: booking.bookingId,
         tourId: tour.tourId,
@@ -739,17 +738,17 @@ export const getUserBookings = async (req: AuthenticatedRequest, res: Response) 
       };
     });
 
-    res.json({ success: true, data: formattedBookings });
+    return res.json({ success: true, data: formattedBookings });
   } catch (err: any) {
     console.error('Get user bookings error:', err);
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
 export const getTours = async (req: Request, res: Response) => {
   try {
     const tours = await prisma.tour.findMany({
-      orderBy: { createdAt: "desc" }, 
+      orderBy: { createdAt: "desc" },
       select: {
         tourId: true,
         name: true,

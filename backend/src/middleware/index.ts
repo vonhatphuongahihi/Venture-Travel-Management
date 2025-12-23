@@ -4,15 +4,27 @@ import helmet from 'helmet';
 // CORS configuration
 export const corsOptions = {
     origin: function (origin: string | undefined, callback: Function) {
-        const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+        const allowedOrigins = process.env.CORS_ORIGIN?.split(',').map(o => o.trim()) || [
             'http://localhost:8080',
-            'http://localhost:8081', 
+            'http://localhost:8081',
             'http://localhost:8082',
             'http://localhost:5173' // Vite default port
         ];
 
+        // Cho phép requests không có origin (mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
 
+        // Cho phép các domains từ Vercel (bao gồm preview deployments)
+        if (origin.includes('.vercel.app')) {
+            return callback(null, true);
+        }
+
+        // Cho phép các domains từ Render
+        if (origin.includes('.onrender.com')) {
+            return callback(null, true);
+        }
+
+        // Kiểm tra trong danh sách allowed origins
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {

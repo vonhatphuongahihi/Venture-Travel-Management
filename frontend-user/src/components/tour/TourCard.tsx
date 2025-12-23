@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Star, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface TourCardProps {
   id: string;
@@ -34,6 +34,7 @@ const TourCard = ({
   availableSpots
 }: TourCardProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
 
 
@@ -89,20 +90,23 @@ const TourCard = ({
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center text-muted-foreground">
               <Users className="h-4 w-4 mr-2 text-primary" />
-              {maxParticipants} chỗ
+              {maxParticipants} {t('tourCard.seats')}
             </div>
 
             <div className="flex items-center text-muted-foreground">
               <Calendar className="h-4 w-4 mr-2 text-primary" />
-              Hàng ngày
+              {t('tourCard.daily')}
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-border flex gap-2">
-          <Button variant="default" size="sm" className="flex-1" onClick={() => { navigate(`/tour/${id}`) }}>
-            Xem chi tiết
+          <Button variant="default" size="sm" className="flex-1" onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/tour/${id}`);
+          }}>
+            {t('common.seeDetails')}
           </Button>
         </div>
       </div>

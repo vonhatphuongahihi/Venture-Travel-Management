@@ -8,6 +8,7 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import ItineraryMap from "../map/ItineraryMap";
+import { useTranslation } from "react-i18next";
 
 function StopDetail({
   stop,
@@ -22,6 +23,8 @@ function StopDetail({
   openDetail: boolean;
   setOpenDetail: (open: boolean) => void;
 }) {
+  const { t } = useTranslation();
+  
   return (
     <div className="w-full min-h-14 flex items-start space-x-5">
       <div
@@ -61,7 +64,7 @@ function StopDetail({
           </CollapsibleContent>
           <CollapsibleTrigger asChild>
             <button className="text-primary hover:underline text-sm font-medium">
-              {openDetail ? "Ẩn bớt" : "Xem chi tiết và hình ảnh"}
+              {openDetail ? t('tourDetail.hideLess') : t('tourDetail.viewDetailsAndImages')}
             </button>
           </CollapsibleTrigger>
         </Collapsible>
@@ -89,6 +92,7 @@ export default function Itinerary({
   endPoint?: string;
   endPointGeom?: [number, number];
 }) {
+  const { t } = useTranslation();
   const [activeStop, setActiveStop] = useState<number | null>(null);
   const [openStops, setOpenStops] = useState<Record<number, boolean>>({});
 
@@ -134,7 +138,7 @@ export default function Itinerary({
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <p className="font-semibold text-lg">Điểm khởi hành</p>
+                <p className="font-semibold text-lg">{t('tourDetail.startPoint')}</p>
               </div>
               <p className="text-gray-700 mb-2">{pickUpPoint}</p>
               <button
@@ -148,7 +152,7 @@ export default function Itinerary({
                   }
                 }}
               >
-                Xem chi tiết khởi hành
+                {t('tourDetail.viewPickupDetails')}
               </button>
             </div>
           </div>
@@ -174,7 +178,7 @@ export default function Itinerary({
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <p className="font-semibold text-lg">Điểm kết thúc</p>
+                <p className="font-semibold text-lg">{t('tourDetail.endPointLabel')}</p>
               </div>
               <p className="text-gray-700">{endPoint}</p>
             </div>

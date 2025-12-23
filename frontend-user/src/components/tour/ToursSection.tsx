@@ -104,23 +104,8 @@ const ToursSection = () => {
         if (appliedFilters.maxPrice !== undefined) {
           params.maxPrice = appliedFilters.maxPrice;
         }
-        if (appliedFilters.duration) {
-          params.duration = appliedFilters.duration;
-        }
-        if (appliedFilters.ageRange) {
-          params.ageRange = appliedFilters.ageRange;
-        }
-        if (appliedFilters.minGroupSize !== undefined) {
-          params.minGroupSize = appliedFilters.minGroupSize;
-        }
         if (appliedFilters.maxGroupSize !== undefined) {
           params.maxGroupSize = appliedFilters.maxGroupSize;
-        }
-        if (appliedFilters.languages && appliedFilters.languages.length > 0) {
-          params.languages = appliedFilters.languages;
-        }
-        if (appliedFilters.startDate) {
-          params.startDate = appliedFilters.startDate.toISOString().split('T')[0];
         }
 
         const result = await tourService.getAllTours(params);
@@ -128,6 +113,7 @@ const ToursSection = () => {
         // Apply client-side filtering for filters not supported by API
         let filteredTours = result.tours;
 
+        // Filter by price
         if (appliedFilters.minPrice !== undefined || appliedFilters.maxPrice !== undefined) {
           filteredTours = filteredTours.filter((tour) => {
             const price = tour.price || 0;
@@ -135,6 +121,17 @@ const ToursSection = () => {
               return false;
             }
             if (appliedFilters.maxPrice !== undefined && price > appliedFilters.maxPrice) {
+              return false;
+            }
+            return true;
+          });
+        }
+
+        // Filter by max group size
+        if (appliedFilters.maxGroupSize !== undefined) {
+          filteredTours = filteredTours.filter((tour) => {
+            const maxGroup = (tour as any).maxGroupSize || (tour as any).maxParticipants || 0;
+            if (maxGroup > appliedFilters.maxGroupSize!) {
               return false;
             }
             return true;
@@ -257,10 +254,7 @@ const ToursSection = () => {
                 <span className="ml-2 px-2 py-0.5 bg-primary text-white text-xs rounded-full">
                   {Object.keys(appliedFilters).filter(
                     (key) =>
-                      appliedFilters[key as keyof FilterOptions] !== undefined &&
-                      (Array.isArray(appliedFilters[key as keyof FilterOptions])
-                        ? (appliedFilters[key as keyof FilterOptions] as any[]).length > 0
-                        : true)
+                      appliedFilters[key as keyof FilterOptions] !== undefined
                   ).length}
                 </span>
               )}

@@ -29,29 +29,13 @@ const TourCard = ({
   location,
   rating,
   reviewCount,
-  category,
-  status,
+
   maxParticipants,
   availableSpots
 }: TourCardProps) => {
   const navigate = useNavigate();
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "upcoming": return "bg-green-100 text-green-800";
-      case "ongoing": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "upcoming": return "Sắp khởi hành";
-      case "ongoing": return "Đang diễn ra";
-      case "completed": return "Đã kết thúc";
-      default: return "Không xác định";
-    }
-  };
+
 
   return (
     <div
@@ -66,16 +50,7 @@ const TourCard = ({
           className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-3 left-3">
-          <Badge className={`tour-badge ${getStatusColor(status)}`}>
-            {getStatusText(status)}
-          </Badge>
-        </div>
-        <div className="absolute top-3 right-3">
-          <Badge className="tour-badge bg-primary text-white">
-            {category}
-          </Badge>
-        </div>
+
         <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
           <span className="text-lg font-bold text-primary">{price.toLocaleString()}đ</span>
         </div>
@@ -114,7 +89,7 @@ const TourCard = ({
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center text-muted-foreground">
               <Users className="h-4 w-4 mr-2 text-primary" />
-              {availableSpots}/{maxParticipants} chỗ
+              {maxParticipants} chỗ
             </div>
 
             <div className="flex items-center text-muted-foreground">

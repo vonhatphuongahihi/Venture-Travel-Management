@@ -430,7 +430,7 @@ export default function ItineraryMap({
                 mapInstanceRef.current.on('load', () => {
                     if (isMounted) {
                         setMapLoaded(true);
-                        renderMap();
+                        // Don't call renderMap here - let useEffect handle it after detailedRoute is loaded
                     }
                 });
 
@@ -468,12 +468,21 @@ export default function ItineraryMap({
         });
     }, [activeMarker]);
 
-    // Re-render map when data changes
+    // Initial render when map is loaded
     useEffect(() => {
         if (mapLoaded && mapInstanceRef.current && mapInstanceRef.current.loaded()) {
+            console.log('🔄 Initial render - mapLoaded:', mapLoaded);
             renderMap();
         }
-    }, [tourStop, tourRoute, pickUpGeom, endPointGeom, pickUpPoint, endPoint, mapLoaded, detailedRoute]);
+    }, [mapLoaded]);
+
+    // Re-render map when data changes (including detailedRoute)
+    useEffect(() => {
+        if (mapLoaded && mapInstanceRef.current && mapInstanceRef.current.loaded()) {
+            console.log('🔄 Data changed - detailedRoute:', detailedRoute?.length || 'null', 'isLoadingRoute:', isLoadingRoute);
+            renderMap();
+        }
+    }, [tourStop, tourRoute, pickUpGeom, endPointGeom, pickUpPoint, endPoint, detailedRoute, isLoadingRoute]);
 
     const recenterItinerary = () => {
         if (!mapInstanceRef.current || tourStop.length === 0) return;

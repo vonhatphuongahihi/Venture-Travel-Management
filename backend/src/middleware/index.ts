@@ -34,7 +34,8 @@ export const corsOptions = {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Type', 'Authorization', 'Content-Length', 'X-Requested-With']
 };
 
 // Security middleware
@@ -47,6 +48,8 @@ export const securityMiddleware = helmet({
             imgSrc: ["'self'", "data:", "https:"],
         },
     },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
 });
 
 // Error handling middleware

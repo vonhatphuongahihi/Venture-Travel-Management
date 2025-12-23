@@ -817,5 +817,15 @@
     "logout": {
       "success": "Logged out successfully"
     }
+  },
+  "weatherSection": {
+    "shortInfo": "Brief information about {{provinceName}}",
+    "forecast7Days": "7-day weather forecast",
+    "viewFeaturedTours": "View featured tours"
+  },
+  "featuredToursMap": {
+    "title": "Featured Tours",
+    "reviews": "Reviews",
+    "reviewCount": "{{count}} reviews"
   }
 }

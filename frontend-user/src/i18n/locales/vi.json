@@ -817,5 +817,15 @@
     "logout": {
       "success": "Đã đăng xuất thành công"
     }
+  },
+  "weatherSection": {
+    "shortInfo": "Thông tin ngắn về {{provinceName}}",
+    "forecast7Days": "Dự báo thời tiết 7 ngày tới",
+    "viewFeaturedTours": "Xem các tour nổi bật"
+  },
+  "featuredToursMap": {
+    "title": "Tour nổi bật",
+    "reviews": "Đánh giá",
+    "reviewCount": "{{count}} đánh giá"
   }
 }

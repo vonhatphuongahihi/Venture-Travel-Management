@@ -123,7 +123,7 @@ export default function ItineraryMap({
             el.className = 'pickup-marker';
             el.style.cursor = 'pointer';
             el.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div class="marker-pickup-point-circle" style="display: flex; align-items: center; gap: 8px;">
           <div style="
             width: 44px;
             height: 44px;
@@ -140,22 +140,41 @@ export default function ItineraryMap({
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
             </svg>
           </div>
-          <div class="pickup-label" style="
-            background: white;
-            padding: 6px 12px;
+          <div class="marker-pickup-point-tooltip" style="
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 10px;
             border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            font-weight: bold;
-            color: #10b981;
-            font-size: 14px;
+            font-size: 12px;
+            font-weight: 500;
             white-space: nowrap;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            z-index: 10;
+            margin-bottom: 4px;
           ">
-            ${pickUpPoint || 'Điểm đón'}
+            Điểm đón khách
+            <div style="
+              position: absolute;
+              top: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 0;
+              height: 0;
+              border-left: 5px solid transparent;
+              border-right: 5px solid transparent;
+              border-top: 5px solid rgba(0, 0, 0, 0.85);
+            "></div>
           </div>
         </div>
       `;
 
+            
             // Add click handler to zoom to pickup point
             el.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -167,6 +186,19 @@ export default function ItineraryMap({
                     });
                 }
             });
+
+            const tooltip = el.querySelector('.marker-pickup-point-tooltip') as HTMLElement;
+            const circle = el.querySelector('.marker-pickup-point-circle') as HTMLElement;
+
+            if (circle && tooltip) {
+                circle.addEventListener('mouseenter', () => {
+                    tooltip.style.opacity = '1';
+                });
+
+                circle.addEventListener('mouseleave', () => {
+                    tooltip.style.opacity = '0';
+                });
+            }
 
             const marker = new mapboxgl.Marker(el)
                 .setLngLat([pickUpGeom[0], pickUpGeom[1]])

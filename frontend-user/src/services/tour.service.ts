@@ -141,7 +141,7 @@ export const tourService = {
           notes: type.notes || 'Đã bao gồm đón khách',
           quantity: type.quantity || 20,
           isActive: type.isActive !== undefined ? type.isActive : true,
-          createdAt: new Date(tour.createdAt || Date.now()),
+          prices: type.prices
         })) || [];
 
         // Map ticket prices

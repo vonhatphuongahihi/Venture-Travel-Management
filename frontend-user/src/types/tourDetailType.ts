@@ -86,6 +86,7 @@ export interface TicketType { // Thường, Cao cấp, ...
   quantity: number;
   isActive: boolean;
   createdAt: Date; // ISO timestamp
+  prices: any;
 }
 
 export interface PriceCategories { // Người lớn, trẻ em, ...

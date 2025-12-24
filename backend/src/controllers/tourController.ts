@@ -295,6 +295,8 @@ export class TourController {
                     : null,
             };
 
+            console.log(formattedTour)
+
             res.status(200).json(
                 ResponseUtils.success('Lấy thông tin tour thành công', formattedTour)
             );

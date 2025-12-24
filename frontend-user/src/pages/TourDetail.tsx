@@ -88,7 +88,7 @@ const TourDetailPage = () => {
     star,
     count: reviews.filter((r) => r.rate === star).length,
   }));
-
+  const [minPrice, setMinPrice] = useState<number>()
   const fetch = async (refreshReviews = false) => {
     if (!id) {
       setError(t('tourDetail.invalidTourId'));
@@ -106,6 +106,7 @@ const TourDetailPage = () => {
 
       const tourData = await tourService.getTourById(id);
 
+      console.log(tourData)
       if (!tourData) {
         setError(t('tourDetail.tourNotFound'));
         setLoading(false);
@@ -222,7 +223,8 @@ const TourDetailPage = () => {
       if (tourData.ticketPrices) {
         setTicketPrices(tourData.ticketPrices);
       }
-    } catch (error) {
+    } 
+      catch (error) {
       console.error('Error fetching tour detail:', error);
       setError(t('tourDetail.loadError'));
     } finally {
@@ -230,7 +232,11 @@ const TourDetailPage = () => {
     }
   };
 
-
+  useEffect(() => {
+    setMinPrice(ticketPrices.length > 0
+        ? Math.min(...ticketPrices.map(tp => tp.price))
+        : 0);
+  }, [ticketPrices])
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -550,7 +556,7 @@ const TourDetailPage = () => {
     <div className="flex flex-col w-full items-center min-h-screen space-y-6 md:space-y-10">
       <Header />
       {/* Container chính: Thay đổi px-[120px] thành responsive */}
-      <div className="mt-24 px-4 md:px-8 lg:px-[120px] w-full flex flex-col space-y-2 md:space-y-4">
+      <div className="mt-24 px-4 md:px-8 lg:px-[80px] w-full flex flex-col space-y-2 md:space-y-4">
         {/*Title*/}
         <div className="flex text-black text-2xl md:text-3xl font-semibold font-['Inter'] flex-wrap">
           {tour.title}
@@ -705,7 +711,7 @@ const TourDetailPage = () => {
               {/* Price + button */}
               <div className="flex items-center gap-4">
                 <span className="font-semibold hidden lg:inline">
-                  {t("tourDetail.startingFrom")} 3,000,000 ₫
+                  {t("tourDetail.startingFrom")} {minPrice.toLocaleString("vi-VN")} ₫
                 </span>
                 <Button
                   className="bg-primary font-semibold border-2 border-black text-white px-4 py-2 rounded-full hover:bg-primary/50"
@@ -932,6 +938,7 @@ const TourDetailPage = () => {
               tourStop={tourStop}
               tourRoute={tourRoute}
               setPUOpen={setPUOpen}
+              pickUpGeom={tour.pickUpPointGeom}
             />
           </section>
         </div>

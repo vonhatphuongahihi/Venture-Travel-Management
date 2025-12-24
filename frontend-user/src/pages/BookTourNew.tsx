@@ -52,7 +52,7 @@ export default function BookTourNew() {
     setIsBooking(true);
 
     try {
-      const priceCategories = userTicket.priceCategories.map((pc: PriceCategoryWithQuantity) => ({
+      const priceCategories = userTicket.priceCategories.filter((pc: PriceCategoryWithQuantity) => pc.quantity > 0).map((pc: PriceCategoryWithQuantity) => ({
         categoryId: pc.categoryId,
         quantity: pc.quantity
       }));
@@ -198,20 +198,22 @@ export default function BookTourNew() {
                     tp.categoryId === pc.categoryId
                 );
                 return (
-                  <div key={idx} className="flex justify-between items-center">
-                    <p className="text-xs">
-                      {pc.quantity} {pc.name} x{" "}
-                      {matchedPrice
-                        ? matchedPrice.price.toLocaleString("vi-VN")
-                        : 0}
-                      ₫
-                    </p>
-                    <p className="text-sm">
-                      {(
-                        pc.quantity * (matchedPrice?.price || 0)
-                      ).toLocaleString("vi-VN")}
-                      ₫
-                    </p>
+                  <div>
+                    {pc.quantity > 0 && <div key={idx} className="flex justify-between items-center">
+                      <p className="text-xs">
+                        {pc.quantity} {pc.categoryName} x{" "}
+                        {matchedPrice
+                          ? matchedPrice.price.toLocaleString("vi-VN")
+                          : 0}
+                        ₫
+                      </p>
+                      <p className="text-sm">
+                        {(
+                          pc.quantity * (matchedPrice?.price || 0)
+                        ).toLocaleString("vi-VN")}
+                        ₫
+                      </p>
+                    </div>}
                   </div>
                 );
               })}

@@ -1,7 +1,6 @@
 import Layout from "@/components/Layout";
 import FormInput from "@/components/tour-create/FormInput";
 import FormMutilpeSelect from "@/components/tour-create/FormMultipleSelect";
-import FormSelect from "@/components/tour-create/FormSelect";
 import FormTextArea from "@/components/tour-create/FormTextArea";
 import ImageUploader from "@/components/tour-create/ImageUploader";
 import { SearchableSelect } from "@/components/tour-create/SearchableSelect";
@@ -25,7 +24,7 @@ import {
     useUploadTourImages,
 } from "@/services/tours/tourHook";
 import { Spinner } from "@/components/ui/spinner";
-import type { Attraction, CreateTourRequest } from "@/types/tour";
+import type { CreateTourRequest } from "@/types/tour";
 import { AttractionSelect } from "@/components/tour-create/AttractionSelect";
 import { useToast } from "@/contexts/ToastContext";
 
@@ -173,7 +172,7 @@ const TourCreate = () => {
     const {
         data: metadata,
         isLoading: loadingMetadata,
-        error: metadataError,
+        error: _metadataError,
     } = useGetTourFormMetadata();
 
     // Create tour hook
@@ -307,11 +306,11 @@ const TourCreate = () => {
             try {
                 const response = await fetch(
                     `https://api.mapbox.com/search/geocode/v6/forward?` +
-                        new URLSearchParams({
-                            q: query,
-                            access_token: MAPBOX_TOKEN,
-                            country: "vn",
-                        })
+                    new URLSearchParams({
+                        q: query,
+                        access_token: MAPBOX_TOKEN,
+                        country: "vn",
+                    })
                 );
 
                 if (!response.ok) {
@@ -452,9 +451,9 @@ const TourCreate = () => {
                                     name="languages"
                                     placeholder="Chọn dịch vụ ngôn ngữ"
                                     options={languagesOptionList}
-                                    // validationRules={{
-                                    //     required: "Cần chọn ít nhất một dịch vụ ngôn ngữ",
-                                    // }}
+                                // validationRules={{
+                                //     required: "Cần chọn ít nhất một dịch vụ ngôn ngữ",
+                                // }}
                                 ></FormMutilpeSelect>
                                 <FormMutilpeSelect
                                     control={control}
@@ -462,9 +461,9 @@ const TourCreate = () => {
                                     name="categories"
                                     placeholder="Chọn danh mục tour"
                                     options={tourCategoryOptionList}
-                                    // validationRules={{
-                                    //     required: "Cần chọn ít nhất một danh mục tour",
-                                    // }}
+                                // validationRules={{
+                                //     required: "Cần chọn ít nhất một danh mục tour",
+                                // }}
                                 ></FormMutilpeSelect>
                                 <FormTextArea
                                     label="Các điểm nổi bật"
@@ -482,9 +481,9 @@ const TourCreate = () => {
                                         errors={errors}
                                         register={register}
                                         row={5}
-                                        // validationRules={{
-                                        //     required: "Cần nhập các dịch vụ tour bao gồm",
-                                        // }}
+                                    // validationRules={{
+                                    //     required: "Cần nhập các dịch vụ tour bao gồm",
+                                    // }}
                                     ></FormTextArea>
                                     <FormTextArea
                                         label="Tour không bao gồm"
@@ -493,9 +492,9 @@ const TourCreate = () => {
                                         errors={errors}
                                         register={register}
                                         row={5}
-                                        // validationRules={{
-                                        //     required: "Cần nhập các dịch vụ tour không bao gồm",
-                                        // }}
+                                    // validationRules={{
+                                    //     required: "Cần nhập các dịch vụ tour không bao gồm",
+                                    // }}
                                     ></FormTextArea>
                                 </div>
                                 <TextEditor

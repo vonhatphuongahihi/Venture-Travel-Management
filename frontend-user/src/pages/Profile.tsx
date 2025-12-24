@@ -24,8 +24,8 @@ const Profile = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
 
-  // STATE MỚI: Quản lý đóng/mở sidebar trên mobile
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // STATE MỚI: Quản lý đóng/mở sidebar trên mobile - mặc định mở để hiển thị trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Form data
   const [formData, setFormData] = useState({

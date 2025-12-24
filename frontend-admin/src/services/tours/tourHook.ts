@@ -2,9 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TourAPI } from "./tourAPI";
 import type {
     CreateTourRequest,
-    TourFormMetadata,
-    Attraction,
-    PriceCategoryData,
     TourFilters,
 } from "@/types/tour";
 import type { AxiosError } from "axios";
@@ -16,10 +13,6 @@ interface UploadResponse {
     }>;
 }
 
-interface UploadError {
-    message: string;
-    details?: string;
-}
 
 export const tourKeys = {
     all: ["tours"] as const,

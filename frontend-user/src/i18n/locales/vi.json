@@ -194,7 +194,28 @@
     "alreadyReviewed": "Bạn đã đánh giá tour này rồi.",
     "alreadyReviewedShort": "Đã đánh giá",
     "filter": "Bộ lọc",
-    "postedOn": "Đăng vào"
+    "postedOn": "Đăng vào",
+    "highlights": "Điểm nổi bật",
+    "expectations": "Dự kiến",
+    "additionalInfo": "Thông tin bổ sung",
+    "cancellationPolicy": "Chính sách hủy",
+    "inclusions": "Chuyến đi bao gồm",
+    "exclusions": "Chuyến đi không bao gồm",
+    "pickUp": "Điểm đón",
+    "pickUpPoint": "Khởi hành",
+    "pickUpLocation": "Vị trí",
+    "pickUpDetails": "Chi tiết đón",
+    "freePickupArea": "Khu vực đón miễn phí",
+    "endPoint": "Kết thúc",
+    "viewPickupDetails": "Xem chi tiết khởi hành",
+    "hideLess": "Ẩn bớt",
+    "viewDetailsAndImages": "Xem chi tiết và hình ảnh",
+    "startPoint": "Điểm khởi hành",
+    "endPointLabel": "Điểm kết thúc"
+  },
+  "tourCard": {
+    "seats": "chỗ",
+    "daily": "Hàng ngày"
   },
   "bookingHistory": {
     "title": "Lịch Sử Đặt Tour",
@@ -796,5 +817,15 @@
     "logout": {
       "success": "Đã đăng xuất thành công"
     }
+  },
+  "weatherSection": {
+    "shortInfo": "Thông tin ngắn về {{provinceName}}",
+    "forecast7Days": "Dự báo thời tiết 7 ngày tới",
+    "viewFeaturedTours": "Xem các tour nổi bật"
+  },
+  "featuredToursMap": {
+    "title": "Tour nổi bật",
+    "reviews": "Đánh giá",
+    "reviewCount": "{{count}} đánh giá"
   }
 }

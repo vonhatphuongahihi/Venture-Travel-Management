@@ -1,7 +1,9 @@
 import { Compass, Navigation } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ProvinceAPI from "@/services/province/provinceAPI";
-import AttractionAPI, { Attraction } from "@/services/attraction/attractionAPI";
+import AttractionAPI from "@/services/attraction/attractionAPI";
+import { Attraction } from "@/global.types";
+
 import { Button } from "@/components/ui/button";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -28,6 +30,7 @@ const ProvinceMapSection = () => {
   const [attractions, setAttractions] = useState<Attraction[]>([]);
   const [loading, setLoading] = useState(true);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
@@ -91,51 +94,45 @@ const ProvinceMapSection = () => {
 
       const popupContent = `
         <div class="p-3" style="max-width: 320px;">
-          ${
-            attraction.image
-              ? `
-            <img src="${attraction.image}" alt="${attraction.name}" 
+          ${attraction.images && attraction.images.length > 0
+          ? `
+            <img src="${attraction.images[0]}" alt="${attraction.name}" 
                  style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />
           `
-              : ""
-          }
-          <strong class="text-primary text-base font-bold">${
-            attraction.name
-          }</strong>
+          : ""
+        }
+          <strong class="text-primary text-base font-bold">${attraction.name
+        }</strong>
           <p class="text-sm text-gray-600 mt-1 mb-2">${attraction.address}</p>
-          ${
-            attraction.category
-              ? `
+          ${attraction.category
+          ? `
             <span class="inline-block px-2 py-1 text-xs bg-primary/10 text-primary rounded-full mb-2">
               ${attraction.category}
             </span>
           `
-              : ""
-          }
-          ${
-            attraction.description
-              ? `
+          : ""
+        }
+          ${attraction.description
+          ? `
             <p class="text-xs text-gray-500 mt-2 line-clamp-2">${attraction.description}</p>
           `
-              : ""
-          }
-          ${
-            attraction.rating
-              ? `
+          : ""
+        }
+          ${attraction.rating
+          ? `
             <div class="flex items-center gap-1 mt-2">
               <span class="text-yellow-500 text-xs">★</span>
               <span class="text-xs text-gray-600">${attraction.rating.toFixed(
-                1
-              )}</span>
-              ${
-                attraction.reviewCount
-                  ? `<span class="text-xs text-gray-500">(${attraction.reviewCount})</span>`
-                  : ""
-              }
+            1
+          )}</span>
+              ${attraction.reviewCount
+            ? `<span class="text-xs text-gray-500">(${attraction.reviewCount})</span>`
+            : ""
+          }
             </div>
           `
-              : ""
-          }
+          : ""
+        }
         </div>
       `;
 
@@ -298,14 +295,14 @@ const ProvinceMapSection = () => {
   }, []);
 
   // Calculate center point for a province based on its attractions
-  const getProvinceCenter = (provinceName: string): [number, number] | null => {
+  const getProvinceCenter = (provinceId: string): [number, number] | null => {
     const provinceAttractions = attractions.filter(
-      (a) => a.provinceName === provinceName && a.coordinates
+      (a) => a.provinceId === provinceId && a.coordinates
     );
 
     if (provinceAttractions.length === 0) {
-      // Try to find province by ID
-      const province = provinces.find((p) => p.name === provinceName);
+      // Try to find province by ID and use its point
+      const province = provinces.find((p) => p.id === provinceId);
       if (
         province?.point &&
         province.point.long !== 0 &&
@@ -335,15 +332,25 @@ const ProvinceMapSection = () => {
   const handleProvinceClick = (provinceName: string) => {
     if (!mapInstanceRef.current || !mapLoaded) return;
 
-    const center = getProvinceCenter(provinceName);
+    // Find province by name to get its ID
+    const province = provinces.find((p) => p.name === provinceName);
+    if (!province) {
+      console.warn(`Province not found: ${provinceName}`);
+      return;
+    }
+
+    // Set selected province for highlighting
+    setSelectedProvinceId(province.id);
+
+    const center = getProvinceCenter(province.id);
     if (!center) {
       console.warn(`No coordinates found for province: ${provinceName}`);
       return;
     }
 
-    // Get all attractions for this province
+    // Get all attractions for this province by provinceId
     const provinceAttractions = attractions.filter(
-      (a) => a.provinceName === provinceName && a.coordinates
+      (a) => a.provinceId === province.id && a.coordinates
     );
 
     if (provinceAttractions.length > 0) {
@@ -404,9 +411,8 @@ const ProvinceMapSection = () => {
       <div className="container">
         {/* Header */}
         <div
-          className={`text-center mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
+          className={`text-center mb-12 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
         >
           <div className="inline-flex items-center gap-2 bg-yellow-200 text-yellow-600 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Compass className="h-4 w-4" />
@@ -432,11 +438,10 @@ const ProvinceMapSection = () => {
           </div>
         ) : (
           <div
-            className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${
-              isVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-12"
-            }`}
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-start transition-all duration-1000 delay-300 ${isVisible
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-12"
+              }`}
           >
             {/* Left Side - Map */}
             <div>
@@ -464,6 +469,9 @@ const ProvinceMapSection = () => {
                             mapInstanceRef.current &&
                             attractions.length > 0
                           ) {
+                            // Reset selected province
+                            setSelectedProvinceId(null);
+
                             const bounds = new mapboxgl.LngLatBounds();
                             attractions.forEach((attraction) => {
                               if (attraction.coordinates) {
@@ -527,22 +535,24 @@ const ProvinceMapSection = () => {
                       <div className="grid grid-cols-2 gap-2">
                         {region.provinces.map((province, index) => {
                           const hasAttractions = attractions.some(
-                            (a) => a.provinceName === province.name
+                            (a) => a.provinceId === province.id
                           );
+                          const isSelected = selectedProvinceId === province.id;
                           return (
                             <div
                               key={province.id || index}
                               onClick={() => handleProvinceClick(province.name)}
-                              className={`text-muted-foreground hover:text-primary cursor-pointer transition-colors duration-200 ${
-                                hasAttractions
-                                  ? ""
-                                  : "opacity-60 cursor-not-allowed"
-                              }`}
+                              className={`transition-all duration-200 ${hasAttractions
+                                ? isSelected
+                                  ? "text-primary font-bold px-2 py-1 rounded-md cursor-pointer"
+                                  : "text-muted-foreground hover:text-primary px-2 py-1 rounded-md cursor-pointer"
+                                : "opacity-60 cursor-not-allowed text-muted-foreground"
+                                }`}
                               title={
                                 hasAttractions
                                   ? t("provinceMap.viewOnMap", {
-                                      province: province.name,
-                                    })
+                                    province: province.name,
+                                  })
                                   : t("provinceMap.noDestinations")
                               }
                             >

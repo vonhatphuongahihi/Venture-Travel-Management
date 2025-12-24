@@ -23,6 +23,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [isForgotLoading, setIsForgotLoading] = useState(false);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
@@ -71,7 +72,10 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
+    setIsGoogleLoading(true);
     loginWithGoogle();
+    // Note: loginWithGoogle redirects, so we won't reset this state
+    // but it's fine as the page will navigate away
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -240,7 +244,7 @@ const Login = () => {
             {/* Google login */}
             <button
               onClick={handleGoogleLogin}
-              disabled={isLoading}
+              disabled={isGoogleLoading}
               className="w-full rounded-full border border-border py-2 bg-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               <img
@@ -248,7 +252,7 @@ const Login = () => {
                 alt="google"
                 className="h-4"
               />
-              {isLoading ? t('auth.login.loggingIn') : t('auth.login.continueWithGoogle')}
+              {isGoogleLoading ? t('auth.login.loggingIn') : t('auth.login.continueWithGoogle')}
             </button>
 
             {/* Link đăng ký */}

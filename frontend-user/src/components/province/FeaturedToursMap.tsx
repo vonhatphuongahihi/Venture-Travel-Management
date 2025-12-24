@@ -9,6 +9,7 @@ import { Tour } from "@/global.types";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/utils/formatters";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 // Ensure Mapbox token is set
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -42,6 +43,7 @@ export default function FeaturedToursMap({
   center,
   onClose,
 }: FeaturedToursMapProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<mapboxgl.Map | null>(null);
@@ -132,6 +134,7 @@ export default function FeaturedToursMap({
         const marker = new mapboxgl.Marker(el).setLngLat([lng, lat]).addTo(map);
 
         // Hover tooltip - Rich Card
+        const reviewText = t("featuredToursMap.reviewCount", { count: tour.review_count });
         const popup = new mapboxgl.Popup({
           offset: 25,
           closeButton: false,
@@ -156,7 +159,7 @@ export default function FeaturedToursMap({
                   <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                   ${tour.rating}
                 </span>
-                <span>(${tour.review_count} Đánh giá)</span>
+                <span>(${reviewText})</span>
               </div>
               
               <div class="mt-1 flex items-center gap-1">
@@ -188,7 +191,7 @@ export default function FeaturedToursMap({
         popupsRef.current[tour.id] = popup;
       }
     });
-  }, [tours]);
+  }, [tours, t]);
 
   // Highlight marker and Show Popup on hover
   useEffect(() => {
@@ -311,7 +314,7 @@ export default function FeaturedToursMap({
       {/* Sidebar - Floating Card */}
       <div className="absolute left-0 top-0 bottom-0 md:left-4 md:top-4 md:bottom-4 w-full md:w-[400px] lg:w-[450px] z-10 bg-white md:rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-100">
         <div className="p-4 border-b flex items-center justify-between bg-white sticky top-0 z-20">
-          <h2 className="text-xl font-bold text-gray-800">Tour nổi bật</h2>
+          <h2 className="text-xl font-bold text-gray-800">{t("featuredToursMap.title")}</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -366,7 +369,7 @@ export default function FeaturedToursMap({
                     </div>
                     <span className="text-gray-400">•</span>
                     <span className="text-gray-500">
-                      {tour.review_count || 0} đánh giá
+                      {t("featuredToursMap.reviewCount", { count: tour.review_count || 0 })}
                     </span>
                   </div>
 

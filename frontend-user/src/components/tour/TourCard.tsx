@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Star, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface TourCardProps {
   id: string;
@@ -29,29 +29,14 @@ const TourCard = ({
   location,
   rating,
   reviewCount,
-  category,
-  status,
+
   maxParticipants,
   availableSpots
 }: TourCardProps) => {
   const navigate = useNavigate();
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "upcoming": return "bg-green-100 text-green-800";
-      case "ongoing": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
+  const { t } = useTranslation();
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "upcoming": return "Sắp khởi hành";
-      case "ongoing": return "Đang diễn ra";
-      case "completed": return "Đã kết thúc";
-      default: return "Không xác định";
-    }
-  };
+
 
   return (
     <div
@@ -66,16 +51,7 @@ const TourCard = ({
           className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute top-3 left-3">
-          <Badge className={`tour-badge ${getStatusColor(status)}`}>
-            {getStatusText(status)}
-          </Badge>
-        </div>
-        <div className="absolute top-3 right-3">
-          <Badge className="tour-badge bg-primary text-white">
-            {category}
-          </Badge>
-        </div>
+
         <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
           <span className="text-lg font-bold text-primary">{price.toLocaleString()}đ</span>
         </div>
@@ -114,20 +90,23 @@ const TourCard = ({
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center text-muted-foreground">
               <Users className="h-4 w-4 mr-2 text-primary" />
-              {availableSpots}/{maxParticipants} chỗ
+              {maxParticipants} {t('tourCard.seats')}
             </div>
 
             <div className="flex items-center text-muted-foreground">
               <Calendar className="h-4 w-4 mr-2 text-primary" />
-              Hàng ngày
+              {t('tourCard.daily')}
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="pt-3 border-t border-border flex gap-2">
-          <Button variant="default" size="sm" className="flex-1" onClick={() => { navigate(`/tour/${id}`) }}>
-            Xem chi tiết
+          <Button variant="default" size="sm" className="flex-1" onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/tour/${id}`);
+          }}>
+            {t('common.seeDetails')}
           </Button>
         </div>
       </div>

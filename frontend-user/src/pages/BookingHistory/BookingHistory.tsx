@@ -28,8 +28,8 @@ const BookingHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // State quản lý đóng mở sidebar trên mobile
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // State quản lý đóng mở sidebar trên mobile - mặc định mở để hiển thị trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const getStatusText = (status: string) => {
     switch (status) {

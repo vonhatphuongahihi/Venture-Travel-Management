@@ -22,8 +22,8 @@ const Settings = () => {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
 
-  // Sidebar state
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Sidebar state - mặc định mở để hiển thị trên mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");

@@ -16,16 +16,18 @@ import PickUp from "../detail/PickUp";
 import AdditionalInfo from "../detail/AdditionalInfo";
 import CancellationPolicy from "../detail/CancellationPolicy";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function TourDetailDialog({ tour }) {
   const [puOpen, setPUOpen] = useState(false);
+  const { t } = useTranslation();
   return (
     <Dialog>
       <DialogTrigger asChild>
         <div className="flex gap-4 items-center">
           <p className="w-3/4 truncate">{tour.description}</p>
           <button className="w-1/4 text-left hover:text-primary underline">
-            Xem chi tiết
+            {t('common.seeDetails')}
           </button>
         </div>
       </DialogTrigger>
@@ -42,7 +44,7 @@ function TourDetailDialog({ tour }) {
             className="w-full h-[400px] object-cover"
           />
           <div className="space-y-2 mt-2">
-            <h2 className="mx-2 text-xl font-bold text-gray-900">Về chuyến đi</h2>
+            <h2 className="mx-2 text-xl font-bold text-gray-900">{t('tourDetail.aboutTrip')}</h2>
             <p className="mx-4 text-justify text-gray-700 font-normal leading-relaxed text-base mb-6">
               {tour.description}
             </p>
@@ -54,8 +56,8 @@ function TourDetailDialog({ tour }) {
                 <Smile className="w-5 h-5 text-primary shrink-0" />
               </div>
               <span className="text-gray-700">
-                <strong className="text-gray-900">Độ tuổi: </strong>
-                {`${tour.age} tuổi`}
+                <strong className="text-gray-900">{t('tourDetail.age')}: </strong>
+                {`${tour.age} ${t('tourDetail.yearsOld')}`}
               </span>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/60 transition-colors">
@@ -63,8 +65,8 @@ function TourDetailDialog({ tour }) {
                 <Users className="w-5 h-5 text-primary shrink-0" />
               </div>
               <span className="text-gray-700">
-                <strong className="text-gray-900">Giới hạn nhóm:</strong> Tối đa{" "}
-                {tour.maxGroup} người/nhóm
+                <strong className="text-gray-900">{t('tourDetail.groupLimit')}:</strong>{" "}
+                {t('tourDetail.maxPeople', { count: tour.maxGroup })}
               </span>
             </div>
             <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/60 transition-colors">
@@ -72,7 +74,7 @@ function TourDetailDialog({ tour }) {
                 <Clock className="w-5 h-5 text-primary shrink-0" />
               </div>
               <span className="text-gray-700">
-                <strong className="text-gray-900">Thời lượng:</strong>{" "}
+                <strong className="text-gray-900">{t('tourDetail.duration')}:</strong>{" "}
                 {tour.duration}
               </span>
             </div>
@@ -81,7 +83,7 @@ function TourDetailDialog({ tour }) {
                 <Languages className="w-5 h-5 text-primary shrink-0" />
               </div>
               <span className="text-gray-700">
-                <strong className="text-gray-900">Hướng dẫn viên:</strong>{" "}
+                <strong className="text-gray-900">{t('tourDetail.tourGuide')}:</strong>{" "}
                 {tour.languages}
               </span>
             </div>
@@ -93,9 +95,11 @@ function TourDetailDialog({ tour }) {
             <Expectations expectations={tour.expectations} />
             <PickUp
               id={"pickUp"}
-              pickUpPoint={tour.pickUpPoint}
-              pickUpDetails={tour.pickUpDetails}
-              endPoint={tour.endPoint}
+              pickUpPoint={tour.pickUpPoint || ''}
+              pickUpDetails={tour.pickUpDetails || ''}
+              pickUpPointGeom={tour.pickUpPointGeom || [0, 0]}
+              pickUpAreaGeom={tour.pickUpAreaGeom || []}
+              endPoint={tour.endPoint || ''}
               open={puOpen}
               setOpen={setPUOpen}
             />

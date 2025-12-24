@@ -194,7 +194,28 @@
     "alreadyReviewed": "You have already reviewed this tour.",
     "alreadyReviewedShort": "Already reviewed",
     "filter": "Filter",
-    "postedOn": "Posted on"
+    "postedOn": "Posted on",
+    "highlights": "Highlights",
+    "expectations": "Expectations",
+    "additionalInfo": "Additional Information",
+    "cancellationPolicy": "Cancellation Policy",
+    "inclusions": "What's Included",
+    "exclusions": "What's Not Included",
+    "pickUp": "Pick-up Point",
+    "pickUpPoint": "Departure",
+    "pickUpLocation": "Location",
+    "pickUpDetails": "Pick-up Details",
+    "freePickupArea": "Free Pick-up Area",
+    "endPoint": "End Point",
+    "viewPickupDetails": "View Pick-up Details",
+    "hideLess": "Show Less",
+    "viewDetailsAndImages": "View Details and Images",
+    "startPoint": "Start Point",
+    "endPointLabel": "End Point"
+  },
+  "tourCard": {
+    "seats": "seats",
+    "daily": "Daily"
   },
   "bookingHistory": {
     "title": "Booking History",
@@ -796,5 +817,15 @@
     "logout": {
       "success": "Logged out successfully"
     }
+  },
+  "weatherSection": {
+    "shortInfo": "Brief information about {{provinceName}}",
+    "forecast7Days": "7-day weather forecast",
+    "viewFeaturedTours": "View featured tours"
+  },
+  "featuredToursMap": {
+    "title": "Featured Tours",
+    "reviews": "Reviews",
+    "reviewCount": "{{count}} reviews"
   }
 }

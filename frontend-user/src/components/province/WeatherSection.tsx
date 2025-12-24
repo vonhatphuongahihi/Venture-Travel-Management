@@ -7,12 +7,14 @@ import WeatherForecast from "./WeatherForecast";
 import FeaturedToursMap from "./FeaturedToursMap";
 import MiniProvinceMap from "./MiniProvinceMap";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface WeatherCardProps {
   province: Province;
 }
 
 const WeatherSection = ({ province }: WeatherCardProps) => {
+  const { t } = useTranslation();
   // Use province coordinates or fallback to Ho Chi Minh City
   const coordinates = useMemo(() => {
     if (province.point && province.point.lat && province.point.long) {
@@ -33,13 +35,13 @@ const WeatherSection = ({ province }: WeatherCardProps) => {
     <section>
       <div className="">
         <h2 className="text-2xl font-semibold mb-6">
-          Thông tin ngắn về {province.name}
+          {t("weatherSection.shortInfo", { provinceName: province.name })}
         </h2>
 
         <Card className="overflow-hidden rounded-2xl p-6">
           <div className="mb-6">
             <h2 className="text-lg font-semibold">
-              Dự báo thời tiết 7 ngày tới
+              {t("weatherSection.forecast7Days")}
             </h2>
           </div>
 
@@ -66,7 +68,7 @@ const WeatherSection = ({ province }: WeatherCardProps) => {
                 onClick={openMap}
               >
                 <Map className="w-4 h-4 mr-2 group-hover:animate-bounce" />
-                Xem các tour nổi bật
+                {t("weatherSection.viewFeaturedTours")}
               </Button>
             </div>
           </div>

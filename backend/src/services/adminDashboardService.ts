@@ -149,7 +149,6 @@ export class AdminDashboardService {
             }
           }
         },
-        take: 5
       });
 
       const formattedTours: TopTour[] = topTours.map(tour => {
@@ -162,7 +161,9 @@ export class AdminDashboardService {
           name: tour.name,
           bookingCount: totalBookings
         };
-      }).sort((a, b) => b.bookingCount - a.bookingCount).slice(0, 5);
+      })
+      .filter(place => place.bookingCount > 0)
+      .sort((a, b) => b.bookingCount - a.bookingCount).slice(0, 5);
 
       return ResponseUtils.success('Lấy top tour thành công', formattedTours);
     } catch (error) {

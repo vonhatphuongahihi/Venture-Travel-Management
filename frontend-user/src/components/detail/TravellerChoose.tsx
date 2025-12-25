@@ -8,27 +8,27 @@ export default function TravellerChoose({
   onConfirm,
 }) {
   const [priceCategories, setPriceCategories] = useState([]);
+  console.log("userTicket", userTicket)
   useEffect(() => {
-    if (userTicket?.priceCategories && userTicket?.priceCategories.length > 0) {
-      setPriceCategories(userTicket?.priceCategories);
-      return;
+    if (userTicket?.currentType.prices && userTicket?.currentType.prices.length > 0) {
+      setPriceCategories(userTicket.currentType.prices.map((pc) => {
+        return {
+          ...pc,
+          quantity: 1,
+        }
+      }));
     }
 
-    const categoryIds = [...new Set(ticketPrices.map(tp => tp.categoryId))];
+    console.log("userTicket", userTicket.currentType.prices)
+    const categoryIds = [...new Set(userTicket.currentType.prices.map(tp => tp.categoryId))];
 
-    const categories: PriceCategories[] = categoryIds.map((categoryId, index) => ({
+    const categories = categoryIds.map((categoryId, index) => ({
       categoryId,
       name: index === 0 ? "Người lớn" : index === 1 ? "Trẻ em" : `Loại ${index + 1}`,
       description: index === 0 ? "Trên 140cm" : index === 1 ? "Dưới 140cm" : "",
       createdAt: new Date(),
     }));
 
-    setPriceCategories(categories?.map((pc) => {
-      return {
-        ...pc,
-        quantity: 1,
-      }
-    }));
   }, [ticketPrices, userTicket?.priceCategories]);
   const addOne = (t) => {
     setPriceCategories((prev) =>
@@ -49,6 +49,8 @@ export default function TravellerChoose({
     );
   };
 
+  console.log("priceCategories", priceCategories)
+
   return (
     <div
       className="w-[400px] bg-white rounded-lg outline outline-1 outline-primary p-5"
@@ -57,8 +59,11 @@ export default function TravellerChoose({
         return (
           <div className="w-full flex justify-between p-2" key={i}>
             <div className="text-left space-y-1 flex-col">
-              <p className="capitalize text font-semibold">{t.name}</p>
-              <p className="text-sm text-gray-500">{t.description}</p>
+              <div className="flex gap-1 items-baseline">
+                <p className="capitalize text font-semibold">{t.categoryName}</p>
+                <p className="text-sm text-gray-500">{t.notes}</p>
+              </div>
+              <div>{t.price.toLocaleString("vi-VN")}đ</div>
             </div>
             <div className="space-x-2 flex items-center">
               <button

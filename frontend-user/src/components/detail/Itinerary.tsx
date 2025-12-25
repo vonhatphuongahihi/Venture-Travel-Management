@@ -38,7 +38,7 @@ function StopDetail({
       </div>
       <div className="flex-1 cursor-pointer">
         <div
-          className="flex items-center justify-between mb-2"
+          className="flex flex-col  justify-between mb-2"
           onClick={() => zoomStop(stop.attractionGeom)}
         >
           <p className="font-semibold text-lg">{stop.attractionName}</p>
@@ -187,7 +187,7 @@ export default function Itinerary({
       </div>
 
       {/* Map - Right Side */}
-      <div className="w-full lg:w-[600px]">
+      <div className="w-full lg:w-[640px] xl:w-[720px]">
         <ItineraryMap
           tourId={tourId}
           tourStop={tourStop}

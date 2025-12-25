@@ -9,6 +9,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import ReviewDialog from "./ReviewDialog";
+import CancelBookingDialog from "./CancelBookingDialog";
 import { bookingService } from "@/services/booking.service";
 import { BookingHistoryItem } from "@/types/tour.types";
 import { Loader2 } from "lucide-react";
@@ -27,6 +28,9 @@ const BookingHistory = () => {
   const [bookings, setBookings] = useState<BookingHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState<any>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   // State quản lý đóng mở sidebar trên mobile - mặc định mở để hiển thị trên mobile
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -85,27 +89,25 @@ const BookingHistory = () => {
     navigate("/login");
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!window.confirm(t("bookingHistory.confirmCancel"))) {
-      return;
-    }
+  const handleOpenCancelDialog = (booking: any) => {
+    setBookingToCancel(booking);
+    setOpenCancelDialog(true);
+  };
 
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return;
+
+    setIsCancelling(true);
     try {
-      await bookingService.cancelBooking(bookingId);
+      await bookingService.cancelBooking(bookingToCancel.bookingId);
       showToast(t("bookingHistory.cancelSuccess"), "success");
+      setOpenCancelDialog(false);
+      setBookingToCancel(null);
 
       const data = await bookingService.getUserBookings();
-      const mappedBookings: any[] = data.map((booking) => ({
-        id: booking.bookingId,
-        tourCode: booking.bookingId.substring(0, 4).toUpperCase(),
-        tourName: booking.tourName,
-        bookingDate: booking.bookingDate,
-        startDate: booking.startDate,
-        status: booking.status,
-        totalPrice: booking.totalPrice,
-        participants: booking.participants,
+      const mappedBookings = data.map((booking) => ({
+        ...booking,
         tourImage: booking.tourImage || halongImg,
-        tourId: booking.tourId,
       }));
       setBookings(mappedBookings);
     } catch (err: unknown) {
@@ -114,6 +116,8 @@ const BookingHistory = () => {
         (err as any)?.response?.data?.message ||
         t("bookingHistory.cancelFailed");
       showToast(errorMessage, "error");
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -228,11 +232,10 @@ const BookingHistory = () => {
                   <button
                     key={option.value}
                     onClick={() => setSelectedFilter(option.value)}
-                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                      selectedFilter === option.value
-                        ? "border-primary text-primary"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                    }`}
+                    className={`pb-3 px-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${selectedFilter === option.value
+                      ? "border-primary text-primary"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      }`}
                   >
                     {option.label} ({option.count})
                   </button>
@@ -256,7 +259,7 @@ const BookingHistory = () => {
                       {/* Tour Code & Status */}
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-2">
                         <p className="text-xs md:text-sm font-medium text-gray-500 truncate">
-                          #{booking.bookingId.substring(0, 4).toUpperCase()} -{" "}
+                          {booking.bookingId ? `#${booking.bookingId.substring(0, 4).toUpperCase()} - ` : ""}
                           {formatBookingDateTime(booking.bookingDate)}
                         </p>
                         <span
@@ -336,18 +339,12 @@ const BookingHistory = () => {
                             >
                               {t("bookingHistory.reviewTour")}
                             </button>
-                          ) : booking.status === "cancelled" ? (
-                            <button className="px-4 py-1.5 text-xs md:text-sm text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors">
-                              {t("bookingHistory.rebook")}
-                            </button>
                           ) : null}
 
                           {booking.status === "processing" && (
                             <button
                               className="px-4 py-1.5 text-xs md:text-sm text-red-500 border border-red-500 bg-white rounded-lg hover:bg-red-50 transition-colors"
-                              onClick={() =>
-                                handleCancelBooking(booking.bookingId)
-                              }
+                              onClick={() => handleOpenCancelDialog(booking)}
                             >
                               {t("bookingHistory.cancelTour")}
                             </button>
@@ -378,6 +375,14 @@ const BookingHistory = () => {
         tourName={selectedBooking?.tourName}
         tourImage={selectedBooking?.tourImage}
         tourDescription={selectedBooking?.description}
+      />
+
+      <CancelBookingDialog
+        open={openCancelDialog}
+        onOpenChange={setOpenCancelDialog}
+        onConfirm={handleCancelBooking}
+        tourName={bookingToCancel?.tourName}
+        isLoading={isCancelling}
       />
     </div>
   );

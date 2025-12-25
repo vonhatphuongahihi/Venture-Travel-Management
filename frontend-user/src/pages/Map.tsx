@@ -139,6 +139,19 @@ const Map = () => {
               }
             }
 
+            // Nếu không có coords từ route, lấy từ attraction đầu tiên trong province
+            if (coords.length === 0 && locationName) {
+              const province = provinces.find((p) => p.name === locationName);
+              if (province) {
+                const provinceAttraction = attractionsData.find(
+                  (a) => a.provinceId === province.id && a.coordinates
+                );
+                if (provinceAttraction && provinceAttraction.coordinates) {
+                  coords = [[provinceAttraction.coordinates.lat, provinceAttraction.coordinates.lon]];
+                }
+              }
+            }
+
             return {
               tourId: tour.id,
               name: tour.title,
@@ -154,12 +167,24 @@ const Map = () => {
             const region = province
               ? getRegionFromProvince(province.name)
               : "south";
+
+            // Lấy coords từ attraction đầu tiên trong province
+            let coords: [number, number][] = [];
+            if (province) {
+              const provinceAttraction = attractionsData.find(
+                (a) => a.provinceId === province.id && a.coordinates
+              );
+              if (provinceAttraction && provinceAttraction.coordinates) {
+                coords = [[provinceAttraction.coordinates.lat, provinceAttraction.coordinates.lon]];
+              }
+            }
+
             return {
               tourId: tour.id,
               name: tour.title,
               description: tour.description || "",
               region,
-              coords: [],
+              coords,
               image: tour.image || "",
               location: province?.name || "",
             };

@@ -211,63 +211,7 @@ function InteractiveMap({
     }
 
     if (layerType === "tour") {
-      const routeFeatures = tours
-        .filter(t => t.coords && t.coords.length > 1)
-        .map(t => ({
-          type: 'Feature' as const,
-          properties: {
-            tourId: t.tourId,
-            tourName: t.name,
-          },
-          geometry: {
-            type: 'LineString' as const,
-            coordinates: t.coords.map(coord => [coord[1], coord[0]]), // [lng, lat]
-          },
-        }));
-
-      if (routeFeatures.length > 0) {
-        mapInstanceRef.current.addSource('tour-routes', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: routeFeatures,
-          },
-        });
-
-        // Add glow effect
-        mapInstanceRef.current.addLayer({
-          id: 'tour-routes-glow',
-          type: 'line',
-          source: 'tour-routes',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#26B8ED',
-            'line-width': 6,
-            'line-opacity': 0.3,
-          },
-        });
-
-        // Add main route line
-        mapInstanceRef.current.addLayer({
-          id: 'tour-routes',
-          type: 'line',
-          source: 'tour-routes',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#26B8ED',
-            'line-width': 3,
-            'line-opacity': 0.8,
-          },
-        });
-      }
-
-      // Vẽ markers sau (nằm trên routes)
+      // Vẽ markers (không vẽ route nữa)
       tours.forEach((tour) => {
         // Hiển thị marker tại điểm đầu tiên của tour
         if (tour.coords && tour.coords.length > 0) {

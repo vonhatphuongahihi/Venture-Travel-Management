@@ -227,15 +227,6 @@ const ToursSection = () => {
                   }`}
               >
                 {filter.label}
-                <Badge
-                  variant="secondary"
-                  className={`text-xs ${activeFilter === filter.id
-                    ? "bg-white/30 text-white"
-                    : "bg-primary/20 text-primary font-semibold"
-                    }`}
-                >
-                  {getTourCount(filter.id)}
-                </Badge>
               </button>
             ))}
           </div>

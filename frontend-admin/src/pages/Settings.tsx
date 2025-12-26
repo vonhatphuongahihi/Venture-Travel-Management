@@ -355,7 +355,6 @@ export default function Settings() {
   return (
     <Layout title="Cài đặt">
       <div className="min-h-screen bg-gray-50 p-4">
-        <h1 className="text-[18px] font-bold text-gray-800 mb-6">Cài đặt</h1>
 
         {/* Loading state */}
         {isProfileLoading ? (
